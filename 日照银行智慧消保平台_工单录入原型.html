@@ -10,15 +10,16 @@
       theme: {
         extend: {
           colors: {
-            rizhaoRed: '#E6361B',
-            rizhaoOrange: '#FF8A18',
-            ink: '#18202A',
+            rizhao: '#EE7800',
+            ink: '#202020',
             graphite: '#35404D',
-            mist: '#F6F7F9',
-            violetSmart: '#E6361B'
+            mist: '#F6F6F6'
           },
           boxShadow: {
-            soft: '0 18px 45px rgba(24,32,42,0.10)'
+            low: '3px 5px 8px 0px rgba(0, 0, 0, 0.02)',
+            mid: '0px 4px 12px 0px rgba(0, 0, 0, 0.08)',
+            high: '0px 17px 24px 0px rgba(0, 0, 0, 0.06)',
+            soft: '0px 4px 12px 0px rgba(0, 0, 0, 0.08)'
           }
         }
       }
@@ -445,14 +446,11 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       background: transparent;
     }
     /* 品牌色兜底：即使 Tailwind 自定义配置未及时生效，也保证页面颜色正常 */
-    .bg-ink { background-color: #18202A; }
-    .text-ink { color: #18202A; }
-    .bg-rizhaoRed { background-color: #E6361B; }
-    .text-rizhaoRed { color: #E6361B; }
-    .border-rizhaoRed { border-color: #E6361B; }
-    .bg-rizhaoOrange { background-color: #FF8A18; }
-    .text-rizhaoOrange { color: #FF8A18; }
-    .bg-violetSmart { background-color: #E6361B; }
+    .bg-ink { background-color: #202020; }
+    .text-ink { color: #202020; }
+    .bg-rizhao { background-color: #EE7800; }
+    .text-rizhao { color: #EE7800; }
+    .border-rizhao { border-color: #EE7800; }
   </style>
 </head>
 <body>
@@ -516,16 +514,16 @@ function App() {
       }), /*#__PURE__*/_jsxs("main", {
         className: "flex-1 min-w-0",
         children: [/*#__PURE__*/_jsx(Topbar, {}), /*#__PURE__*/_jsx("div", {
-          className: "px-8 py-6",
+          className: "px-6 py-6",
           children: /*#__PURE__*/_jsxs("section", {
-            className: "rounded-[18px] border border-white/70 bg-white/82 shadow-soft backdrop-blur",
+            className: "rounded-[18px] border border-white/70 bg-white/82 shadow-mid backdrop-blur",
             children: [/*#__PURE__*/_jsx("div", {
-              className: "border-b border-slate-200 px-7 py-6",
+              className: "border-b border-slate-200 px-6 py-6",
               children: /*#__PURE__*/_jsx("div", {
                 className: "flex flex-wrap items-center justify-between gap-4",
                 children: /*#__PURE__*/_jsxs("div", {
                   children: [/*#__PURE__*/_jsxs("p", {
-                    className: "text-sm font-semibold text-rizhaoRed",
+                    className: "text-sm font-semibold text-rizhao",
                     children: ["投诉处理 / ", mainTab]
                   }), /*#__PURE__*/_jsx("h1", {
                     className: "mt-1 text-2xl font-bold tracking-tight",
@@ -534,7 +532,7 @@ function App() {
                 })
               })
             }), /*#__PURE__*/_jsx("div", {
-              className: "p-7",
+              className: "p-6",
               children: mainTab === '录入工单' ? /*#__PURE__*/_jsx(EntryWorkspace, {
                 entryTab: entryTab,
                 setEntryTab: setEntryTab,
@@ -593,7 +591,7 @@ function Sidebar({
               className: "text-[25px] font-black leading-none tracking-wide",
               children: "日照银行"
             }), /*#__PURE__*/_jsx("div", {
-              className: "mt-3 text-[18px] font-black leading-none text-rizhaoOrange",
+              className: "mt-3 text-[18px] font-black leading-none text-rizhao",
               children: "智慧消保平台"
             })]
           })]
@@ -606,7 +604,7 @@ function Sidebar({
             children: /*#__PURE__*/_jsxs("div", {
               className: "flex items-center gap-3",
               children: [/*#__PURE__*/_jsx("span", {
-                className: `flex h-8 w-8 items-center justify-center rounded-lg text-sm font-black ${item.active ? 'bg-rizhaoRed text-white' : 'bg-white/10 text-white/80'}`,
+                className: `flex h-8 w-8 items-center justify-center rounded-lg text-sm font-black ${item.active ? 'bg-rizhao text-white' : 'bg-white/10 text-white/80'}`,
                 children: index + 1
               }), /*#__PURE__*/_jsxs("div", {
                 children: [/*#__PURE__*/_jsx("div", {
@@ -622,7 +620,7 @@ function Sidebar({
             className: "ml-5 mt-2 space-y-1 border-l border-white/14 pl-4",
             children: subMenus.map(name => /*#__PURE__*/_jsx("button", {
               onClick: () => openSubMenu(name),
-              className: `block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold transition ${mainTab === name ? 'bg-rizhaoRed text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              className: `block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
               children: name
             }, name))
           })]
@@ -693,10 +691,10 @@ function EntryWorkspace(props) {
         }), /*#__PURE__*/_jsxs("div", {
           className: "flex flex-wrap gap-2",
           children: [/*#__PURE__*/_jsx("button", {
-            className: "rounded-lg border border-orange-200 bg-white px-4 py-2 text-sm font-bold text-rizhaoRed",
+            className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-rizhao",
             children: "保存草稿"
           }), /*#__PURE__*/_jsx("button", {
-            className: "rounded-lg bg-rizhaoRed px-4 py-2 text-sm font-black text-white",
+            className: "rounded-lg bg-rizhao px-4 py-2 text-sm font-black text-white",
             children: "提交"
           })]
         })]
@@ -829,7 +827,7 @@ function ProcessingWorkspace({
       children: groups.map(item => /*#__PURE__*/_jsxs("button", {
         type: "button",
         onClick: () => switchScope(item.name),
-        className: `rounded-2xl border bg-white p-5 text-left transition ${scope === item.name ? 'border-rizhaoRed shadow-lg shadow-orange-100' : 'border-slate-200 hover:border-orange-200'}`,
+        className: `rounded-2xl border bg-white p-5 text-left transition ${scope === item.name ? 'border-rizhao shadow-low' : 'border-slate-200 hover:border-line-divider'}`,
         children: [/*#__PURE__*/_jsx("div", {
           className: "text-sm font-black text-slate-500",
           children: item.name
@@ -844,7 +842,7 @@ function ProcessingWorkspace({
               children: "笔"
             })]
           }), /*#__PURE__*/_jsx("span", {
-            className: `rounded-full px-3 py-1 text-xs font-bold ${scope === item.name ? 'bg-orange-50 text-rizhaoRed' : 'bg-slate-100 text-slate-600'}`,
+            className: `rounded-full px-3 py-1 text-xs font-bold ${scope === item.name ? 'bg-mist text-rizhao' : 'bg-slate-100 text-slate-600'}`,
             children: item.note
           })]
         })]
@@ -880,9 +878,9 @@ function ProcessingWorkspace({
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: visibleRows.map(row => /*#__PURE__*/_jsxs("tr", {
-              className: "hover:bg-orange-50/50",
+              className: "hover:bg-mist/50",
               children: [/*#__PURE__*/_jsx("td", {
-                className: "px-5 py-4 font-bold text-rizhaoRed",
+                className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
@@ -902,7 +900,7 @@ function ProcessingWorkspace({
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
                 children: /*#__PURE__*/_jsx("span", {
-                  className: "rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-rizhaoRed",
+                  className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
                   children: row.status
                 })
               }), /*#__PURE__*/_jsx("td", {
@@ -912,7 +910,7 @@ function ProcessingWorkspace({
                 className: "px-5 py-4",
                 children: /*#__PURE__*/_jsx("button", {
                   onClick: () => setDetailRow(row),
-                  className: "font-bold text-rizhaoRed",
+                  className: "font-bold text-rizhao",
                   children: "处理"
                 })
               })]
@@ -1027,7 +1025,7 @@ function ProcessingDetail({
             children: `${row.title} / ${row.channel}`
           })]
         }), /*#__PURE__*/_jsx("span", {
-          className: "rounded-full bg-orange-50 px-4 py-2 text-sm font-bold text-rizhaoRed",
+          className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
           children: row.status
         })]
       })]
@@ -1093,7 +1091,7 @@ function ProcessingDetail({
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-4 flex items-center gap-3",
         children: [/*#__PURE__*/_jsx("button", {
-          className: "rounded-lg bg-rizhaoRed px-5 py-2.5 text-sm font-black text-white",
+          className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
           children: "上传处理附件"
         }), /*#__PURE__*/_jsx("span", {
           className: "text-sm text-slate-500",
@@ -1105,7 +1103,7 @@ function ProcessingDetail({
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
           children: "保存处理意见"
         }), /*#__PURE__*/_jsx("button", {
-          className: "rounded-xl bg-rizhaoRed px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "提交审核"
         })]
       })]
@@ -1270,11 +1268,11 @@ function EntryMethodList({
         className: "flex gap-3",
         children: [/*#__PURE__*/_jsx("button", {
           onClick: () => setEntryTab('单笔录入'),
-          className: "rounded-xl bg-rizhaoRed px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "rounded-xl bg-rizhao px-5 py-3 text-sm font-black text-white shadow-mid",
           children: "单笔录入"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setEntryTab('批量导入'),
-          className: "rounded-xl border border-rizhaoRed bg-white px-5 py-3 text-sm font-black text-rizhaoRed",
+          className: "rounded-xl border border-rizhao bg-white px-5 py-3 text-sm font-black text-rizhao",
           children: "批量导入"
         })]
       })]
@@ -1327,9 +1325,9 @@ function EntryMethodList({
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: rows.map(row => /*#__PURE__*/_jsxs("tr", {
-              className: "hover:bg-orange-50/50",
+              className: "hover:bg-mist/50",
               children: [/*#__PURE__*/_jsx("td", {
-                className: "px-5 py-4 font-bold text-rizhaoRed",
+                className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
@@ -1351,7 +1349,7 @@ function EntryMethodList({
                 children: /*#__PURE__*/_jsx("button", {
                   type: "button",
                   onClick: () => openDetail(row, true),
-                  className: "rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-rizhaoRed transition hover:bg-orange-100",
+                  className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao transition hover:bg-line-light",
                   children: row.status
                 })
               }), /*#__PURE__*/_jsx("td", {
@@ -1361,7 +1359,7 @@ function EntryMethodList({
                 className: "px-5 py-4",
                 children: /*#__PURE__*/_jsx("button", {
                   onClick: () => openDetail(row, false),
-                  className: "font-bold text-rizhaoRed",
+                  className: "font-bold text-rizhao",
                   children: "查看"
                 })
               })]
@@ -1538,11 +1536,11 @@ function FlowRecordSection({
 }) {
   return /*#__PURE__*/_jsxs("section", {
     id: "flow-record-section",
-    className: `rounded-2xl border bg-white p-6 transition ${highlight ? 'border-orange-300 ring-4 ring-orange-100' : 'border-slate-200'}`,
+    className: `rounded-2xl border bg-white p-6 transition ${highlight ? 'border-line-border ring-4 ring-line-divider' : 'border-slate-200'}`,
     children: [/*#__PURE__*/_jsxs("div", {
       className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
       children: [/*#__PURE__*/_jsx("span", {
-        className: "h-7 w-1.5 rounded-full bg-rizhaoRed"
+        className: "h-7 w-1.5 rounded-full bg-rizhao"
       }), /*#__PURE__*/_jsx("h3", {
         className: "text-base font-black text-ink",
         children: "流转记录"
@@ -1552,7 +1550,7 @@ function FlowRecordSection({
       children: /*#__PURE__*/_jsxs("table", {
         className: "w-full min-w-[860px] text-left text-sm",
         children: [/*#__PURE__*/_jsx("thead", {
-          className: "bg-orange-50 text-slate-700",
+          className: "bg-mist text-slate-700",
           children: /*#__PURE__*/_jsx("tr", {
             children: ['时间', '节点', '操作人', '操作', '意见'].map(head => /*#__PURE__*/_jsx("th", {
               className: "px-4 py-3 font-black whitespace-nowrap",
@@ -1562,7 +1560,7 @@ function FlowRecordSection({
         }), /*#__PURE__*/_jsx("tbody", {
           className: "divide-y divide-slate-100",
           children: records.map((record, index) => /*#__PURE__*/_jsxs("tr", {
-            className: "hover:bg-orange-50/40",
+            className: "hover:bg-mist/40",
             children: [/*#__PURE__*/_jsx("td", {
               className: "px-4 py-3 whitespace-nowrap text-slate-500",
               children: record.time
@@ -1598,7 +1596,7 @@ function ReadOnlySection({
     children: [/*#__PURE__*/_jsxs("div", {
       className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
       children: [/*#__PURE__*/_jsx("span", {
-        className: "h-7 w-1.5 rounded-full bg-rizhaoRed"
+        className: "h-7 w-1.5 rounded-full bg-rizhao"
       }), /*#__PURE__*/_jsx("h3", {
         className: "text-base font-black text-ink",
         children: title
@@ -1746,7 +1744,7 @@ function StandardComplaintForm({
             children: "统一录入国家局、省监管局、12378、12345、客服中心等来源投诉"
           })]
         }), /*#__PURE__*/_jsx("span", {
-          className: "rounded-full bg-orange-50 px-4 py-2 text-sm font-bold text-rizhaoRed",
+          className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
           children: "标准工单"
         })]
       })
@@ -1801,7 +1799,7 @@ function StandardComplaintForm({
             }), /*#__PURE__*/_jsx("button", {
               type: "button",
               onClick: () => setShowHistory(!showHistory),
-              className: "rounded-xl border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-black text-rizhaoRed hover:bg-rizhaoRed hover:text-white",
+              className: "rounded-xl border border-line-divider bg-mist px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
               children: showHistory ? "收起历史投诉" : "查询历史投诉"
             })]
           }), /*#__PURE__*/_jsxs("div", {
@@ -1857,11 +1855,11 @@ function StandardComplaintForm({
               placeholder: "可手工填写或由标签带出"
             })]
           }), showHistory && /*#__PURE__*/_jsxs("div", {
-            className: "overflow-hidden rounded-2xl border border-orange-200 bg-white",
+            className: "overflow-hidden rounded-2xl border border-line-divider bg-white",
             children: [/*#__PURE__*/_jsxs("div", {
-              className: "flex items-center justify-between bg-orange-50 px-4 py-3",
+              className: "flex items-center justify-between bg-mist px-4 py-3",
               children: [/*#__PURE__*/_jsx("div", {
-                className: "font-black text-rizhaoRed",
+                className: "font-black text-rizhao",
                 children: "历史投诉列表"
               }), /*#__PURE__*/_jsx("div", {
                 className: "text-sm font-bold text-slate-500",
@@ -1882,8 +1880,8 @@ function StandardComplaintForm({
                 }), /*#__PURE__*/_jsx("tbody", {
                   className: "divide-y divide-slate-100",
                   children: historyRows.map(row => /*#__PURE__*/_jsxs("tr", {
-                    className: "hover:bg-orange-50/50",
-                    children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.no }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-rizhaoRed whitespace-nowrap", children: row.channel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.phone }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[240px]", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.business }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.point }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.type }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.result }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.onsite }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.loanType }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[160px]", children: row.remark })]
+                    className: "hover:bg-mist/50",
+                    children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.no }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-rizhao whitespace-nowrap", children: row.channel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.phone }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[240px]", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.business }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.point }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.type }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.result }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.onsite }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.loanType }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[160px]", children: row.remark })]
                   }, row.no))
                 })]
               })
@@ -1918,7 +1916,7 @@ function StandardComplaintForm({
               className: "flex flex-wrap items-center gap-3",
               children: [/*#__PURE__*/_jsx("button", {
                 onClick: handleTag,
-                className: "rounded-xl bg-rizhaoRed px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:translate-y-[-1px]",
+                className: "rounded-xl bg-rizhao px-5 py-3 text-sm font-black text-white shadow-mid transition hover:translate-y-[-1px]",
                 children: "一键获取标签"
               }), /*#__PURE__*/_jsx("span", {
                 className: "text-sm text-slate-500",
@@ -1926,7 +1924,7 @@ function StandardComplaintForm({
               })]
             })
           }), /*#__PURE__*/_jsxs("div", {
-            className: `xl:col-span-3 grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-orange-200 bg-orange-50/70' : 'border-slate-200 bg-slate-50'}`,
+            className: `xl:col-span-3 grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-line-divider bg-mist/70' : 'border-slate-200 bg-slate-50'}`,
             children: [/*#__PURE__*/_jsx(EditableTag, {
               label: "投诉产品标签",
               value: productTag,
@@ -1945,7 +1943,7 @@ function StandardComplaintForm({
         children: [/*#__PURE__*/_jsxs("div", {
           className: "mb-4 flex items-center gap-3",
           children: [/*#__PURE__*/_jsx("button", {
-            className: "rounded-lg bg-rizhaoRed px-5 py-2.5 text-sm font-black text-white",
+            className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
             children: "上传"
           }), /*#__PURE__*/_jsx("span", {
             className: "text-sm text-slate-500",
@@ -1956,7 +1954,7 @@ function StandardComplaintForm({
           children: /*#__PURE__*/_jsxs("table", {
             className: "w-full text-left text-sm",
             children: [/*#__PURE__*/_jsx("thead", {
-              className: "bg-orange-50 text-slate-700",
+              className: "bg-mist text-slate-700",
               children: /*#__PURE__*/_jsx("tr", {
                 children: ['附件名称', '大小', '上传日期', '上传人员', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                   className: "px-4 py-3 font-black",
@@ -1994,11 +1992,11 @@ function StandardComplaintForm({
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
           children: "重置"
         }), /*#__PURE__*/_jsx("button", {
-          className: "rounded-xl border border-orange-200 bg-white px-5 py-3 text-sm font-bold text-rizhaoRed",
+          className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
           children: "保存草稿"
       }), /*#__PURE__*/_jsx("button", {
           onClick: footerMode === 'dispatch' ? onDispatch : undefined,
-          className: "rounded-xl bg-rizhaoRed px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: footerMode === 'dispatch' ? "派发" : "提交"
         })]
       })]
@@ -2019,7 +2017,7 @@ function CustomerConfirmModal({
     children: /*#__PURE__*/_jsxs("div", {
       className: "w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl",
       children: [/*#__PURE__*/_jsxs("div", {
-        className: "flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-orange-50 to-white px-6 py-5",
+        className: "flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
         children: [/*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("div", {
             className: "text-xl font-black text-ink",
@@ -2031,7 +2029,7 @@ function CustomerConfirmModal({
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
-          className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-orange-200 hover:text-rizhaoRed",
+          className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-line-divider hover:text-rizhao",
           children: "关闭"
         })]
       }), /*#__PURE__*/_jsx("div", {
@@ -2039,7 +2037,7 @@ function CustomerConfirmModal({
         children: /*#__PURE__*/_jsxs("table", {
           className: "w-full min-w-[920px] text-left text-sm",
           children: [/*#__PURE__*/_jsx("thead", {
-            className: "bg-orange-50 text-slate-700",
+            className: "bg-mist text-slate-700",
             children: /*#__PURE__*/_jsx("tr", {
               children: ['客户姓名', '性别', '身份证号', '联系电话', '数据来源', '匹配说明', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-4 py-3 font-black whitespace-nowrap",
@@ -2049,7 +2047,7 @@ function CustomerConfirmModal({
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: candidates.map(customer => /*#__PURE__*/_jsxs("tr", {
-              className: "hover:bg-orange-50/50",
+              className: "hover:bg-mist/50",
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-4 py-4 font-black text-ink whitespace-nowrap",
                 children: customer.name
@@ -2073,7 +2071,7 @@ function CustomerConfirmModal({
                 children: /*#__PURE__*/_jsx("button", {
                   type: "button",
                   onClick: () => onConfirm(customer),
-                  className: "rounded-xl bg-rizhaoRed px-4 py-2 text-sm font-black text-white shadow-lg shadow-orange-100",
+                  className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
                   children: "确认回填"
                 })
               })]
@@ -2096,7 +2094,7 @@ function StandardSection({
     children: [/*#__PURE__*/_jsxs("div", {
       className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
       children: [/*#__PURE__*/_jsx("span", {
-        className: "h-7 w-1.5 rounded-full bg-rizhaoRed"
+        className: "h-7 w-1.5 rounded-full bg-rizhao"
       }), /*#__PURE__*/_jsx("h3", {
         className: "text-base font-black text-ink",
         children: title
@@ -2123,7 +2121,7 @@ function SearchField({
         value: value || '',
         onChange: event => setValue && setValue(event.target.value)
       }), /*#__PURE__*/_jsx("button", {
-        className: "shrink-0 text-xl font-black text-rizhaoRed",
+        className: "shrink-0 text-xl font-black text-rizhao",
         type: "button",
         onClick: event => {
           event.preventDefault();
@@ -2156,7 +2154,7 @@ function SearchableSelectField({
           value: option
         }, option))
       }), /*#__PURE__*/_jsx("span", {
-        className: "shrink-0 text-sm font-black text-rizhaoRed",
+        className: "shrink-0 text-sm font-black text-rizhao",
         children: "⌄"
       })]
     })]
@@ -2266,14 +2264,14 @@ function RegulatoryForm({
           className: "flex flex-wrap items-center gap-3",
           children: [/*#__PURE__*/_jsx("button", {
             onClick: handleTag,
-            className: "rounded-xl bg-rizhaoRed px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-200 transition hover:translate-y-[-1px]",
+            className: "rounded-xl bg-rizhao px-5 py-3 text-sm font-black text-white shadow-mid transition hover:translate-y-[-1px]",
             children: "一键获取标签"
           }), /*#__PURE__*/_jsx("span", {
             className: "text-sm text-slate-500",
             children: "智能结果仅作为建议，业务人员可直接修改后保存。"
           })]
         }), /*#__PURE__*/_jsxs("div", {
-          className: `grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-orange-200 bg-orange-50/70' : 'border-slate-200 bg-slate-50'}`,
+          className: `grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-line-divider bg-mist/70' : 'border-slate-200 bg-slate-50'}`,
           children: [/*#__PURE__*/_jsx(EditableTag, {
             label: "投诉产品标签",
             value: productTag,
@@ -2309,7 +2307,7 @@ function RegulatoryForm({
         className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
         children: "重置"
       }), /*#__PURE__*/_jsx("button", {
-        className: "rounded-xl bg-rizhaoRed px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+        className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
         children: "提交工单"
       })]
     })]
@@ -2355,7 +2353,7 @@ function GovernmentHotlineForm() {
         })]
       })]
     }), /*#__PURE__*/_jsx("div", {
-      className: "rounded-2xl border border-orange-100 bg-orange-50 p-5 text-sm leading-7 text-slate-700",
+      className: "rounded-2xl border border-line-light bg-mist p-5 text-sm leading-7 text-slate-700",
       children: "当前原型先完整展开“监管转办类自建单”。政务热线类保留独立入口和核心字段，后续可继续补充热线平台特有字段。"
     })]
   });
@@ -2455,13 +2453,13 @@ function BatchImport({
             children: "先上传标准模板，系统解析通过后，再导入为待填写工单。"
           })]
         }), /*#__PURE__*/_jsx("span", {
-          className: "rounded-full bg-orange-50 px-4 py-2 text-sm font-bold text-rizhaoRed",
+          className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
           children: isParsed ? "解析完成" : isUploaded ? "解析中" : "待上传"
         })]
       }), /*#__PURE__*/_jsxs("div", {
-        className: `mt-6 rounded-3xl border border-dashed px-8 py-12 text-center ${isUploaded ? 'border-orange-200 bg-orange-50/60' : 'border-slate-300 bg-slate-50'}`,
+        className: `mt-6 rounded-3xl border border-dashed px-8 py-12 text-center ${isUploaded ? 'border-line-divider bg-mist/60' : 'border-slate-300 bg-slate-50'}`,
         children: [/*#__PURE__*/_jsx("div", {
-          className: "mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl font-black text-rizhaoRed shadow-sm",
+          className: "mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl font-black text-rizhao shadow-sm",
           children: "↑"
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-5 text-lg font-black text-ink",
@@ -2471,7 +2469,7 @@ function BatchImport({
           children: isUploaded ? "文件已上传，系统正在解析字段和数据内容。" : "点击上传标准 Excel 模板，上传后自动解析并进入导入界面。"
         }), !isUploaded && /*#__PURE__*/_jsx("button", {
           onClick: startUploadAndParse,
-          className: "mt-6 rounded-xl bg-rizhaoRed px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "mt-6 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "上传模板"
         }), isUploaded && /*#__PURE__*/_jsxs("div", {
           className: "mx-auto mt-6 max-w-xl",
@@ -2485,7 +2483,7 @@ function BatchImport({
           }), /*#__PURE__*/_jsx("div", {
             className: "h-3 overflow-hidden rounded-full bg-white",
             children: /*#__PURE__*/_jsx("div", {
-              className: "h-full rounded-full bg-rizhaoRed transition-all duration-700",
+              className: "h-full rounded-full bg-rizhao transition-all duration-700",
               style: {
                 width: isParsed ? '100%' : '72%'
               }
@@ -2516,9 +2514,9 @@ function BatchImport({
           children: importedRows.map(row => /*#__PURE__*/_jsxs("button", {
             type: "button",
             onClick: () => setSelectedNo(row.no),
-            className: `w-full rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-orange-200 bg-orange-50 shadow-sm' : 'border-slate-200 bg-white hover:border-orange-100 hover:bg-orange-50/40'}`,
+            className: `w-full rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light hover:bg-mist/40'}`,
             children: [/*#__PURE__*/_jsx("div", {
-              className: "text-sm font-black text-rizhaoRed",
+              className: "text-sm font-black text-rizhao",
               children: row.no
             }), /*#__PURE__*/_jsx("div", {
               className: "mt-2 line-clamp-1 text-sm font-bold text-ink",
@@ -2670,7 +2668,7 @@ function LedgerExportWorkspace() {
           className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white",
           children: "查询"
         }), /*#__PURE__*/_jsx("button", {
-          className: "rounded-xl bg-rizhaoRed px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-mid",
           children: "导出台账"
         })]
       })]
@@ -2705,9 +2703,9 @@ function LedgerExportWorkspace() {
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: visibleRows.map(row => /*#__PURE__*/_jsxs("tr", {
-              className: "hover:bg-orange-50/50",
+              className: "hover:bg-mist/50",
               children: [/*#__PURE__*/_jsx("td", {
-                className: "px-5 py-4 font-bold text-rizhaoRed",
+                className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 text-slate-600",
@@ -2727,7 +2725,7 @@ function LedgerExportWorkspace() {
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 whitespace-nowrap",
                 children: /*#__PURE__*/_jsx("span", {
-                  className: "inline-flex whitespace-nowrap rounded-full bg-orange-50 px-3 py-1 text-xs font-bold text-rizhaoRed",
+                  className: "inline-flex whitespace-nowrap rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
                   children: row.status
                 })
               }), /*#__PURE__*/_jsx("td", {
@@ -2749,7 +2747,7 @@ function LedgerExportWorkspace() {
                       type: action,
                       row
                     }),
-                    className: "font-bold text-rizhaoRed hover:text-rizhaoOrange",
+                    className: "font-bold text-rizhao hover:text-rizhao",
                     children: action
                   }, action))
                 })
@@ -2870,12 +2868,12 @@ function ReturnVisitPage({
             }), /*#__PURE__*/_jsx("button", {
               type: "button",
               onClick: () => alert(`正在拨打 ${row.phone}`),
-              className: "rounded-xl bg-rizhaoRed px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-orange-200",
+              className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-mid",
               children: "拨打号码"
             })]
           })]
         }), visitWay === '短信回访' && /*#__PURE__*/_jsxs("div", {
-          className: "xl:col-span-2 rounded-2xl border border-orange-200 bg-orange-50/40 p-4",
+          className: "xl:col-span-2 rounded-2xl border border-line-divider bg-mist/40 p-4",
           children: [/*#__PURE__*/_jsx(TextArea, {
             label: "短信内容",
             placeholder: "请输入短信内容",
@@ -2886,7 +2884,7 @@ function ReturnVisitPage({
             children: /*#__PURE__*/_jsx("button", {
               type: "button",
               onClick: sendSms,
-              className: "rounded-xl bg-rizhaoRed px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-orange-200",
+              className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-mid",
               children: "发送至运营商"
             })
           }), smsSendStatus && /*#__PURE__*/_jsxs("div", {
@@ -2907,7 +2905,7 @@ function ReturnVisitPage({
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
           children: "保存回访"
         }), /*#__PURE__*/_jsx("button", {
-          className: "rounded-xl bg-rizhaoRed px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "提交"
         })]
       })]
@@ -3021,7 +3019,7 @@ function LedgerEditPage({
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
           children: "保存草稿"
         }), /*#__PURE__*/_jsx("button", {
-          className: "rounded-xl bg-rizhaoRed px-6 py-3 text-sm font-black text-white shadow-lg shadow-orange-200",
+          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "保存修改"
         })]
       })]
@@ -3174,7 +3172,7 @@ function EditableTag({
         className: "field-label",
         children: label
       }), /*#__PURE__*/_jsx("span", {
-        className: "rounded-full bg-white px-2.5 py-1 text-xs font-bold text-rizhaoRed ring-1 ring-orange-100",
+        className: "rounded-full bg-white px-2.5 py-1 text-xs font-bold text-rizhao ring-1 ring-line-divider",
         children: "可人工修改"
       })]
     }), /*#__PURE__*/_jsx("div", {
