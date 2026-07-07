@@ -1761,34 +1761,47 @@ function StandardComplaintForm({
               placeholder: "请输入工单标题"
             })
           }), /*#__PURE__*/_jsx(Field, {
-            label: "行内工单编号",
-            placeholder: "系统生成或手工录入"
+            label: "* 录入时间",
+            placeholder: "2026-07-02 08:47",
+            disabled: true
           }), /*#__PURE__*/_jsx(Field, {
-            label: "监管工单编号",
-            placeholder: "请输入监管或外部平台工单编号"
+            label: "行内工单编号",
+            placeholder: "系统自动生成",
+            disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单类型",
             type: "select",
-            options: ['投诉', '咨询', '建议', '其他']
+            options: ['投诉', '举报', '抱怨', '咨询', '建议', '求助']
+          }), /*#__PURE__*/_jsx(Field, {
+          label: "* 投诉反映渠道",
+          type: "select",
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它']
+          }), /*#__PURE__*/_jsx(Field, {
+            label: "渠道细分",
+            placeholder: "投诉反映渠道为其它时必填，不超过20字"
+          }), /*#__PURE__*/_jsx(Field, {
+            label: "监管工单编号",
+            placeholder: "监管来源必填；其他渠道非必填"
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单级别",
             type: "select",
             options: ['普通', '重要', '紧急']
           }), /*#__PURE__*/_jsx(Field, {
-          label: "* 投诉反映渠道",
-          type: "select",
-          options: ['国家局', '省监管局', '12378', '12345政务热线', '客服中心', '网点', '其他']
+            label: "* 办理时限",
+            placeholder: "受理时间 + 3 个工作日（系统自动计算）",
+            disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 是否重办",
             type: "select",
             options: ['否', '是']
           }), /*#__PURE__*/_jsx(Field, {
-            label: "* 录入时间",
-            placeholder: "2026-07-02 08:47"
+            label: "* 是否现场",
+            type: "select",
+            options: ['是', '否']
           })]
         })
       }), /*#__PURE__*/_jsx(StandardSection, {
-        title: "投诉人信息",
+        title: "客户信息",
         children: /*#__PURE__*/_jsxs("div", {
           className: "space-y-4",
           children: [/*#__PURE__*/_jsxs("div", {
@@ -1811,9 +1824,9 @@ function StandardComplaintForm({
               setValue: setComplainantName,
               onSearch: () => setShowCustomerModal(true)
             }), /*#__PURE__*/_jsx(Field, {
-              label: "* 性别",
+              label: "性别",
               type: "select",
-              options: ['男', '女', '未知'],
+              options: ['男', '女'],
               value: gender,
               setValue: setGender
             }), /*#__PURE__*/_jsx(Field, {
@@ -1829,30 +1842,6 @@ function StandardComplaintForm({
             }), /*#__PURE__*/_jsx(Field, {
               label: "卡号",
               placeholder: "选填，若提供则填写"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 投诉人诉求",
-              type: "select",
-              options: ['解释说明', '协商处理', '赔偿/减免', '道歉', '其他']
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 业务类别大类",
-              type: "select",
-              options: ['贷款业务', '银行卡业务', '账户服务', '支付结算', '其他']
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "业务类别中类",
-              placeholder: "可手工填写或由标签带出"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "业务类别小类",
-              placeholder: "可手工填写或由标签带出"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 投诉原因大类",
-              type: "select",
-              options: ['服务态度及质量', '业务办理', '收费及价格', '催收及征信', '其他']
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "投诉原因中类",
-              placeholder: "可手工填写或由标签带出"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "投诉原因小类",
-              placeholder: "可手工填写或由标签带出"
             })]
           }), showHistory && /*#__PURE__*/_jsxs("div", {
             className: "overflow-hidden rounded-2xl border border-line-divider bg-white",
@@ -1889,19 +1878,21 @@ function StandardComplaintForm({
           })]
         })
       }), /*#__PURE__*/_jsx(StandardSection, {
-        title: "被投诉信息",
+        title: "投诉信息",
         children: /*#__PURE__*/_jsxs("div", {
-          className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
-          children: [/*#__PURE__*/_jsx(Field, {
-            label: "* 被投诉机构",
-            placeholder: "请选择或输入被投诉机构"
-          }), /*#__PURE__*/_jsx(Field, {
-            label: "* 是否现场",
-            type: "select",
-            options: ['请选择', '是', '否']
-          }), /*#__PURE__*/_jsx(Field, {
-            label: "* 办理时限",
-            placeholder: "2026-07-04 08:54"
+          className: "space-y-4",
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
+            children: [/*#__PURE__*/_jsx(Field, {
+              label: "* 被投诉机构",
+              placeholder: "请选择或输入被投诉机构"
+            }), /*#__PURE__*/_jsx(Field, {
+              label: "* 投诉人诉求",
+              type: "select",
+              options: ['金钱赔偿', '赔礼道歉', '返还财产', '恢复原状', '其他']
+            }), /*#__PURE__*/_jsx("div", {
+              className: "xl:col-span-1"
+            })]
           }), /*#__PURE__*/_jsx("div", {
             className: "xl:col-span-3",
             children: /*#__PURE__*/_jsx(TextArea, {
@@ -1911,7 +1902,6 @@ function StandardComplaintForm({
               placeholder: "请输入投诉内容"
             })
           }), /*#__PURE__*/_jsx("div", {
-            className: "xl:col-span-3",
             children: /*#__PURE__*/_jsxs("div", {
               className: "flex flex-wrap items-center gap-3",
               children: [/*#__PURE__*/_jsx("button", {
@@ -1924,17 +1914,40 @@ function StandardComplaintForm({
               })]
             })
           }), /*#__PURE__*/_jsxs("div", {
-            className: `xl:col-span-3 grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-line-divider bg-mist/70' : 'border-slate-200 bg-slate-50'}`,
+            className: `grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-line-divider bg-mist/70' : 'border-slate-200 bg-slate-50'}`,
             children: [/*#__PURE__*/_jsx(EditableTag, {
-              label: "投诉产品标签",
+              label: "* 投诉产品标签",
               value: productTag,
               setValue: setProductTag,
               placeholder: "点击一键获取标签后生成"
             }), /*#__PURE__*/_jsx(EditableTag, {
-              label: "投诉原因标签",
+              label: "* 投诉原因标签",
               value: reasonTag,
               setValue: setReasonTag,
               placeholder: "点击一键获取标签后生成"
+            })]
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
+            children: [/*#__PURE__*/_jsx(Field, {
+              label: "* 业务类别大类",
+              type: "select",
+              options: ['贷款业务', '银行卡业务', '账户服务', '支付结算', '其他']
+            }), /*#__PURE__*/_jsx(Field, {
+              label: "* 业务类别中类",
+              placeholder: "手工填写或由标签带出"
+            }), /*#__PURE__*/_jsx(Field, {
+              label: "* 业务类别小类",
+              placeholder: "手工填写或由标签带出"
+            }), /*#__PURE__*/_jsx(Field, {
+              label: "* 投诉原因大类",
+              type: "select",
+              options: ['服务态度及质量', '业务办理', '收费及价格', '催收及征信', '其他']
+            }), /*#__PURE__*/_jsx(Field, {
+              label: "* 投诉原因中类",
+              placeholder: "手工填写或由标签带出"
+            }), /*#__PURE__*/_jsx(Field, {
+              label: "* 投诉原因小类",
+              placeholder: "手工填写或由标签带出"
             })]
           })]
         })
@@ -3108,16 +3121,20 @@ function Field({
   type = 'input',
   options = [],
   value,
-  setValue
+  setValue,
+  disabled = false
 }) {
   return /*#__PURE__*/_jsxs("label", {
-    className: "block",
+    className: disabled ? "block opacity-60" : "block",
     children: [/*#__PURE__*/_jsx("div", {
       className: "field-label mb-2",
       children: label
     }), /*#__PURE__*/_jsx("div", {
       className: "field-box",
-      children: type === 'select' ? /*#__PURE__*/_jsxs("select", {
+      children: disabled ? /*#__PURE__*/_jsx("div", {
+        className: "py-2 text-sm text-slate-600",
+        children: value || placeholder || '—'
+      }) : type === 'select' ? /*#__PURE__*/_jsxs("select", {
         defaultValue: value === undefined ? "" : undefined,
         value: value !== undefined ? value : undefined,
         onChange: event => setValue && setValue(event.target.value),
