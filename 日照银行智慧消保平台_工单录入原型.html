@@ -1227,6 +1227,15 @@ function EntryMethodList({
         children: `${tab}（${(tab === '已派发工单' ? dispatchedRows : draftRows).length}）`
       }, tab))
     }), /*#__PURE__*/_jsxs("section", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉来源", type: "select", options: ['国家局', '山东省监管局', '12378监管热线', '日照市12345'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['草稿', '已派发', '处理中', '已关单'] }), /*#__PURE__*/_jsx(Field, { label: "录入时间", placeholder: "请选择日期范围" })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "mt-5 flex justify-end gap-3",
+        children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
+      })]
+    }), /*#__PURE__*/_jsxs("section", {
       className: "overflow-hidden rounded-2xl border border-slate-200 bg-white",
       children: [/*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto",
@@ -1548,6 +1557,7 @@ function StandardComplaintForm({
   onDispatch,
   disableCustomerSearch = false
 }) {
+  const [showHistory, setShowHistory] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [complainantName, setComplainantName] = useState('王先生');
   const [gender, setGender] = useState('');
@@ -1762,6 +1772,17 @@ function StandardComplaintForm({
         children: /*#__PURE__*/_jsxs("div", {
           className: "space-y-4",
           children: [/*#__PURE__*/_jsxs("div", {
+            className: "flex flex-wrap items-center justify-between gap-3",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "text-sm text-slate-500",
+              children: "可按姓名、电话、证件号辅助核查客户历史投诉"
+            }), /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: () => setShowHistory(!showHistory),
+              className: "rounded-xl border border-line-divider bg-mist px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
+              children: showHistory ? "收起历史投诉" : "查询历史投诉"
+            })]
+          }), /*#__PURE__*/_jsxs("div", {
             className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
             children: [/*#__PURE__*/_jsx(SearchField, {
               label: "* 投诉人姓名",
@@ -1788,6 +1809,38 @@ function StandardComplaintForm({
             }), /*#__PURE__*/_jsx(Field, {
               label: "卡号",
               placeholder: "选填，若提供则填写"
+            })]
+          }), showHistory && /*#__PURE__*/_jsxs("div", {
+            className: "overflow-hidden rounded-2xl border border-line-divider bg-white",
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "flex items-center justify-between bg-mist px-4 py-3",
+              children: [/*#__PURE__*/_jsx("div", {
+                className: "font-black text-rizhao",
+                children: "历史投诉列表"
+              }), /*#__PURE__*/_jsx("div", {
+                className: "text-sm font-bold text-slate-500",
+                children: "共 4 条，覆盖 96588、国家局、政务热线、省监管局"
+              })]
+            }), /*#__PURE__*/_jsx("div", {
+              className: "overflow-x-auto",
+              children: /*#__PURE__*/_jsxs("table", {
+                className: "w-full min-w-[1500px] text-left text-sm",
+                children: [/*#__PURE__*/_jsx("thead", {
+                  className: "bg-white text-slate-700",
+                  children: /*#__PURE__*/_jsx("tr", {
+                    children: ['序号', '时间', '投诉渠道', '被诉单位', '来电人', '联系电话', '投诉内容', '业务类别', '诉点', '工单类别', '处理情况', '是否现场', '贷款种类', '备注1'].map(head => /*#__PURE__*/_jsx("th", {
+                      className: "border-b border-slate-200 px-4 py-3 font-black whitespace-nowrap",
+                      children: head
+                    }, head))
+                  })
+                }), /*#__PURE__*/_jsx("tbody", {
+                  className: "divide-y divide-slate-100",
+                  children: historyRows.map(row => /*#__PURE__*/_jsxs("tr", {
+                    className: "hover:bg-mist/50",
+                    children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.no }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-rizhao whitespace-nowrap", children: row.channel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.phone }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[240px]", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.business }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.point }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.type }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.result }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.onsite }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.loanType }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[160px]", children: row.remark })]
+                  }, row.no))
+                })]
+              })
             })]
           })]
         })
@@ -2501,8 +2554,7 @@ function BatchImport({
           handleTag: handleTag,
           hideHeader: true,
           footerMode: "dispatch",
-          onDispatch: dispatchCurrent,
-          disableCustomerSearch: true
+          onDispatch: dispatchCurrent
         })]
       }) : /*#__PURE__*/_jsxs("section", {
         className: "flex min-h-[360px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center",
