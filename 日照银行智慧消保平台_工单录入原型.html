@@ -2514,11 +2514,11 @@ function BatchImport({
             children: "批量导入"
           }), /*#__PURE__*/_jsx("div", {
             className: "mt-1 text-sm text-slate-500",
-            children: "先上传标准模板，系统解析通过后，再导入为待填写工单。"
+            children: "先下载模板填写数据，上传后系统解析并导入为待填写工单。"
           })]
         }), /*#__PURE__*/_jsx("span", {
           className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
-          children: isParsed ? "解析完成" : isUploaded ? "解析中" : "待上传"
+          children: isParsed ? "解析完成" : isUploaded ? "解析中" : "下载模板"
         })]
       }), /*#__PURE__*/_jsxs("div", {
         className: `mt-6 rounded-3xl border border-dashed px-8 py-12 text-center ${isUploaded ? 'border-line-divider bg-mist/60' : 'border-slate-300 bg-slate-50'}`,
@@ -2527,14 +2527,14 @@ function BatchImport({
           children: "↑"
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-5 text-lg font-black text-ink",
-          children: isUploaded ? "投诉批量导入模板.xlsx" : "上传批量导入模板"
+          children: isUploaded ? "投诉批量导入模板.xlsx" : "上传批量数据"
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-2 text-sm text-slate-500",
-          children: isUploaded ? "文件已上传，系统正在解析字段和数据内容。" : "点击上传标准 Excel 模板，上传后自动解析并进入导入界面。"
+          children: isUploaded ? "文件已上传，系统正在解析字段和数据内容。" : "先下载模板并按格式填写，再上传批量数据，系统自动解析。"
         }), !isUploaded && /*#__PURE__*/_jsx("button", {
           onClick: startUploadAndParse,
           className: "mt-6 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
-          children: "上传模板"
+          children: "上传数据"
         }), isUploaded && /*#__PURE__*/_jsxs("div", {
           className: "mx-auto mt-6 max-w-xl",
           children: [/*#__PURE__*/_jsxs("div", {
