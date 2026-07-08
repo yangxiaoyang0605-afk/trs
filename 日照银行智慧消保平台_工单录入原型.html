@@ -491,11 +491,13 @@ const govChannels = ['日照市12345政务热线', '省级政务热线转办'];
 function App() {
   const [mainTab, setMainTab] = useState('录入工单');
   const [entryTab, setEntryTab] = useState('列表');
+  const [adminTab, setAdminTab] = useState('角色权限管理');
   const [formType, setFormType] = useState('监管转办类自建单');
   const [content, setContent] = useState('');
   const [productTag, setProductTag] = useState('');
   const [reasonTag, setReasonTag] = useState('');
   const [tagReady, setTagReady] = useState(false);
+  const isSuperAdmin = true; // 原型中默认超管，后续接入 SSO 权限判断
 
   // 模拟智能打标：原型里先体现“可自动生成、可人工修改”的交互。
   const handleTag = () => {
@@ -514,7 +516,10 @@ function App() {
       children: [/*#__PURE__*/_jsx(Sidebar, {
         mainTab: mainTab,
         setMainTab: setMainTab,
-        setEntryTab: setEntryTab
+        setEntryTab: setEntryTab,
+        adminTab: adminTab,
+        setAdminTab: setAdminTab,
+        isSuperAdmin: isSuperAdmin
       }), /*#__PURE__*/_jsxs("main", {
         className: "flex-1 min-w-0",
         children: [/*#__PURE__*/_jsx(Topbar, {}), /*#__PURE__*/_jsx("div", {
@@ -528,10 +533,10 @@ function App() {
                 children: /*#__PURE__*/_jsxs("div", {
                   children: [/*#__PURE__*/_jsxs("p", {
                     className: "text-sm font-semibold text-rizhao",
-                    children: ["投诉处理 / ", mainTab]
+                    children: [mainTab === '后台管理' ? '后台管理 / ' : '投诉处理 / ', mainTab === '后台管理' ? adminTab : mainTab]
                   }), /*#__PURE__*/_jsx("h1", {
                     className: "mt-1 text-2xl font-bold tracking-tight",
-                    children: mainTab === '录入工单' && entryTab !== '列表' ? entryTab : mainTab
+                    children: mainTab === '录入工单' && entryTab !== '列表' ? entryTab : mainTab === '后台管理' ? adminTab : mainTab
                   })]
                 })
               })
@@ -554,7 +559,10 @@ function App() {
                 content: content || '客户反映贷款提前还款过程中利息计算口径不清晰，要求银行核实费用明细并反馈处理结果。',
                 productTag: productTag || '个人贷款 / 消费贷款',
                 reasonTag: reasonTag || '业务办理 / 还款与征信异议'
-              }) : mainTab === '台账导出' ? /*#__PURE__*/_jsx(LedgerExportWorkspace, {}) : /*#__PURE__*/_jsx(Placeholder, {
+              }) : mainTab === '台账导出' ? /*#__PURE__*/_jsx(LedgerExportWorkspace, {}) : mainTab === '后台管理' ? /*#__PURE__*/_jsx(AdminWorkspace, {
+                adminTab: adminTab,
+                setAdminTab: setAdminTab
+              }) : /*#__PURE__*/_jsx(Placeholder, {
                 tab: mainTab
               })
             })]
@@ -567,9 +575,14 @@ function App() {
 function Sidebar({
   mainTab,
   setMainTab,
-  setEntryTab
+  setEntryTab,
+  adminTab,
+  setAdminTab,
+  isSuperAdmin
 }) {
   const subMenus = ['录入工单', '处理工单', '台账导出'];
+  const adminSubMenus = ['角色权限管理', '用户管理', '机构管理', '短信模板维护'];
+  const visibleMenus = isSuperAdmin ? menus : menus.filter(m => m.name !== '后台管理');
   const openSubMenu = name => {
     setMainTab(name);
     if (name === '录入工单') setEntryTab('列表');
@@ -602,7 +615,7 @@ function Sidebar({
         })
       }), /*#__PURE__*/_jsx("nav", {
         className: "flex-1 space-y-2 px-4 py-5",
-        children: menus.map((item, index) => /*#__PURE__*/_jsxs("div", {
+        children: visibleMenus.map((item, index) => /*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("button", {
             className: `group w-full rounded-xl px-4 py-4 text-left transition ${item.active ? 'bg-white text-ink shadow-lg' : 'text-white/76 hover:bg-white/8 hover:text-white'}`,
             children: /*#__PURE__*/_jsxs("div", {
@@ -625,6 +638,16 @@ function Sidebar({
             children: subMenus.map(name => /*#__PURE__*/_jsx("button", {
               onClick: () => openSubMenu(name),
               className: `block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              children: name
+            }, name))
+          }), item.name === '后台管理' && /*#__PURE__*/_jsx("div", {
+            className: "ml-5 mt-2 space-y-1 border-l border-white/14 pl-4",
+            children: adminSubMenus.map(name => /*#__PURE__*/_jsx("button", {
+              onClick: () => {
+                setMainTab('后台管理');
+                setAdminTab(name);
+              },
+              className: `block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold transition ${mainTab === '后台管理' && adminTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
               children: name
             }, name))
           })]
@@ -1634,7 +1657,6 @@ function StandardComplaintForm({
   onDispatch,
   disableCustomerSearch = false
 }) {
-  const [showHistory, setShowHistory] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [complainantName, setComplainantName] = useState('王先生');
   const [gender, setGender] = useState('');
@@ -1849,17 +1871,6 @@ function StandardComplaintForm({
         children: /*#__PURE__*/_jsxs("div", {
           className: "space-y-4",
           children: [/*#__PURE__*/_jsxs("div", {
-            className: "flex flex-wrap items-center justify-between gap-3",
-            children: [/*#__PURE__*/_jsx("div", {
-              className: "text-sm text-slate-500",
-              children: "可按姓名、电话、证件号辅助核查客户历史投诉"
-            }), /*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: () => setShowHistory(!showHistory),
-              className: "rounded-xl border border-line-divider bg-mist px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
-              children: showHistory ? "收起历史投诉" : "查询历史投诉"
-            })]
-          }), /*#__PURE__*/_jsxs("div", {
             className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
             children: [/*#__PURE__*/_jsx(SearchField, {
               label: "* 投诉人姓名",
@@ -1886,38 +1897,6 @@ function StandardComplaintForm({
             }), /*#__PURE__*/_jsx(Field, {
               label: "卡号",
               placeholder: "选填，若提供则填写"
-            })]
-          }), showHistory && /*#__PURE__*/_jsxs("div", {
-            className: "overflow-hidden rounded-2xl border border-line-divider bg-white",
-            children: [/*#__PURE__*/_jsxs("div", {
-              className: "flex items-center justify-between bg-mist px-4 py-3",
-              children: [/*#__PURE__*/_jsx("div", {
-                className: "font-black text-rizhao",
-                children: "历史投诉列表"
-              }), /*#__PURE__*/_jsx("div", {
-                className: "text-sm font-bold text-slate-500",
-                children: "共 4 条，覆盖 96588、国家局、政务热线、省监管局"
-              })]
-            }), /*#__PURE__*/_jsx("div", {
-              className: "overflow-x-auto",
-              children: /*#__PURE__*/_jsxs("table", {
-                className: "w-full min-w-[1500px] text-left text-sm",
-                children: [/*#__PURE__*/_jsx("thead", {
-                  className: "bg-white text-slate-700",
-                  children: /*#__PURE__*/_jsx("tr", {
-                    children: ['序号', '时间', '投诉渠道', '被诉单位', '来电人', '联系电话', '投诉内容', '业务类别', '诉点', '工单类别', '处理情况', '是否现场', '贷款种类', '备注1'].map(head => /*#__PURE__*/_jsx("th", {
-                      className: "border-b border-slate-200 px-4 py-3 font-black whitespace-nowrap",
-                      children: head
-                    }, head))
-                  })
-                }), /*#__PURE__*/_jsx("tbody", {
-                  className: "divide-y divide-slate-100",
-                  children: historyRows.map(row => /*#__PURE__*/_jsxs("tr", {
-                    className: "hover:bg-mist/50",
-                    children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.no }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-rizhao whitespace-nowrap", children: row.channel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.phone }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[240px]", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.business }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.point }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.type }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.result }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.onsite }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.loanType }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[160px]", children: row.remark })]
-                  }, row.no))
-                })]
-              })
             })]
           })]
         })
@@ -3309,6 +3288,579 @@ function EditableTag({
     })]
   });
 }
+function AdminWorkspace({ adminTab, setAdminTab }) {
+  return adminTab === '角色权限管理' ? /*#__PURE__*/_jsx(RolePermissionManager, {}) :
+    adminTab === '用户管理' ? /*#__PURE__*/_jsx(UserManager, {}) :
+    adminTab === '机构管理' ? /*#__PURE__*/_jsx(OrgManager, {}) :
+    adminTab === '短信模板维护' ? /*#__PURE__*/_jsx(SMSTemplateManager, {}) : null;
+}
+
+// ─── 角色权限管理 ───────────────────────────────────────────
+const rolesData = [
+  { name: '机构管理员', code: 'ORG_ADMIN', count: 18, scope: '本机构及下辖机构', status: true,
+    perms: {
+      menus: { 投诉工单: { 工单录入: true, 工单处理: true, 投诉台账: true }, 数据分析: { 业务报表: true, 统计看板: true }, 后台管理: {} },
+      buttons: { 工单录入: { 查看: true, 单笔录入: true, 批量导入: true, 保存草稿: true, 派发: true }, 工单处理: { 查看详情: true, 填写处理结果: true, 外呼: true, 发送短信: true, 上传沟通记录: true, 转办: true, 提交审核: true, 关单审核: true }, 台账: { 查询: true, 查看详情: true, 导出: true, 回访: true } },
+      dataScope: '本机构及下辖机构'
+    },
+    users: [
+      { name: '张三', empId: '100023', org: '东港支行', role: '机构管理员', status: true },
+      { name: '李四', empId: '100041', org: '莒县支行', role: '机构管理员', status: true }
+    ]
+  },
+  { name: '投诉处理员', code: 'HANDLER', count: 280, scope: '按机构授权', status: true,
+    perms: {
+      menus: { 投诉工单: { 工单录入: false, 工单处理: true, 投诉台账: true }, 数据分析: { 业务报表: false, 统计看板: false }, 后台管理: {} },
+      buttons: { 工单录入: { 查看: true, 单笔录入: false, 批量导入: false, 保存草稿: false, 派发: false }, 工单处理: { 查看详情: true, 填写处理结果: true, 外呼: true, 发送短信: true, 上传沟通记录: true, 转办: true, 提交审核: true, 关单审核: false }, 台账: { 查询: true, 查看详情: true, 导出: false, 回访: true } },
+      dataScope: '仅本人'
+    },
+    users: [
+      { name: '王芳', empId: '100156', org: '东港支行', role: '投诉处理员', status: true },
+      { name: '赵刚', empId: '100203', org: '岚山支行', role: '投诉处理员', status: true },
+      { name: '刘洋', empId: '100189', org: '莒县支行', role: '投诉处理员', status: true }
+    ]
+  },
+];
+
+function RolePermissionManager() {
+  const [selectedRoleIdx, setSelectedRoleIdx] = useState(0);
+  const [permTab, setPermTab] = useState('菜单权限');
+  const role = rolesData[selectedRoleIdx];
+  return /*#__PURE__*/_jsxs("div", {
+    className: "flex gap-6",
+    children: [/*#__PURE__*/_jsx("div", {
+      className: "w-[320px] shrink-0 space-y-3",
+      children: /*#__PURE__*/_jsxs("div", {
+        className: "space-y-3",
+        children: [rolesData.map((r, i) => /*#__PURE__*/_jsxs("button", {
+          type: "button",
+          onClick: () => setSelectedRoleIdx(i),
+          className: `w-full rounded-2xl border bg-white p-5 text-left transition ${i === selectedRoleIdx ? 'border-rizhao shadow-low' : 'border-slate-200 hover:border-line-divider'}`,
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "flex items-start justify-between",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "text-base font-black",
+              children: r.name
+            }), /*#__PURE__*/_jsx("span", {
+              className: `rounded-full px-3 py-0.5 text-xs font-bold ${r.status ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
+              children: r.status ? '启用' : '停用'
+            })]
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "mt-3 text-sm text-slate-500",
+            children: [/*#__PURE__*/_jsx("span", {
+              className: "font-bold text-ink",
+              children: r.count
+            }), "人  ·  ", r.scope]
+          })]
+        }, r.name))]
+      })
+    }), /*#__PURE__*/_jsx("div", {
+      className: "flex-1 min-w-0",
+      children: /*#__PURE__*/_jsxs("div", {
+        className: "rounded-2xl border border-slate-200 bg-white",
+        children: [/*#__PURE__*/_jsxs("div", {
+          className: "border-b border-slate-200 px-6 py-5",
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "flex items-center justify-between",
+            children: [/*#__PURE__*/_jsxs("div", {
+              children: [/*#__PURE__*/_jsxs("div", {
+                className: "text-lg font-black",
+                children: [role.name, "  ",
+                  /*#__PURE__*/_jsx("span", {
+                    className: "text-sm font-bold text-slate-400",
+                    children: role.code
+                  })
+                ]
+              }), /*#__PURE__*/_jsxs("div", {
+                className: "mt-1 text-sm text-slate-500",
+                children: [/*#__PURE__*/_jsx("span", {
+                  className: `inline-block rounded-full px-2 py-0.5 text-xs font-bold ${role.status ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
+                  children: role.status ? '启用' : '停用'
+                })]
+              })]
+            }), /*#__PURE__*/_jsxs("div", {
+              className: "flex gap-2",
+              children: [/*#__PURE__*/_jsx("button", {
+                className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-rizhao",
+                children: "编辑基本信息"
+              }), /*#__PURE__*/_jsx("button", {
+                className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-rizhao",
+                children: "复制角色"
+              }), /*#__PURE__*/_jsx("button", {
+                className: "rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-bold text-red-500",
+                children: "停用角色"
+              })]
+            })]
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "px-6 pt-4",
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "flex gap-0 border-b border-slate-200",
+            children: ['菜单权限', '按钮权限', '数据范围'].map(tab => /*#__PURE__*/_jsx("button", {
+              onClick: () => setPermTab(tab),
+              className: `px-5 py-3 text-sm font-bold transition border-b-2 ${permTab === tab ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-500 hover:text-ink'}`,
+              children: tab
+            }, tab))
+          }), /*#__PURE__*/_jsx("div", {
+            className: "py-6",
+            children: permTab === '菜单权限' ? /*#__PURE__*/_jsx(MenuPermPanel, { perms: role.perms.menus }) :
+              permTab === '按钮权限' ? /*#__PURE__*/_jsx(ButtonPermPanel, { perms: role.perms.buttons }) :
+              permTab === '数据范围' ? /*#__PURE__*/_jsx(DataScopePanel, { scope: role.perms.dataScope }) : null
+          })]
+        })]
+      })
+    })]
+  });
+}
+
+function MenuPermPanel({ perms }) {
+  const keys = Object.keys(perms);
+  return /*#__PURE__*/_jsxs("div", {
+    className: "space-y-4",
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: "flex gap-3",
+      children: [/*#__PURE__*/_jsx("button", {
+        className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
+        children: "全选"
+      }), /*#__PURE__*/_jsx("button", {
+        className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
+        children: "清空"
+      }), /*#__PURE__*/_jsx("button", {
+        className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
+        children: "展开全部"
+      }), /*#__PURE__*/_jsx("button", {
+        className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
+        children: "收起全部"
+      })]
+    }), keys.map(parent => /*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
+      children: [/*#__PURE__*/_jsxs("label", {
+        className: "flex cursor-pointer items-center gap-3",
+        children: [/*#__PURE__*/_jsx("input", {
+          type: "checkbox",
+          defaultChecked: true,
+          className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
+        }), /*#__PURE__*/_jsx("span", {
+          className: "text-base font-bold",
+          children: parent
+        })]
+      }), Object.keys(perms[parent] || {}).length > 0 && /*#__PURE__*/_jsx("div", {
+        className: "ml-7 mt-3 space-y-2 border-l-2 border-slate-200 pl-4",
+        children: Object.entries(perms[parent] || {}).map(([child, checked]) => /*#__PURE__*/_jsx("label", {
+          className: "flex cursor-pointer items-center gap-3",
+          children: [/*#__PURE__*/_jsx("input", {
+            type: "checkbox",
+            defaultChecked: checked,
+            className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
+          }), /*#__PURE__*/_jsx("span", {
+            className: "text-sm",
+            children: child
+          })]
+        }, child))
+      })]
+    }, parent))]
+  });
+}
+
+function ButtonPermPanel({ perms }) {
+  const groupLabels = { 工单录入: '工单录入', 工单处理: '工单处理', 台账: '台账' };
+  return /*#__PURE__*/_jsx("div", {
+    className: "space-y-5",
+    children: Object.entries(perms).map(([group, items]) => /*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
+      children: [/*#__PURE__*/_jsx("div", {
+        className: "mb-3 text-sm font-bold text-slate-500",
+        children: groupLabels[group] || group
+      }), /*#__PURE__*/_jsx("div", {
+        className: "grid grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-3 lg:grid-cols-4",
+        children: Object.entries(items).map(([name, checked]) => /*#__PURE__*/_jsx("label", {
+          className: "flex cursor-pointer items-center gap-3",
+          children: [/*#__PURE__*/_jsx("input", {
+            type: "checkbox",
+            defaultChecked: checked,
+            className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
+          }), /*#__PURE__*/_jsx("span", {
+            className: "text-sm",
+            children: name
+          })]
+        }, name))
+      })]
+    }, group))
+  });
+}
+
+function DataScopePanel({ scope }) {
+  const options = ['仅本人', '本机构', '本机构及下辖机构', '指定机构', '全行'];
+  return /*#__PURE__*/_jsxs("div", {
+    className: "space-y-4",
+    children: [/*#__PURE__*/_jsx("div", {
+      className: "text-sm font-bold text-slate-500",
+      children: "数据范围"
+    }), /*#__PURE__*/_jsx("div", {
+      className: "space-y-3",
+      children: options.map(opt => /*#__PURE__*/_jsx("label", {
+        className: "flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-rizhao",
+        children: [/*#__PURE__*/_jsx("input", {
+          type: "radio",
+          name: "dataScope",
+          defaultChecked: opt === scope,
+          className: "h-4 w-4 border-slate-300 text-rizhao focus:ring-rizhao"
+        }), /*#__PURE__*/_jsx("span", {
+          className: "text-sm font-bold",
+          children: opt
+        })]
+      }, opt))
+    }), scope === '指定机构' && /*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "mb-3 flex items-center justify-between",
+        children: [/*#__PURE__*/_jsx("span", {
+          className: "text-sm font-bold",
+          children: "已选择"
+        }), /*#__PURE__*/_jsx("button", {
+          className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-rizhao",
+          children: "选择机构"
+        })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "flex flex-wrap gap-2",
+        children: ['东港支行', '莒县支行', '五莲支行'].map(org => /*#__PURE__*/_jsx("span", {
+          className: "inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200",
+          children: [org, /*#__PURE__*/_jsx("button", {
+            className: "ml-1 text-slate-400 hover:text-red-500",
+            children: "×"
+          })]
+        }, org))
+      })]
+    })]
+  });
+}
+
+// ─── 用户管理 ─────────────────────────────────────────────
+const userListData = Array.from({ length: 15 }, (_, i) => ({
+  name: ['张三', '李四', '王芳', '赵刚', '刘洋', '陈丽', '周明', '吴强', '郑华', '孙梅', '钱伟', '许晴', '何涛', '宋磊', '韩雪'][i],
+  empId: String(100023 + i),
+  account: 'zhangsan' + (i + 1),
+  org: ['总行消保中心', '东港支行', '岚山支行', '莒县支行', '五莲支行', '信用卡中心', '总行科技部', '开发区支行', '东港支行', '岚山支行', '莒县支行', '五莲支行', '信用卡中心', '总行科技部', '开发区支行'][i],
+  role: ['超级管理员', '机构管理员', '投诉处理员', '投诉处理员', '投诉处理员', '投诉处理员', '超级管理员', '投诉处理员', '机构管理员', '投诉处理员', '投诉处理员', '投诉处理员', '投诉处理员', '机构管理员', '投诉处理员'][i],
+  dataScope: ['全行', '本机构及下辖机构', '仅本人', '仅本人', '本机构', '本机构', '全行', '仅本人', '本机构及下辖机构', '仅本人', '仅本人', '本机构', '本机构', '本机构及下辖机构', '仅本人'][i],
+  status: i < 13 ? true : i === 13
+}));
+
+function UserManager() {
+  const [searchName, setSearchName] = useState('');
+  const [searchEmpId, setSearchEmpId] = useState('');
+  const [searchOrg, setSearchOrg] = useState('');
+  const [searchRole, setSearchRole] = useState('');
+  const [searchStatus, setSearchStatus] = useState('');
+  const filtered = userListData.filter(u => {
+    if (searchName && !u.name.includes(searchName)) return false;
+    if (searchEmpId && !u.empId.includes(searchEmpId)) return false;
+    if (searchOrg && !u.org.includes(searchOrg)) return false;
+    if (searchRole && u.role !== searchRole) return false;
+    if (searchStatus !== '' && (searchStatus === '启用') !== u.status) return false;
+    return true;
+  });
+  return /*#__PURE__*/_jsxs("div", {
+    className: "space-y-5",
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex flex-wrap items-end gap-4",
+        children: [/*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "姓名"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchName,
+              onChange: e => setSearchName(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "工号"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchEmpId,
+              onChange: e => setSearchEmpId(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "机构"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchOrg,
+              onChange: e => setSearchOrg(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "角色"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchRole,
+              onChange: e => setSearchRole(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "状态"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchStatus,
+              onChange: e => setSearchStatus(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "flex gap-2",
+          children: [/*#__PURE__*/_jsx("button", {
+            className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+            children: "查询"
+          }), /*#__PURE__*/_jsx("button", {
+            className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
+            children: "重置"
+          })]
+        })]
+      })]
+    }), /*#__PURE__*/_jsx("div", {
+      className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
+      children: /*#__PURE__*/_jsxs("table", {
+        className: "w-full text-left text-sm",
+        children: [/*#__PURE__*/_jsx("thead", {
+          children: /*#__PURE__*/_jsx("tr", {
+            className: "border-b border-slate-200 bg-mist/60",
+            children: ['姓名', '工号', '登录账号', '所属机构', '角色', '数据范围', '状态', '操作'].map(h => /*#__PURE__*/_jsx("th", {
+              className: "px-4 py-3 font-bold text-slate-600",
+              children: h
+            }, h))
+          })
+        }), /*#__PURE__*/_jsx("tbody", {
+          children: filtered.map((u, i) => /*#__PURE__*/_jsx("tr", {
+            className: "border-b border-slate-100 hover:bg-mist/40",
+            children: [/*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 font-bold",
+              children: u.name
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3",
+              children: u.empId
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 text-slate-600",
+              children: u.account
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3",
+              children: u.org
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3",
+              children: /*#__PURE__*/_jsx("span", {
+                className: "rounded-full bg-mist px-2 py-0.5 text-xs font-bold text-rizhao",
+                children: u.role
+              })
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 text-slate-600",
+              children: u.dataScope
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3",
+              children: /*#__PURE__*/_jsx("span", {
+                className: `rounded-full px-2 py-0.5 text-xs font-bold ${u.status ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
+                children: u.status ? '启用' : '停用'
+              })
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3",
+              children: /*#__PURE__*/_jsxs("div", {
+                className: "flex gap-2",
+                children: [/*#__PURE__*/_jsx("button", {
+                  className: "text-sm font-bold text-rizhao",
+                  children: "查看"
+                }), /*#__PURE__*/_jsx("button", {
+                  className: "text-sm font-bold text-rizhao",
+                  children: "分配角色"
+                }), /*#__PURE__*/_jsx("button", {
+                  className: "text-sm font-bold text-rizhao",
+                  children: "数据范围"
+                }), /*#__PURE__*/_jsx("button", {
+                  className: `text-sm font-bold ${u.status ? 'text-red-500' : 'text-green-600'}`,
+                  children: u.status ? '停用' : '启用'
+                })]
+              })
+            })]
+          }, i))
+        })]
+      })
+    })]
+  });
+}
+
+// ─── 机构管理 ─────────────────────────────────────────────
+const orgTree = {
+  name: '日照银行', children: [
+    { name: '总行', children: [
+      { name: '消保岗' },
+      { name: '总行部室' }
+    ]},
+    { name: '青岛分行' },
+    { name: '莒县支行' },
+    { name: '东港支行' },
+    { name: '岚山支行' },
+    { name: '五莲支行' },
+    { name: '开发区支行' },
+    { name: '信用卡中心' }
+  ]
+};
+
+function OrgNode({ node, depth, onSelect, selected }) {
+  const [expanded, setExpanded] = useState(true);
+  const hasChildren = node.children && node.children.length > 0;
+  return /*#__PURE__*/_jsxs("div", {
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: `flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-mist ${selected ? 'bg-rizhao/10 font-bold text-rizhao' : ''}`,
+      style: { paddingLeft: 12 + depth * 20 },
+      onClick: () => {
+        if (hasChildren) setExpanded(!expanded);
+        onSelect(node);
+      },
+      children: [hasChildren && /*#__PURE__*/_jsx("span", {
+        className: "text-xs text-slate-400",
+        children: expanded ? '▼' : '▶'
+      }), !hasChildren && /*#__PURE__*/_jsx("span", {
+        className: "w-3"
+      }), /*#__PURE__*/_jsx("span", {
+        className: "font-bold",
+        children: node.name
+      })]
+    }), hasChildren && expanded && node.children.map(child => /*#__PURE__*/_jsx(OrgNode, {
+      node: child,
+      depth: depth + 1,
+      onSelect: onSelect,
+      selected: selected && selected.name === child.name
+    }, child.name))]
+  });
+}
+
+function OrgManager() {
+  const [selectedOrg, setSelectedOrg] = useState(null);
+  return /*#__PURE__*/_jsxs("div", {
+    className: "flex gap-6",
+    children: [/*#__PURE__*/_jsx("div", {
+      className: "w-[300px] shrink-0 rounded-2xl border border-slate-200 bg-white p-4",
+      children: /*#__PURE__*/_jsx("div", {
+        className: "space-y-0.5",
+        children: /*#__PURE__*/_jsx(OrgNode, { node: orgTree, depth: 0, onSelect: setSelectedOrg, selected: selectedOrg })
+      })
+    }), /*#__PURE__*/_jsx("div", {
+      className: "flex-1 min-w-0",
+      children: !selectedOrg ? /*#__PURE__*/_jsxs("div", {
+        className: "flex h-full min-h-[200px] items-center justify-center rounded-2xl border border-slate-200 bg-white",
+        children: [/*#__PURE__*/_jsx("span", {
+          className: "text-sm text-slate-400",
+          children: "请从左侧选择机构查看详情"
+        })]
+      }) : /*#__PURE__*/_jsxs("div", {
+        className: "rounded-2xl border border-slate-200 bg-white p-6",
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "text-lg font-black",
+          children: "机构详情"
+        }), /*#__PURE__*/_jsx("div", {
+          className: "mt-6 grid grid-cols-2 gap-6",
+          children: ['机构编码', '机构名称', '机构简称', '机构类型', '上级机构', '机构层级', '机构状态'].map(field => /*#__PURE__*/_jsxs("div", {
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "field-label mb-1",
+              children: field
+            }), /*#__PURE__*/_jsx("div", {
+              className: "field-box",
+              children: /*#__PURE__*/_jsx("div", {
+                className: "py-2 text-sm text-slate-600",
+                children: "—"
+              })
+            })]
+          }, field))
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "mt-6 flex gap-3",
+          children: [/*#__PURE__*/_jsx("button", {
+            className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+            children: "编辑"
+          }), /*#__PURE__*/_jsx("button", {
+            className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
+            children: "停用机构"
+          })]
+        })]
+      })
+    })]
+  });
+}
+
+// ─── 短信模板维护 ─────────────────────────────────────────
+const smsTemplatesData = [
+  { id: 1, name: '工单派发通知', content: '【日照银行】您有新工单待处理，工单编号：${no}，请及时登录系统查看处理。', status: true, updated: '2026-06-15 10:30' },
+  { id: 2, name: '工单超期提醒', content: '【日照银行】工单编号：${no}，已接近办理时限，请尽快处理。', status: true, updated: '2026-06-15 10:30' },
+  { id: 3, name: '回访邀请', content: '【日照银行】您反映的问题已处理完毕，请配合回访评价。', status: true, updated: '2026-06-10 14:20' },
+  { id: 4, name: '转办通知', content: '【日照银行】工单编号：${no}，已转办至您处处理，请查收。', status: false, updated: '2026-05-28 09:15' },
+  { id: 5, name: '审核结果通知', content: '【日照银行】您提交的工单编号：${no}，审核${result}。', status: true, updated: '2026-05-20 16:45' }
+];
+
+function SMSTemplateManager() {
+  const [editId, setEditId] = useState(null);
+  return /*#__PURE__*/_jsxs("div", {
+    className: "space-y-4",
+    children: [/*#__PURE__*/_jsx("div", {
+      className: "flex justify-end",
+      children: /*#__PURE__*/_jsx("button", {
+        className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+        children: "新增模板"
+      })
+    }), /*#__PURE__*/_jsx("div", {
+      className: "space-y-3",
+      children: smsTemplatesData.map(t => /*#__PURE__*/_jsxs("div", {
+        className: "rounded-2xl border border-slate-200 bg-white p-5",
+        children: [/*#__PURE__*/_jsxs("div", {
+          className: "flex items-start justify-between",
+          children: [/*#__PURE__*/_jsxs("div", {
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "flex items-center gap-3",
+              children: [/*#__PURE__*/_jsx("span", {
+                className: "text-base font-black",
+                children: t.name
+              }), /*#__PURE__*/_jsx("span", {
+                className: `rounded-full px-2 py-0.5 text-xs font-bold ${t.status ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
+                children: t.status ? '启用' : '停用'
+              })]
+            }), /*#__PURE__*/_jsx("div", {
+              className: "mt-2 text-sm text-slate-600",
+              children: t.content
+            }), /*#__PURE__*/_jsx("div", {
+              className: "mt-1 text-xs text-slate-400",
+              children: "最后更新：" + t.updated
+            })]
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "flex gap-2",
+            children: [/*#__PURE__*/_jsx("button", {
+              className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-rizhao",
+              children: "编辑"
+            }), /*#__PURE__*/_jsx("button", {
+              className: "rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-500",
+              children: t.status ? '停用' : '启用'
+            })]
+          })]
+        })]
+      }, t.id))
+    })]
+  });
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/_jsx(App, {}));
 
   </script>
