@@ -1638,6 +1638,38 @@ function StandardComplaintForm({
   const [complaintChannel, setComplaintChannel] = useState('');
   const isRegulatoryRequired = complaintChannel === '国家局' || complaintChannel === '省监管局';
   const isChannelDetailRequired = complaintChannel === '其它';
+  const [bizL1, setBizL1] = useState('');
+  const [bizL2, setBizL2] = useState('');
+  const [bizL3, setBizL3] = useState('');
+  const bizData = {
+    '贷款业务': { '个人住房贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '消费贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '经营性贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '其他贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'] },
+    '银行卡': { '账户管理': ['开卡','销户','限额','转账次数','风控','其他'], '市场活动及增值服务': null, '收费及挂失': null, '其他': null },
+    '信用卡': { '申请、开卡及换卡': null, '协商还款': null, '使用和还款': null, '账单服务': null, '市场活动、积分及增值服务': null, '挂失及注销': null, '个人信用信息': null, '信用卡盗刷': null, '催收': null, '征信': null, '其他': null },
+    '对公账户': null,
+    '理财业务': { '自营理财': null, '代理理财': null },
+    '营业秩序': { '停车': null, '营业时间': null, '其他': null },
+    '存款业务': null,
+    '取款业务': null,
+    '用工管理': null,
+    '社保卡': { '申请、开卡及换卡': null, '挂失及注销': null, '其他': null },
+    '个人金融信息': { '个人信用信息采集': null, '个人信用信息使用': null, '个人信用信息异议处理': null, '征信之外的个人金融信息的收集': null, '其他': null },
+    '支付结算': { '账户管理': null, '资金汇划': null, '票据': null, '联网核查': null, '电子支付': null, '非银行支付机构网络支付': null },
+    '服务问题': null,
+    '设备设施': null,
+    '营销问题': { '营销方式': null, '中介营销': null, '其他': null },
+    '人民币管理': { '残损、污损币兑换（收存）': null, '假币鉴定与收缴': null, '小面额人民币兑换（收存）': null, '纪念币（钞）': null, '其他': null },
+    '外汇': { '个人结售汇': null, '个人外汇汇款': null, '个人外汇交易': null, '个人外汇储蓄': null, '外汇账户管理': null, '其他': null },
+    '贵金属': { '自营实物贵金属': null, '自营账户贵金属': null, '代理贵金属交易': null, '其他': null },
+    '银行代理业务': { '代理保险业务': null, '代理证券业务': null, '代理期货业务': null, '代理信托业务': null, '代理基金业务': null, '代理他行业务': null, '其他': null },
+    '其他中间业务': { '个人资信证明': null, '保管箱': null, '代收付业务': null, '其他': null },
+    '国库': { '国债': null, '税收与行政事业性收费': null, '资金缴付': null, '其他': null },
+    '其他': { '功能类业务': null, '其他银行业务': null, '呼叫服务': null, '其他投诉': null }
+  };
+  const bizL1Options = Object.keys(bizData);
+  const bizL2Options = bizL1 && bizData[bizL1] ? Object.keys(bizData[bizL1]) : [];
+  const bizL3Options = bizL1 && bizL2 && bizData[bizL1] && bizData[bizL1][bizL2] ? bizData[bizL1][bizL2] : [];
+  const handleBizL1Change = v => { setBizL1(v); setBizL2(''); setBizL3(''); };
+  const handleBizL2Change = v => { setBizL2(v); setBizL3(''); };
   // 客户查询返回多条候选记录，需要业务人员人工确认后再回填。
   const customerCandidates = [{
     id: 'C001',
@@ -1938,13 +1970,25 @@ function StandardComplaintForm({
             children: [/*#__PURE__*/_jsx(Field, {
               label: "* 业务类别大类",
               type: "select",
-              options: ['贷款业务', '银行卡业务', '账户服务', '支付结算', '其他']
+              options: bizL1Options,
+              value: bizL1,
+              setValue: handleBizL1Change
             }), /*#__PURE__*/_jsx(Field, {
               label: "* 业务类别中类",
-              placeholder: "手工填写或由标签带出"
+              type: bizL2Options.length ? "select" : "input",
+              options: bizL2Options,
+              value: bizL2,
+              setValue: handleBizL2Change,
+              disabled: !bizL2Options.length,
+              placeholder: bizL2Options.length ? "请选择中类" : "无中类分类"
             }), /*#__PURE__*/_jsx(Field, {
               label: "* 业务类别小类",
-              placeholder: "手工填写或由标签带出"
+              type: bizL3Options.length ? "select" : "input",
+              options: bizL3Options,
+              value: bizL3,
+              setValue: setBizL3,
+              disabled: !bizL3Options.length,
+              placeholder: bizL3Options.length ? "请选择小类" : "无小类分类"
             }), /*#__PURE__*/_jsx(Field, {
               label: "* 投诉原因大类",
               type: "select",
