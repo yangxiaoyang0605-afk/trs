@@ -2570,23 +2570,9 @@ function BatchImport({
             children: "›"
           })]
         })]
-      }), selectedRow ? /*#__PURE__*/_jsxs("section", {
+      }), selectedRow ? /*#__PURE__*/_jsx("section", {
         className: "min-w-0 space-y-4",
-        children: [/*#__PURE__*/_jsxs("div", {
-          className: "rounded-2xl border border-slate-200 bg-white px-5 py-4",
-          children: [/*#__PURE__*/_jsxs("div", {
-            className: "flex flex-wrap items-center justify-between gap-3",
-            children: [/*#__PURE__*/_jsxs("div", {
-              children: [/*#__PURE__*/_jsxs("div", {
-                className: "text-base font-black text-ink",
-                children: ["当前填写：", selectedRow.no]
-              }), /*#__PURE__*/_jsx("div", {
-                className: "mt-1 text-sm text-slate-500",
-                children: "填写完成后在表单底部点击派发，当前工单将进入处理流程，并从左侧导入列表移除。"
-              })]
-            })]
-          })]
-        }), /*#__PURE__*/_jsx(StandardComplaintForm, {
+        children: /*#__PURE__*/_jsx(StandardComplaintForm, {
           content: content,
           setContent: setContent,
           productTag: productTag,
@@ -2598,7 +2584,7 @@ function BatchImport({
           hideHeader: true,
           footerMode: "dispatch",
           onDispatch: dispatchCurrent
-        })]
+        })
       }) : /*#__PURE__*/_jsxs("section", {
         className: "flex min-h-[360px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center",
         children: [/*#__PURE__*/_jsx("div", {
