@@ -711,20 +711,11 @@ function EntryWorkspace(props) {
     }) : /*#__PURE__*/_jsxs(_Fragment, {
       children: [/*#__PURE__*/_jsxs("div", {
         className: "mb-5 flex flex-wrap items-center justify-between gap-3",
-        children: [/*#__PURE__*/_jsx("button", {
+        children: /*#__PURE__*/_jsx("button", {
           onClick: () => setEntryTab('列表'),
           className: "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700",
           children: "返回工单列表"
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "flex flex-wrap gap-2",
-          children: [/*#__PURE__*/_jsx("button", {
-            className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-rizhao",
-            children: "保存草稿"
-          }), /*#__PURE__*/_jsx("button", {
-            className: "rounded-lg bg-rizhao px-4 py-2 text-sm font-black text-white",
-            children: "提交"
-          })]
-        })]
+        })
       }), /*#__PURE__*/_jsx(StandardComplaintForm, {
         content: content,
         setContent: setContent,
@@ -1031,7 +1022,7 @@ function ProcessingDetail({
     label: '办理时限',
     value: '2026-07-04 18:00'
   }, {
-    label: '所属机构',
+    label: '处理机构',
     value: row.org
   }, {
     label: '处理人',
@@ -1085,7 +1076,7 @@ function ProcessingDetail({
         value: reasonTag
       }]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "文件附件",
+      title: "附件",
       fields: [{
         label: '附件状态',
         value: '暂无附件'
@@ -1465,7 +1456,7 @@ function ReadOnlyComplaintDetail({
     label: '办理时限',
     value: '2026-07-04 18:00'
   }, {
-    label: '所属机构',
+    label: '处理机构',
     value: row.org
   }, {
     label: '处理人',
@@ -1519,7 +1510,7 @@ function ReadOnlyComplaintDetail({
         value: '业务办理 / 还款与征信异议'
       }]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "文件附件",
+      title: "附件",
       fields: [{
         label: '附件状态',
         value: '暂无附件'
@@ -1527,7 +1518,7 @@ function ReadOnlyComplaintDetail({
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: [{
-        label: '所属机构',
+        label: '处理机构',
         value: row.org
       }, {
         label: '处理人',
@@ -1987,7 +1978,7 @@ function StandardComplaintForm({
           })]
         })
       }), /*#__PURE__*/_jsxs(StandardSection, {
-        title: "文件附件",
+        title: "附件",
         children: [/*#__PURE__*/_jsxs("div", {
           className: "mb-4 flex items-center gap-3",
           children: [/*#__PURE__*/_jsx("button", {
@@ -2004,7 +1995,7 @@ function StandardComplaintForm({
             children: [/*#__PURE__*/_jsx("thead", {
               className: "bg-mist text-slate-700",
               children: /*#__PURE__*/_jsx("tr", {
-                children: ['附件名称', '大小', '上传日期', '上传人员', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+                children: ['附件名称', '大小', '上传日期', '上传人员'].map(head => /*#__PURE__*/_jsx("th", {
                   className: "px-4 py-3 font-black",
                   children: head
                 }, head))
@@ -2013,7 +2004,7 @@ function StandardComplaintForm({
               children: /*#__PURE__*/_jsx("tr", {
                 children: /*#__PURE__*/_jsx("td", {
                   className: "px-4 py-5 text-slate-400",
-                  colSpan: "5",
+                  colSpan: "4",
                   children: "暂无附件"
                 })
               })
@@ -2025,8 +2016,8 @@ function StandardComplaintForm({
         children: /*#__PURE__*/_jsxs("div", {
           className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
           children: [/*#__PURE__*/_jsx(SearchableSelectField, {
-            label: "所属机构",
-            placeholder: "搜索或选择所属机构",
+            label: "处理机构",
+            placeholder: "搜索或选择处理机构",
             options: ['总行消保中心', '东港支行', '岚山支行', '莒县支行', '五莲支行', '信用卡中心']
           }), /*#__PURE__*/_jsx(SearchableSelectField, {
             label: "处理人",
@@ -2037,15 +2028,12 @@ function StandardComplaintForm({
       }), /*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
-          className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
-          children: "重置"
-        }), /*#__PURE__*/_jsx("button", {
           className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
-          children: "保存草稿"
+          children: "保存"
       }), /*#__PURE__*/_jsx("button", {
           onClick: footerMode === 'dispatch' ? onDispatch : undefined,
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
-          children: footerMode === 'dispatch' ? "派发" : "提交"
+          children: "派发"
         })]
       })]
     }), showCustomerModal && /*#__PURE__*/_jsx(CustomerConfirmModal, {
@@ -2479,8 +2467,6 @@ function BatchImport({
   }];
   const [importedRows, setImportedRows] = useState(initialImportedRows);
   const [selectedNo, setSelectedNo] = useState(initialImportedRows[0].no);
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [previewTab, setPreviewTab] = useState(0);
   const selectedRow = importedRows.find(row => row.no === selectedNo) || importedRows[0];
   const dispatchCurrent = () => {
     if (!selectedRow) return;
@@ -2524,138 +2510,10 @@ function BatchImport({
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-2 text-sm text-slate-500",
           children: isUploaded ? "文件已上传，系统正在解析字段和数据内容。" : "先下载模板并按格式填写，再上传批量数据，系统自动解析。"
-        }), !isUploaded && /*#__PURE__*/_jsx("button", {
-          onClick: () => setShowUploadModal(true),
+        }),         !isUploaded && /*#__PURE__*/_jsx("button", {
+          onClick: () => startUploadAndParse(),
           className: "mt-6 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "上传数据"
-        }), showUploadModal && /*#__PURE__*/_jsx("div", {
-          className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
-          children: /*#__PURE__*/_jsxs("div", {
-            className: "flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-high",
-            children: [/*#__PURE__*/_jsxs("div", {
-              className: "flex items-center justify-between border-b border-line-divider px-6 py-5",
-              children: [/*#__PURE__*/_jsx("div", {
-                className: "text-lg font-black text-ink",
-                children: "数据异常"
-              }), /*#__PURE__*/_jsx("button", {
-                onClick: () => setShowUploadModal(false),
-                className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600",
-                children: "关闭"
-              })]
-            }), /*#__PURE__*/_jsx("div", {
-              className: "flex-1 overflow-y-auto px-6 py-5",
-              children: /*#__PURE__*/_jsxs("div", {
-                className: "space-y-4",
-                children: [/*#__PURE__*/_jsxs("div", {
-                  className: "flex gap-1 rounded-xl bg-slate-100 p-1",
-                  children: [['字段格式错误', '文件内工单重复', '系统工单重复', '重要值缺失'].map((tabName, i) => /*#__PURE__*/_jsx("button", {
-                    onClick: () => setPreviewTab(i),
-                    className: `flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${previewTab === i ? 'bg-white text-ink shadow-sm' : 'text-slate-600 hover:text-ink'}`,
-                    children: tabName
-                  }, i))]
-                }), previewTab === 0 ? /*#__PURE__*/_jsx("div", {
-                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
-                  children: /*#__PURE__*/_jsxs("table", {
-                    className: "w-full text-left text-sm",
-                    children: [/*#__PURE__*/_jsx("thead", {
-                      children: /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-200 bg-mist/60",
-                        children: ['Excel行号', '异常字段', '原始内容', '异常原因'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
-                      })
-                    }), /*#__PURE__*/_jsx("tbody", {
-                      children: [
-                        ['第 8 行', '联系电话', '138123', '手机号格式错误，应为11位手机号或有效固定电话'],
-                        ['第 12 行', '身份证号码', '3701ABC001', '身份证号码格式错误'],
-                        ['第 19 行', '是否重办', '需要', '仅允许填写"是"或"否"'],
-                        ['第 26 行', '工单级别', '特别紧急', '不属于系统有效字典值'],
-                        ['第 31 行', '投诉内容', '2058个字符', '超过2000字符长度限制']
-                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-100",
-                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
-                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 3 ? 'text-red-600 font-bold' : ''}`, children: cell
-                        }, j))
-                      }, i))
-                    })]
-                  })
-                }) : previewTab === 1 ? /*#__PURE__*/_jsx("div", {
-                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
-                  children: /*#__PURE__*/_jsxs("table", {
-                    className: "w-full text-left text-sm",
-                    children: [/*#__PURE__*/_jsx("thead", {
-                      children: /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-200 bg-mist/60",
-                        children: ['Excel行号', '重复内容', '重复行', '判断依据'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
-                      })
-                    }), /*#__PURE__*/_jsx("tbody", {
-                      children: [
-                        ['第 15 行', '监管工单编号：JG202607090015', '第 6 行', '监管工单编号完全一致'],
-                        ['第 23 行', '王某 / 13806331234 / 贷款利息争议', '第 9 行', '客户身份及投诉内容完全一致'],
-                        ['第 37 行', '李某 / 东港支行 / 客服热线', '第 35 行', '核心工单信息高度重复']
-                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-100",
-                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
-                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 1 ? 'font-bold' : ''}`, children: cell
-                        }, j))
-                      }, i))
-                    })]
-                  })
-                }) : previewTab === 2 ? /*#__PURE__*/_jsx("div", {
-                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
-                  children: /*#__PURE__*/_jsxs("table", {
-                    className: "w-full text-left text-sm",
-                    children: [/*#__PURE__*/_jsx("thead", {
-                      children: /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-200 bg-mist/60",
-                        children: ['Excel行号', '当前内容', '系统已有工单', '当前状态'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
-                      })
-                    }), /*#__PURE__*/_jsx("tbody", {
-                      children: [
-                        ['第 7 行', '监管编号 JG202607010008', 'TS202607010023', '处理中'],
-                        ['第 18 行', '王某 / 13806331234', 'TS202606280015', '已结案'],
-                        ['第 29 行', '李某 / 身份证尾号 1234', 'TS202607050042', '待审核']
-                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-100",
-                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
-                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 3 ? 'font-bold' : ''}`, children: cell
-                        }, j))
-                      }, i))
-                    })]
-                  })
-                }) : /*#__PURE__*/_jsx("div", {
-                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
-                  children: /*#__PURE__*/_jsxs("table", {
-                    className: "w-full text-left text-sm",
-                    children: [/*#__PURE__*/_jsx("thead", {
-                      children: /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-200 bg-mist/60",
-                        children: ['Excel行号', '缺失字段', '当前内容', '处理要求'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
-                      })
-                    }), /*#__PURE__*/_jsx("tbody", {
-                      children: [
-                        ['第 5 行', '标题', '空', '必须补充工单标题'],
-                        ['第 11 行', '投诉人姓名', '空', '必须填写投诉人姓名'],
-                        ['第 16 行', '被投诉机构', '空', '必须选择有效机构'],
-                        ['第 22 行', '投诉内容', '空', '必须填写投诉具体内容'],
-                        ['第 28 行', '监管工单编号', '空', '当前为监管来源，必须填写监管工单编号']
-                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
-                        className: "border-b border-slate-100",
-                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
-                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 2 ? 'font-bold text-red-500' : j === 3 ? 'font-bold text-rizhao' : ''}`, children: cell
-                        }, j))
-                      }, i))
-                    })]
-                  })
-                })]
-              })
-            }), /*#__PURE__*/_jsxs("div", {
-              className: "flex justify-end gap-3 border-t border-slate-200 px-6 py-4",
-              children: [/*#__PURE__*/_jsx("button", {
-                onClick: () => { setShowUploadModal(false); startUploadAndParse(); },
-                className: "rounded-xl bg-rizhao px-6 py-2.5 text-sm font-black text-white shadow-mid",
-                children: "解析"
-              })]
-            })]
-          })
         }), isUploaded && /*#__PURE__*/_jsxs("div", {
           className: "mx-auto mt-6 max-w-xl",
           children: [/*#__PURE__*/_jsxs("div", {
@@ -3014,7 +2872,7 @@ function ReturnVisitPage({
         label: '工号',
         value: currentUser.workNo
       }, {
-        label: '所属机构',
+        label: '处理机构',
         value: currentUser.org
       }]
     }), /*#__PURE__*/_jsxs(StandardSection, {
@@ -3221,7 +3079,7 @@ function LedgerEditPage({
         label: '办理时限',
         value: '2026-07-04 18:00'
       }, {
-        label: '所属机构',
+        label: '处理机构',
         value: row.org
       }, {
         label: '处理人',
@@ -3247,7 +3105,7 @@ function LedgerEditPage({
         value: '业务办理 / 还款与征信异议'
       }]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "文件附件",
+      title: "附件",
       fields: [{
         label: '附件状态',
         value: '暂无附件'
@@ -3495,18 +3353,6 @@ function RolePermissionManager() {
                   className: `inline-block rounded-full px-2 py-0.5 text-xs font-bold ${role.status ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
                   children: role.status ? '启用' : '停用'
                 })]
-              })]
-            }), /*#__PURE__*/_jsxs("div", {
-              className: "flex gap-2",
-              children: [/*#__PURE__*/_jsx("button", {
-                className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-rizhao",
-                children: "编辑基本信息"
-              }), /*#__PURE__*/_jsx("button", {
-                className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-rizhao",
-                children: "复制角色"
-              }), /*#__PURE__*/_jsx("button", {
-                className: "rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-bold text-red-500",
-                children: "停用角色"
               })]
             })]
           })]
