@@ -1635,6 +1635,9 @@ function StandardComplaintForm({
   const [gender, setGender] = useState('');
   const [idNo, setIdNo] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [complaintChannel, setComplaintChannel] = useState('');
+  const isRegulatoryRequired = complaintChannel === '国家局' || complaintChannel === '省监管局';
+  const isChannelDetailRequired = complaintChannel === '其它';
   // 客户查询返回多条候选记录，需要业务人员人工确认后再回填。
   const customerCandidates = [{
     id: 'C001',
@@ -1775,13 +1778,17 @@ function StandardComplaintForm({
           }), /*#__PURE__*/_jsx(Field, {
           label: "* 投诉反映渠道",
           type: "select",
-          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它']
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'],
+          value: complaintChannel,
+          setValue: setComplaintChannel
           }), /*#__PURE__*/_jsx(Field, {
             label: "渠道细分",
-            placeholder: "投诉反映渠道为其它时必填，不超过20字"
+            placeholder: "投诉反映渠道为其它时必填，不超过20字",
+            required: isChannelDetailRequired
           }), /*#__PURE__*/_jsx(Field, {
             label: "监管工单编号",
-            placeholder: "监管来源必填；其他渠道非必填"
+            placeholder: "监管来源必填；其他渠道非必填",
+            required: isRegulatoryRequired
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单级别",
             type: "select",
@@ -3122,13 +3129,15 @@ function Field({
   options = [],
   value,
   setValue,
-  disabled = false
+  disabled = false,
+  required = false
 }) {
+  const displayLabel = required ? '* ' + label : label;
   return /*#__PURE__*/_jsxs("label", {
     className: disabled ? "block opacity-60" : "block",
     children: [/*#__PURE__*/_jsx("div", {
       className: "field-label mb-2",
-      children: label
+      children: displayLabel
     }), /*#__PURE__*/_jsx("div", {
       className: "field-box",
       children: disabled ? /*#__PURE__*/_jsx("div", {
