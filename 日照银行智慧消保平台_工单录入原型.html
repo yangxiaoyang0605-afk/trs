@@ -3203,7 +3203,8 @@ const rolesData = [
         台账查询与导出: { '台账查询': true, '导出台账': true, '回访登记': true },
         报表管理: { '报表查询': true, '导出报表': true },
         统计分析: { '统计看板': true },
-        消息提醒: { '待办/超期提醒': true }
+        消息提醒: { '待办/超期提醒': true },
+        后台管理: { '用户管理': false, '角色权限管理': false, '机构管理': false, '短信模板维护': false }
       },
       buttons: {},
       dataScope: '本行及下辖'
@@ -3216,10 +3217,25 @@ const rolesData = [
         台账查询与导出: { '台账查询': true, '导出台账': false, '回访登记': true },
         报表管理: { '报表查询': false, '导出报表': false },
         统计分析: { '统计看板': false },
-        消息提醒: { '待办/超期提醒': true }
+        消息提醒: { '待办/超期提醒': true },
+        后台管理: { '用户管理': false, '角色权限管理': false, '机构管理': false, '短信模板维护': false }
       },
       buttons: {},
       dataScope: '本支行/网点'
+    }
+  },
+  { name: '超级管理员', code: 'SUPER_ADMIN', count: 2, scope: '全行', status: true,
+    perms: {
+      menus: {
+        工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': true, '转办': true, '查看工单详情': true, '关单审核': true },
+        台账查询与导出: { '台账查询': true, '导出台账': true, '回访登记': true },
+        报表管理: { '报表查询': true, '导出报表': true },
+        统计分析: { '统计看板': true },
+        消息提醒: { '待办/超期提醒': true },
+        后台管理: { '用户管理': true, '角色权限管理': true, '机构管理': true, '短信模板维护': true }
+      },
+      buttons: {},
+      dataScope: '全行'
     }
   }
 ];
@@ -3280,7 +3296,10 @@ function RolePermissionManager() {
               children: r.count
             }), "人  ·  ", r.scope]
           })]
-        }, r.name))]
+        }, r.name)), /*#__PURE__*/_jsx("button", {
+          className: "flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-white/60 p-4 text-sm font-bold text-slate-500 transition hover:border-rizhao hover:text-rizhao",
+          children: /*#__PURE__*/_jsxs("span", { children: ["+ 新增角色"] })
+        })]
       })
     }), /*#__PURE__*/_jsx("div", {
       className: "flex-1 min-w-0",
@@ -3509,7 +3528,7 @@ function ButtonPermPanel({ perms, onChange }) {
 }
 
 function DataScopePanel({ scope, onChange }) {
-  const options = ['本行及下辖', '本部室', '本支行/网点'];
+  const options = ['全行', '本行及下辖', '本部室', '本支行/网点'];
   return /*#__PURE__*/_jsx("div", {
     className: "space-y-3",
     children: options.map(opt => /*#__PURE__*/_jsx("label", {
