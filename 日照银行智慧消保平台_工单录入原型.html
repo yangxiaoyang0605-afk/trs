@@ -2488,6 +2488,8 @@ function BatchImport({
   }];
   const [importedRows, setImportedRows] = useState(initialImportedRows);
   const [selectedNo, setSelectedNo] = useState(initialImportedRows[0].no);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [previewTab, setPreviewTab] = useState(0);
   const selectedRow = importedRows.find(row => row.no === selectedNo) || importedRows[0];
   const dispatchCurrent = () => {
     if (!selectedRow) return;
@@ -2532,9 +2534,48 @@ function BatchImport({
           className: "mt-2 text-sm text-slate-500",
           children: isUploaded ? "文件已上传，系统正在解析字段和数据内容。" : "先下载模板并按格式填写，再上传批量数据，系统自动解析。"
         }), !isUploaded && /*#__PURE__*/_jsx("button", {
-          onClick: startUploadAndParse,
+          onClick: () => setShowUploadModal(true),
           className: "mt-6 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "上传数据"
+        }), showUploadModal && /*#__PURE__*/_jsx("div", {
+          className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
+          children: /*#__PURE__*/_jsxs("div", {
+            className: "flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-high",
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "flex items-center justify-between border-b border-line-divider px-6 py-5",
+              children: [/*#__PURE__*/_jsx("div", {
+                className: "text-lg font-black text-ink",
+                children: "数据异常"
+              }), /*#__PURE__*/_jsx("button", {
+                onClick: () => setShowUploadModal(false),
+                className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600",
+                children: "关闭"
+              })]
+            }), /*#__PURE__*/_jsx("div", {
+              className: "flex-1 overflow-y-auto px-6 py-5",
+              children: /*#__PURE__*/_jsxs("div", {
+                className: "space-y-4",
+                children: [/*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-1 rounded-xl bg-slate-100 p-1",
+                  children: [['字段格式错误', '文件内工单重复', '系统工单重复', '重要值缺失'].map((tabName, i) => /*#__PURE__*/_jsx("button", {
+                    onClick: () => setPreviewTab(i),
+                    className: `flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${previewTab === i ? 'bg-white text-ink shadow-sm' : 'text-slate-600 hover:text-ink'}`,
+                    children: tabName
+                  }, i))]
+                }), /*#__PURE__*/_jsx("div", {
+                  className: "flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500",
+                  children: ['暂无字段格式错误', '暂无文件内重复工单', '暂无双系统重复工单', '暂无重要值缺失'][previewTab]
+                })]
+              })
+            }), /*#__PURE__*/_jsxs("div", {
+              className: "flex justify-end gap-3 border-t border-slate-200 px-6 py-4",
+              children: [/*#__PURE__*/_jsx("button", {
+                onClick: () => { setShowUploadModal(false); startUploadAndParse(); },
+                className: "rounded-xl bg-rizhao px-6 py-2.5 text-sm font-black text-white shadow-mid",
+                children: "解析"
+              })]
+            })]
+          })
         }), isUploaded && /*#__PURE__*/_jsxs("div", {
           className: "mx-auto mt-6 max-w-xl",
           children: [/*#__PURE__*/_jsxs("div", {
