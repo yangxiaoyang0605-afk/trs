@@ -2553,9 +2553,98 @@ function BatchImport({
                     className: `flex-1 rounded-lg px-3 py-2 text-sm font-bold transition ${previewTab === i ? 'bg-white text-ink shadow-sm' : 'text-slate-600 hover:text-ink'}`,
                     children: tabName
                   }, i))]
-                }), /*#__PURE__*/_jsx("div", {
-                  className: "flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500",
-                  children: ['暂无字段格式错误', '暂无文件内重复工单', '暂无双系统重复工单', '暂无重要值缺失'][previewTab]
+                }), previewTab === 0 ? /*#__PURE__*/_jsx("div", {
+                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
+                  children: /*#__PURE__*/_jsxs("table", {
+                    className: "w-full text-left text-sm",
+                    children: [/*#__PURE__*/_jsx("thead", {
+                      children: /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-200 bg-mist/60",
+                        children: ['Excel行号', '异常字段', '原始内容', '异常原因'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
+                      })
+                    }), /*#__PURE__*/_jsx("tbody", {
+                      children: [
+                        ['第 8 行', '联系电话', '138123', '手机号格式错误，应为11位手机号或有效固定电话'],
+                        ['第 12 行', '身份证号码', '3701ABC001', '身份证号码格式错误'],
+                        ['第 19 行', '是否重办', '需要', '仅允许填写"是"或"否"'],
+                        ['第 26 行', '工单级别', '特别紧急', '不属于系统有效字典值'],
+                        ['第 31 行', '投诉内容', '2058个字符', '超过2000字符长度限制']
+                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-100",
+                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
+                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 3 ? 'text-red-600 font-bold' : ''}`, children: cell
+                        }, j))
+                      }, i))
+                    })]
+                  })
+                }) : previewTab === 1 ? /*#__PURE__*/_jsx("div", {
+                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
+                  children: /*#__PURE__*/_jsxs("table", {
+                    className: "w-full text-left text-sm",
+                    children: [/*#__PURE__*/_jsx("thead", {
+                      children: /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-200 bg-mist/60",
+                        children: ['Excel行号', '重复内容', '重复行', '判断依据'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
+                      })
+                    }), /*#__PURE__*/_jsx("tbody", {
+                      children: [
+                        ['第 15 行', '监管工单编号：JG202607090015', '第 6 行', '监管工单编号完全一致'],
+                        ['第 23 行', '王某 / 13806331234 / 贷款利息争议', '第 9 行', '客户身份及投诉内容完全一致'],
+                        ['第 37 行', '李某 / 东港支行 / 客服热线', '第 35 行', '核心工单信息高度重复']
+                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-100",
+                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
+                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 1 ? 'font-bold' : ''}`, children: cell
+                        }, j))
+                      }, i))
+                    })]
+                  })
+                }) : previewTab === 2 ? /*#__PURE__*/_jsx("div", {
+                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
+                  children: /*#__PURE__*/_jsxs("table", {
+                    className: "w-full text-left text-sm",
+                    children: [/*#__PURE__*/_jsx("thead", {
+                      children: /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-200 bg-mist/60",
+                        children: ['Excel行号', '当前内容', '系统已有工单', '当前状态'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
+                      })
+                    }), /*#__PURE__*/_jsx("tbody", {
+                      children: [
+                        ['第 7 行', '监管编号 JG202607010008', 'TS202607010023', '处理中'],
+                        ['第 18 行', '王某 / 13806331234', 'TS202606280015', '已结案'],
+                        ['第 29 行', '李某 / 身份证尾号 1234', 'TS202607050042', '待审核']
+                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-100",
+                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
+                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 3 ? 'font-bold' : ''}`, children: cell
+                        }, j))
+                      }, i))
+                    })]
+                  })
+                }) : /*#__PURE__*/_jsx("div", {
+                  className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
+                  children: /*#__PURE__*/_jsxs("table", {
+                    className: "w-full text-left text-sm",
+                    children: [/*#__PURE__*/_jsx("thead", {
+                      children: /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-200 bg-mist/60",
+                        children: ['Excel行号', '缺失字段', '当前内容', '处理要求'].map(h => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }, h))
+                      })
+                    }), /*#__PURE__*/_jsx("tbody", {
+                      children: [
+                        ['第 5 行', '标题', '空', '必须补充工单标题'],
+                        ['第 11 行', '投诉人姓名', '空', '必须填写投诉人姓名'],
+                        ['第 16 行', '被投诉机构', '空', '必须选择有效机构'],
+                        ['第 22 行', '投诉内容', '空', '必须填写投诉具体内容'],
+                        ['第 28 行', '监管工单编号', '空', '当前为监管来源，必须填写监管工单编号']
+                      ].map((row, i) => /*#__PURE__*/_jsx("tr", {
+                        className: "border-b border-slate-100",
+                        children: row.map((cell, j) => /*#__PURE__*/_jsx("td", {
+                          className: `px-4 py-3 ${j === 0 ? 'font-bold text-slate-500' : j === 2 ? 'font-bold text-red-500' : j === 3 ? 'font-bold text-rizhao' : ''}`, children: cell
+                        }, j))
+                      }, i))
+                    })]
+                  })
                 })]
               })
             }), /*#__PURE__*/_jsxs("div", {
