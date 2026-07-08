@@ -3299,33 +3299,62 @@ function AdminWorkspace({ adminTab, setAdminTab }) {
 const rolesData = [
   { name: '机构管理员', code: 'ORG_ADMIN', count: 18, scope: '本机构及下辖机构', status: true,
     perms: {
-      menus: { 投诉工单: { 工单录入: true, 工单处理: true, 投诉台账: true }, 数据分析: { 业务报表: true, 统计看板: true }, 后台管理: {} },
-      buttons: { 工单录入: { 查看: true, 单笔录入: true, 批量导入: true, 保存草稿: true, 派发: true }, 工单处理: { 查看详情: true, 填写处理结果: true, 外呼: true, 发送短信: true, 上传沟通记录: true, 转办: true, 提交审核: true, 关单审核: true }, 台账: { 查询: true, 查看详情: true, 导出: true, 回访: true } },
-      dataScope: '本机构及下辖机构'
-    },
-    users: [
-      { name: '张三', empId: '100023', org: '东港支行', role: '机构管理员', status: true },
-      { name: '李四', empId: '100041', org: '莒县支行', role: '机构管理员', status: true }
-    ]
+      menus: {
+        工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': true, '转办': true, '查看工单详情': true, '关单审核': true },
+        台账查询与导出: { '台账查询': true, '导出台账': true, '回访登记': true },
+        报表管理: { '报表查询': true, '导出报表': true },
+        统计分析: { '统计看板': true },
+        消息提醒: { '待办/超期提醒': true }
+      },
+      buttons: {},
+      dataScope: '本行及下辖'
+    }
   },
   { name: '投诉处理员', code: 'HANDLER', count: 280, scope: '按机构授权', status: true,
     perms: {
-      menus: { 投诉工单: { 工单录入: false, 工单处理: true, 投诉台账: true }, 数据分析: { 业务报表: false, 统计看板: false }, 后台管理: {} },
-      buttons: { 工单录入: { 查看: true, 单笔录入: false, 批量导入: false, 保存草稿: false, 派发: false }, 工单处理: { 查看详情: true, 填写处理结果: true, 外呼: true, 发送短信: true, 上传沟通记录: true, 转办: true, 提交审核: true, 关单审核: false }, 台账: { 查询: true, 查看详情: true, 导出: false, 回访: true } },
-      dataScope: '仅本人'
-    },
-    users: [
-      { name: '王芳', empId: '100156', org: '东港支行', role: '投诉处理员', status: true },
-      { name: '赵刚', empId: '100203', org: '岚山支行', role: '投诉处理员', status: true },
-      { name: '刘洋', empId: '100189', org: '莒县支行', role: '投诉处理员', status: true }
-    ]
-  },
+      menus: {
+        工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': false, '转办': true, '查看工单详情': true, '关单审核': false },
+        台账查询与导出: { '台账查询': true, '导出台账': false, '回访登记': true },
+        报表管理: { '报表查询': false, '导出报表': false },
+        统计分析: { '统计看板': false },
+        消息提醒: { '待办/超期提醒': true }
+      },
+      buttons: {},
+      dataScope: '本支行/网点'
+    }
+  }
 ];
 
 function RolePermissionManager() {
   const [selectedRoleIdx, setSelectedRoleIdx] = useState(0);
   const [permTab, setPermTab] = useState('菜单权限');
+  const [dirty, setDirty] = useState(false);
   const role = rolesData[selectedRoleIdx];
+  const [menusState, setMenusState] = useState(() => JSON.parse(JSON.stringify(role.perms.menus)));
+  const [buttonsState, setButtonsState] = useState(() => JSON.parse(JSON.stringify(role.perms.buttons)));
+  const [scopeState, setScopeState] = useState(role.perms.dataScope);
+  const [saved, setSaved] = useState(false);
+
+  const switchRole = i => {
+    setSelectedRoleIdx(i);
+    const r = rolesData[i];
+    setMenusState(JSON.parse(JSON.stringify(r.perms.menus)));
+    setButtonsState(JSON.parse(JSON.stringify(r.perms.buttons)));
+    setScopeState(r.perms.dataScope);
+    setDirty(false);
+    setSaved(false);
+  };
+
+  const handleSave = () => {
+    const r = rolesData[selectedRoleIdx];
+    r.perms.menus = JSON.parse(JSON.stringify(menusState));
+    r.perms.buttons = JSON.parse(JSON.stringify(buttonsState));
+    r.perms.dataScope = scopeState;
+    setDirty(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return /*#__PURE__*/_jsxs("div", {
     className: "flex gap-6",
     children: [/*#__PURE__*/_jsx("div", {
@@ -3334,7 +3363,7 @@ function RolePermissionManager() {
         className: "space-y-3",
         children: [rolesData.map((r, i) => /*#__PURE__*/_jsxs("button", {
           type: "button",
-          onClick: () => setSelectedRoleIdx(i),
+          onClick: () => switchRole(i),
           className: `w-full rounded-2xl border bg-white p-5 text-left transition ${i === selectedRoleIdx ? 'border-rizhao shadow-low' : 'border-slate-200 hover:border-line-divider'}`,
           children: [/*#__PURE__*/_jsxs("div", {
             className: "flex items-start justify-between",
@@ -3393,19 +3422,47 @@ function RolePermissionManager() {
             })]
           })]
         }), /*#__PURE__*/_jsxs("div", {
-          className: "px-6 pt-4",
+          className: "px-6 pt-3",
           children: [/*#__PURE__*/_jsx("div", {
             className: "flex gap-0 border-b border-slate-200",
-            children: ['菜单权限', '按钮权限', '数据范围'].map(tab => /*#__PURE__*/_jsx("button", {
+            children: ['菜单权限', '数据范围'].map(tab => /*#__PURE__*/_jsx("button", {
               onClick: () => setPermTab(tab),
               className: `px-5 py-3 text-sm font-bold transition border-b-2 ${permTab === tab ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-500 hover:text-ink'}`,
               children: tab
             }, tab))
-          }), /*#__PURE__*/_jsx("div", {
-            className: "py-6",
-            children: permTab === '菜单权限' ? /*#__PURE__*/_jsx(MenuPermPanel, { perms: role.perms.menus }) :
-              permTab === '按钮权限' ? /*#__PURE__*/_jsx(ButtonPermPanel, { perms: role.perms.buttons }) :
-              permTab === '数据范围' ? /*#__PURE__*/_jsx(DataScopePanel, { scope: role.perms.dataScope }) : null
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "py-4",
+            children: [permTab === '菜单权限' ? /*#__PURE__*/_jsx(MenuPermPanel, { perms: menusState, onChange: v => { setMenusState(v); setDirty(true); } }) :
+              permTab === '数据范围' ? /*#__PURE__*/_jsx(DataScopePanel, { scope: scopeState, onChange: v => { setScopeState(v); setDirty(true); } }) : null,
+            /*#__PURE__*/_jsxs("div", {
+              className: "mt-4 flex items-center justify-between gap-3 border-t border-slate-200 pt-3",
+              children: [/*#__PURE__*/_jsxs("div", {
+                className: "flex items-center gap-2 text-sm",
+                children: [dirty && /*#__PURE__*/_jsxs(React.Fragment, {
+                  children: [/*#__PURE__*/_jsx("span", {
+                    className: "inline-block h-2 w-2 rounded-full bg-amber-400"
+                  }), /*#__PURE__*/_jsx("span", {
+                    className: "text-amber-600 font-bold",
+                    children: "有未保存的更改"
+                  })]
+                }), saved && /*#__PURE__*/_jsxs(React.Fragment, {
+                  children: [/*#__PURE__*/_jsx("span", {
+                    className: "inline-block h-2 w-2 rounded-full bg-green-500"
+                  }), /*#__PURE__*/_jsx("span", {
+                    className: "text-green-600 font-bold",
+                    children: "权限已保存"
+                  })]
+                }), !dirty && !saved && /*#__PURE__*/_jsx("span", {
+                  className: "text-slate-400",
+                  children: "暂无更改"
+                })]
+              }), /*#__PURE__*/_jsx("button", {
+                onClick: handleSave,
+                disabled: !dirty,
+                className: `rounded-lg px-6 py-2.5 text-sm font-bold text-white shadow-sm transition ${dirty ? 'bg-rizhao hover:brightness-110' : 'bg-slate-300 cursor-not-allowed'}`,
+                children: "保存权限配置"
+              })]
+            })]
           })]
         })]
       })
@@ -3413,138 +3470,217 @@ function RolePermissionManager() {
   });
 }
 
-function MenuPermPanel({ perms }) {
+function MenuPermPanel({ perms, onChange }) {
+  const [expanded, setExpanded] = useState(true);
   const keys = Object.keys(perms);
+  const allChecked = keys.every(k => {
+    const children = Object.keys(perms[k] || {});
+    return children.length === 0 || children.every(c => perms[k][c]);
+  });
+  const handleParent = (parent, val) => {
+    const next = { ...perms };
+    if (next[parent]) {
+      const children = { ...next[parent] };
+      Object.keys(children).forEach(k => { children[k] = val; });
+      next[parent] = children;
+    }
+    onChange(next);
+  };
+  const handleChild = (parent, child, val) => {
+    const next = { ...perms };
+    if (next[parent]) {
+      next[parent] = { ...next[parent], [child]: val };
+    }
+    onChange(next);
+  };
+  const toggleAll = val => {
+    const next = {};
+    keys.forEach(k => {
+      if (perms[k] && Object.keys(perms[k]).length) {
+        next[k] = {};
+        Object.keys(perms[k]).forEach(c => { next[k][c] = val; });
+      } else {
+        next[k] = perms[k] ? { ...perms[k] } : {};
+      }
+    });
+    onChange(next);
+  };
   return /*#__PURE__*/_jsxs("div", {
-    className: "space-y-4",
+    className: "space-y-3",
     children: [/*#__PURE__*/_jsxs("div", {
-      className: "flex gap-3",
+      className: "flex flex-wrap gap-2",
       children: [/*#__PURE__*/_jsx("button", {
+        onClick: () => toggleAll(true),
         className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
         children: "全选"
       }), /*#__PURE__*/_jsx("button", {
+        onClick: () => toggleAll(false),
         className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
         children: "清空"
       }), /*#__PURE__*/_jsx("button", {
+        onClick: () => setExpanded(true),
         className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
         children: "展开全部"
       }), /*#__PURE__*/_jsx("button", {
+        onClick: () => setExpanded(false),
         className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-slate-600",
         children: "收起全部"
       })]
-    }), keys.map(parent => /*#__PURE__*/_jsxs("div", {
-      className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
-      children: [/*#__PURE__*/_jsxs("label", {
-        className: "flex cursor-pointer items-center gap-3",
-        children: [/*#__PURE__*/_jsx("input", {
-          type: "checkbox",
-          defaultChecked: true,
-          className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
-        }), /*#__PURE__*/_jsx("span", {
-          className: "text-base font-bold",
-          children: parent
-        })]
-      }), Object.keys(perms[parent] || {}).length > 0 && /*#__PURE__*/_jsx("div", {
-        className: "ml-7 mt-3 space-y-2 border-l-2 border-slate-200 pl-4",
-        children: Object.entries(perms[parent] || {}).map(([child, checked]) => /*#__PURE__*/_jsx("label", {
+    }), (!expanded ? null : keys.map(parent => {
+      const children = perms[parent] ? Object.keys(perms[parent]) : [];
+      const childrenAll = children.length > 0 && children.every(c => perms[parent][c]);
+      const childrenSome = children.some(c => perms[parent][c]);
+      return /*#__PURE__*/_jsxs("div", {
+        className: "rounded-xl border border-slate-200 bg-mist/40 px-4 py-3",
+        children: [/*#__PURE__*/_jsxs("label", {
           className: "flex cursor-pointer items-center gap-3",
           children: [/*#__PURE__*/_jsx("input", {
             type: "checkbox",
-            defaultChecked: checked,
+            checked: childrenAll || (children.length === 0 && true),
+            ref: el => { if (el) el.indeterminate = children.length > 0 && !childrenAll && childrenSome; },
+            onChange: e => handleParent(parent, e.target.checked),
             className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
           }), /*#__PURE__*/_jsx("span", {
-            className: "text-sm",
-            children: child
+            className: "text-base font-bold",
+            children: parent
           })]
-        }, child))
-      })]
-    }, parent))]
+        }), children.length > 0 && /*#__PURE__*/_jsx("div", {
+          className: "ml-7 mt-3 flex flex-wrap gap-x-6 gap-y-2 border-l-2 border-slate-200 pl-4",
+          children: children.map(child => /*#__PURE__*/_jsx("label", {
+            className: "flex cursor-pointer items-center gap-3",
+            children: [/*#__PURE__*/_jsx("input", {
+              type: "checkbox",
+              checked: !!perms[parent][child],
+              onChange: e => handleChild(parent, child, e.target.checked),
+              className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
+            }), /*#__PURE__*/_jsx("span", {
+              className: "text-sm",
+              children: child
+            })]
+          }, child))
+        })]
+      }, parent);
+    }))]
   });
 }
 
-function ButtonPermPanel({ perms }) {
+function ButtonPermPanel({ perms, onChange }) {
   const groupLabels = { 工单录入: '工单录入', 工单处理: '工单处理', 台账: '台账' };
+  const handleGroup = (group, val) => {
+    const next = { ...perms };
+    if (next[group]) {
+      next[group] = {};
+      Object.keys(perms[group]).forEach(k => { next[group][k] = val; });
+    }
+    onChange(next);
+  };
+  const handleItem = (group, item, val) => {
+    const next = { ...perms };
+    if (next[group]) {
+      next[group] = { ...next[group], [item]: val };
+    }
+    onChange(next);
+  };
   return /*#__PURE__*/_jsx("div", {
     className: "space-y-5",
-    children: Object.entries(perms).map(([group, items]) => /*#__PURE__*/_jsxs("div", {
-      className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
-      children: [/*#__PURE__*/_jsx("div", {
-        className: "mb-3 text-sm font-bold text-slate-500",
-        children: groupLabels[group] || group
-      }), /*#__PURE__*/_jsx("div", {
-        className: "grid grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-3 lg:grid-cols-4",
-        children: Object.entries(items).map(([name, checked]) => /*#__PURE__*/_jsx("label", {
-          className: "flex cursor-pointer items-center gap-3",
-          children: [/*#__PURE__*/_jsx("input", {
+    children: Object.entries(perms).map(([group, items]) => {
+      const itemList = Object.entries(items);
+      const allOn = itemList.length > 0 && itemList.every(([, v]) => v);
+      const someOn = itemList.some(([, v]) => v);
+      return /*#__PURE__*/_jsxs("div", {
+        className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
+        children: [/*#__PURE__*/_jsxs("div", {
+          className: "mb-3 flex items-center gap-3",
+          children: [itemList.length > 0 && /*#__PURE__*/_jsx("input", {
             type: "checkbox",
-            defaultChecked: checked,
+            checked: allOn,
+            ref: el => { if (el) el.indeterminate = !allOn && someOn; },
+            onChange: e => handleGroup(group, e.target.checked),
             className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
           }), /*#__PURE__*/_jsx("span", {
-            className: "text-sm",
-            children: name
+            className: "text-sm font-bold text-slate-500",
+            children: groupLabels[group] || group
           })]
-        }, name))
-      })]
-    }, group))
+        }), /*#__PURE__*/_jsx("div", {
+          className: "grid grid-cols-2 gap-x-8 gap-y-3 md:grid-cols-3 lg:grid-cols-4",
+          children: itemList.map(([name, checked]) => /*#__PURE__*/_jsx("label", {
+            className: "flex cursor-pointer items-center gap-3",
+            children: [/*#__PURE__*/_jsx("input", {
+              type: "checkbox",
+              checked: !!checked,
+              onChange: e => handleItem(group, name, e.target.checked),
+              className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
+            }), /*#__PURE__*/_jsx("span", {
+              className: "text-sm",
+              children: name
+            })]
+          }, name))
+        })]
+      }, group);
+    })
   });
 }
 
-function DataScopePanel({ scope }) {
-  const options = ['仅本人', '本机构', '本机构及下辖机构', '指定机构', '全行'];
-  return /*#__PURE__*/_jsxs("div", {
-    className: "space-y-4",
-    children: [/*#__PURE__*/_jsx("div", {
-      className: "text-sm font-bold text-slate-500",
-      children: "数据范围"
-    }), /*#__PURE__*/_jsx("div", {
-      className: "space-y-3",
-      children: options.map(opt => /*#__PURE__*/_jsx("label", {
-        className: "flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-rizhao",
-        children: [/*#__PURE__*/_jsx("input", {
-          type: "radio",
-          name: "dataScope",
-          defaultChecked: opt === scope,
-          className: "h-4 w-4 border-slate-300 text-rizhao focus:ring-rizhao"
-        }), /*#__PURE__*/_jsx("span", {
-          className: "text-sm font-bold",
-          children: opt
-        })]
-      }, opt))
-    }), scope === '指定机构' && /*#__PURE__*/_jsxs("div", {
-      className: "rounded-2xl border border-slate-200 bg-mist/40 p-4",
-      children: [/*#__PURE__*/_jsxs("div", {
-        className: "mb-3 flex items-center justify-between",
-        children: [/*#__PURE__*/_jsx("span", {
-          className: "text-sm font-bold",
-          children: "已选择"
-        }), /*#__PURE__*/_jsx("button", {
-          className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-rizhao",
-          children: "选择机构"
-        })]
-      }), /*#__PURE__*/_jsxs("div", {
-        className: "flex flex-wrap gap-2",
-        children: ['东港支行', '莒县支行', '五莲支行'].map(org => /*#__PURE__*/_jsx("span", {
-          className: "inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200",
-          children: [org, /*#__PURE__*/_jsx("button", {
-            className: "ml-1 text-slate-400 hover:text-red-500",
-            children: "×"
-          })]
-        }, org))
+function DataScopePanel({ scope, onChange }) {
+  const options = ['本行及下辖', '本部室', '本支行/网点'];
+  return /*#__PURE__*/_jsx("div", {
+    className: "space-y-3",
+    children: options.map(opt => /*#__PURE__*/_jsx("label", {
+      className: `flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${scope === opt ? 'border-rizhao bg-rizhao/5' : 'border-slate-200 bg-white hover:border-rizhao'}`,
+      children: [/*#__PURE__*/_jsx("input", {
+        type: "radio",
+        name: "dataScope",
+        checked: scope === opt,
+        onChange: () => onChange(opt),
+        className: "h-4 w-4 border-slate-300 text-rizhao focus:ring-rizhao"
+      }), /*#__PURE__*/_jsx("span", {
+        className: "text-sm font-bold",
+        children: opt
       })]
-    })]
+    }, opt))
   });
 }
 
 // ─── 用户管理 ─────────────────────────────────────────────
-const userListData = Array.from({ length: 15 }, (_, i) => ({
-  name: ['张三', '李四', '王芳', '赵刚', '刘洋', '陈丽', '周明', '吴强', '郑华', '孙梅', '钱伟', '许晴', '何涛', '宋磊', '韩雪'][i],
-  empId: String(100023 + i),
-  account: 'zhangsan' + (i + 1),
-  org: ['总行消保中心', '东港支行', '岚山支行', '莒县支行', '五莲支行', '信用卡中心', '总行科技部', '开发区支行', '东港支行', '岚山支行', '莒县支行', '五莲支行', '信用卡中心', '总行科技部', '开发区支行'][i],
-  role: ['超级管理员', '机构管理员', '投诉处理员', '投诉处理员', '投诉处理员', '投诉处理员', '超级管理员', '投诉处理员', '机构管理员', '投诉处理员', '投诉处理员', '投诉处理员', '投诉处理员', '机构管理员', '投诉处理员'][i],
-  dataScope: ['全行', '本机构及下辖机构', '仅本人', '仅本人', '本机构', '本机构', '全行', '仅本人', '本机构及下辖机构', '仅本人', '仅本人', '本机构', '本机构', '本机构及下辖机构', '仅本人'][i],
-  status: i < 13 ? true : i === 13
-}));
+const orgLevelMap = [
+  { match: /^总行(?!部)(?!.*部室)/, level: '总行', scope: '本机构及下辖' },
+  { match: /^总行部室$|^总行.*部$|^总行.*处$|^总行.*中心$/, level: '总行部室', scope: '本部室' },
+  { match: /一级行/, level: '一级行', scope: '本机构及下辖' },
+  { match: /分行.*部$|分行.*部室/, level: '一级行部室', scope: '本部室' },
+  { match: /中支.*部$|中支.*部室/, level: '中支部室', scope: '本部室' },
+  { match: /中支.*消保岗|中支.*管理/, level: '分支管理机构', scope: '本机构及下辖' },
+  { match: /支行.*消保岗/, level: '分支管理机构', scope: '本机构及下辖' },
+  { match: /营业部$/, level: '营业部', scope: '本营业部' },
+  { match: /网点$/, level: '网点', scope: '本网点' },
+  { match: /支行$/, level: '支行', scope: '本支行' },
+  { match: /.*/, level: '支行', scope: '本支行' }
+];
+const resolveOrg = org => {
+  for (const { match, level, scope } of orgLevelMap) {
+    if (match.test(org)) return { level, scope };
+  }
+  return { level: '支行', scope: '本支行/本网点/本营业部' };
+};
+const userListData = [
+  { name: '赵一明', empId: '100001', account: 'zhaoyiming', org: '总行消保岗', role: '机构管理员', status: true },
+  { name: '钱立新', empId: '100002', account: 'qianlixin', org: '银河中支消保岗', role: '机构管理员', status: true },
+  { name: '孙海燕', empId: '100003', account: 'sunhaiyan', org: '山海天支行消保岗', role: '机构管理员', status: true },
+  { name: '李国华', empId: '100004', account: 'liguohua', org: '开发区中支消保岗', role: '机构管理员', status: true },
+  { name: '周晓东', empId: '100005', account: 'zhouxiaodong', org: '人力资源部', role: '投诉处理员', status: true },
+  { name: '吴晓婷', empId: '100006', account: 'wuxiaoting', org: '发展规划部', role: '投诉处理员', status: true },
+  { name: '郑文博', empId: '100007', account: 'zhengwenbo', org: '青岛分行零售金融部', role: '投诉处理员', status: true },
+  { name: '王丽萍', empId: '100008', account: 'wangliping', org: '银河中支公司部', role: '投诉处理员', status: true },
+  { name: '冯志强', empId: '100009', account: 'fengzhiqiang', org: '银河中支风险部', role: '投诉处理员', status: true },
+  { name: '陈嘉欣', empId: '100010', account: 'chenjiaxin', org: '日照港口支行', role: '投诉处理员', status: true },
+  { name: '褚卫东', empId: '100011', account: 'chuweidong', org: '银河中支营业部', role: '投诉处理员', status: true },
+  { name: '卫兰', empId: '100012', account: 'weilan', org: '黄海一路网点', role: '投诉处理员', status: true },
+  { name: '蒋明辉', empId: '100013', account: 'jiangminghui', org: '青岛分行', role: '机构管理员', status: true },
+  { name: '沈雅琴', empId: '100014', account: 'shenyaqin', org: '总行科技部', role: '投诉处理员', status: false },
+  { name: '韩磊', empId: '100015', account: 'hanlei', org: '东港支行', role: '投诉处理员', status: true }
+].map(u => {
+  const { level, scope } = resolveOrg(u.org);
+  return { ...u, orgLevel: level, dataScope: scope };
+});
 
 function UserManager() {
   const [searchName, setSearchName] = useState('');
@@ -3644,7 +3780,7 @@ function UserManager() {
         children: [/*#__PURE__*/_jsx("thead", {
           children: /*#__PURE__*/_jsx("tr", {
             className: "border-b border-slate-200 bg-mist/60",
-            children: ['姓名', '工号', '登录账号', '所属机构', '角色', '数据范围', '状态', '操作'].map(h => /*#__PURE__*/_jsx("th", {
+            children: ['姓名', '工号', '登录账号', '所属机构', '使用机构层级', '角色', '数据范围', '状态', '操作'].map(h => /*#__PURE__*/_jsx("th", {
               className: "px-4 py-3 font-bold text-slate-600",
               children: h
             }, h))
@@ -3664,6 +3800,12 @@ function UserManager() {
             }), /*#__PURE__*/_jsx("td", {
               className: "px-4 py-3",
               children: u.org
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3",
+              children: /*#__PURE__*/_jsx("span", {
+                className: "rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700",
+                children: u.orgLevel
+              })
             }), /*#__PURE__*/_jsx("td", {
               className: "px-4 py-3",
               children: /*#__PURE__*/_jsx("span", {
