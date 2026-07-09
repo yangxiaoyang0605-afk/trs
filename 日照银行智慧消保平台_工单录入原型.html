@@ -754,7 +754,7 @@ function ProcessingWorkspace({
   productTag,
   reasonTag
 }) {
-  const [scope, setScope] = useState(role === 'complaint_handler' ? '我的待办' : role === 'admin_office' ? '待派发工单' : '我的待办');
+  const [scope, setScope] = useState('我的待办');
   const [page, setPage] = useState(1);
   const [detailRow, setDetailRow] = useState(null);
   const [dispatchRow, setDispatchRow] = useState(null);
@@ -822,39 +822,46 @@ function ProcessingWorkspace({
     handler: ['赵专员', '陈专员', '刘专员'][index % 3],
     content: '客户反映下辖机构相关业务办理问题，要求机构核实并反馈处理意见。'
   }));
-  const pendingDispatchRows = [{
-    no: 'TS202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '东港支行', level: '普通', status: '待派发', remain: '剩余 4 天', handler: '', content: '客户反映贷款利息计算有误，要求银行核实并调整。'
-  }, {
-    no: 'TS202607020005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', org: '五莲支行', level: '普通', status: '待派发', remain: '剩余 3 天', handler: '', content: '客户反映网点服务体验不佳，要求反馈处理情况。'
-  }];
-  const pendingReviewRows = [{
-    no: 'TS202607020003', title: '账户服务咨询投诉', channel: '12345政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '待审核', remain: '剩余 2 天', handler: '李经理', content: '客户反映账户服务问题，已处理待审核。'
-  }, {
-    no: 'TS202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '信用卡中心', level: '重要', status: '待审核', remain: '已超期', handler: '王主管', content: '客户反映征信异议，已处理待审核。'
-  }];
   const myPendingAssignRows = [{
     no: 'TS202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '东港支行', level: '重要', status: '待分配', remain: '剩余 4 天', handler: '', content: '客户反映经营贷办理进度问题，需分配处理员。'
   }, {
     no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '12345政务热线', customer: '吴女士', org: '东港支行', level: '普通', status: '待分配', remain: '剩余 3 天', handler: '', content: '客户咨询银行卡交易限额，需分配处理员。'
   }];
-  const scopeRows = Array.from({ length: 8 }, (_, index) => ({
-    no: `TS20260705${String(index + 1).padStart(4, '0')}`,
-    title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉', '经营贷办理进度反馈', '还款提醒争议', '柜面业务办理时效'][index % 8],
+  const adminMyRows = [{
+    no: 'TS202607020003', title: '账户服务咨询投诉', channel: '12345政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '待审核', remain: '剩余 2 天', handler: '李经理', content: '客户反映账户服务问题，已处理待审核。'
+  }, {
+    no: 'TS202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '信用卡中心', level: '重要', status: '审核中', remain: '已超期', handler: '王主管', content: '客户反映征信异议，审核中。'
+  }];
+  const adminSameOrgRows = Array.from({ length: 6 }, (_, index) => ({
+    no: `TS20260710${String(index + 1).padStart(3, '0')}`,
+    title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉', '柜面业务办理时效'][index % 6],
     channel: ['省监管局', '12378监管热线', '12345政务热线', '客服中心'][index % 4],
-    customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '赵先生', '孙女士', '马先生'][index % 8],
-    org: ['东港支行', '岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心'][index % 6],
+    customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '马先生'][index % 6],
+    org: '东港支行',
     level: index % 3 === 0 ? '重要' : '普通',
-    status: [['待派发', '待分配', '待处理', '处理中', '待审核', '已办结'][index % 6]],
-    remain: index % 4 === 0 ? '已超期' : `剩余 ${index % 4 + 1} 天`,
-    handler: ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'][index % 6],
-    content: '权限范围内工单内容。'
+    status: ['已办结', '待审核', '审核中', '待分配', '待处理', '处理中'][index % 6],
+    remain: index % 3 === 0 ? '已超期' : `剩余 ${index % 3 + 1} 天`,
+    handler: ['张经理', '李经理', '王主管'][index % 3],
+    content: '本机构工单内容。'
+  }));
+  const adminChildOrgRows = Array.from({ length: 6 }, (_, index) => ({
+    no: `TS20260711${String(index + 1).padStart(3, '0')}`,
+    title: ['经营贷办理进度反馈', '账户服务咨询投诉', '还款提醒争议', '网点服务态度反馈', '贷款资料补充说明', '提前还款费用争议'][index % 6],
+    channel: ['国家局', '省监管局', '12378监管热线', '12345政务热线'][index % 4],
+    customer: ['赵先生', '张女士', '李女士', '孙女士', '马先生', '周先生'][index % 6],
+    org: ['岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心', '山海天支行'][index % 6],
+    level: index % 4 === 0 ? '重要' : '普通',
+    status: ['已办结', '待审核', '审核中', '待分配', '待处理', '处理中'][index % 6],
+    remain: `剩余 ${index % 4 + 1} 天`,
+    handler: ['赵专员', '陈专员', '刘专员'][index % 3],
+    content: '下辖机构工单内容。'
   }));
   const groups = role === 'admin_office' ? [{
-    name: '待派发工单', count: pendingDispatchRows.length, note: '需派发至处理机构', rows: pendingDispatchRows
+    name: '我的待办', count: adminMyRows.length, note: '需本人处理', rows: adminMyRows
   }, {
-    name: '待审核工单', count: pendingReviewRows.length, note: '待审核的处理结果', rows: pendingReviewRows
+    name: '本机构工单', count: adminSameOrgRows.length, note: '本机构全部工单', rows: adminSameOrgRows
   }, {
-    name: '权限范围工单', count: scopeRows.length, note: '本角色权限范围内工单', rows: scopeRows
+    name: '下辖机构工单', count: adminChildOrgRows.length, note: '下辖机构工单', rows: adminChildOrgRows
   }] : role === 'org_admin' ? [{
     name: '我的待办', count: myPendingAssignRows.length, note: '需本人处理', rows: myPendingAssignRows
   }, {
@@ -878,7 +885,7 @@ function ProcessingWorkspace({
     rows: childOrgRows
   }];
   const currentGroup = groups.find(item => item.name === scope) || groups[0];
-  const pageSize = (scope === '我的待办' || scope === '待派发工单') ? 3 : 5;
+  const pageSize = scope === '我的待办' ? 3 : 5;
   const totalPages = Math.max(1, Math.ceil(currentGroup.rows.length / pageSize));
   const visibleRows = currentGroup.rows.slice((page - 1) * pageSize, page * pageSize);
   const switchScope = name => {
@@ -939,7 +946,7 @@ function ProcessingWorkspace({
             className: "mt-1 text-sm text-slate-500",
             children: ["共 ", currentGroup.rows.length, " 笔工单"]
           })]
-        }), scope !== '我的待办' && scope !== '待派发工单' && /*#__PURE__*/_jsxs("div", {
+        }), scope !== '我的待办' && /*#__PURE__*/_jsxs("div", {
           className: "text-sm font-bold text-slate-500",
           children: ["第 ", page, " / ", totalPages, " 页"]
         })]
@@ -990,22 +997,18 @@ function ProcessingWorkspace({
                 className: "px-5 py-4",
                 children: role === 'admin_office' ? /*#__PURE__*/_jsxs("div", {
                   className: "flex gap-2",
-                  children: [row.status === '待派发' && /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDispatchRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "派发"
-                  }), row.status === '待审核' ? /*#__PURE__*/_jsx("button", {
+                  children: [(row.status === '待审核' || row.status === '审核中') && /*#__PURE__*/_jsx("button", {
                     onClick: () => setDetailRow(row),
                     className: "font-bold text-rizhao",
                     children: "审核"
-                  }) : (row.status === '待处理' || row.status === '待分配' || row.status === '处理中' || row.status === '已办结') && /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "查看"
                   }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
                     children: "收回"
+                  }), /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "查看"
                   })]
                 }) : role === 'org_admin' ? /*#__PURE__*/_jsxs("div", {
                   className: "flex gap-2",
@@ -1013,33 +1016,33 @@ function ProcessingWorkspace({
                     onClick: () => setDispatchRow(row),
                     className: "font-bold text-rizhao",
                     children: "分配"
-                  }), (row.status === '待处理' || row.status === '处理中' || row.status === '待审核' || row.status === '已办结') && /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "查看"
                   }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
                     children: "收回"
-                  })]
-                }) : /*#__PURE__*/_jsxs("div", {
-                  className: "flex gap-2",
-                  children: [row.status === '待处理' ? /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "处理"
-                  }) : row.status === '处理中' ? /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "继续处理"
-                  }) : /*#__PURE__*/_jsx("button", {
+                  }), /*#__PURE__*/_jsx("button", {
                     onClick: () => setDetailRow(row),
                     className: "font-bold text-rizhao",
                     children: "查看"
+                  })]
+                }) : /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-2",
+                  children: [row.status === '待处理' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "处理"
                   }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
                     onClick: () => setTransferRow(row),
                     className: "font-bold text-rizhao",
                     children: "转办"
+                  }), row.status === '处理中' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "处理"
+                  }), /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "查看"
                   })]
                 })
               })]
@@ -1050,7 +1053,7 @@ function ProcessingWorkspace({
         className: "flex items-center justify-between border-t border-slate-100 px-5 py-4 text-sm text-slate-500",
         children: [/*#__PURE__*/_jsxs("span", {
           children: ["本页 ", visibleRows.length, " 条"]
-        }), scope !== '我的待办' && scope !== '待派发工单' && /*#__PURE__*/_jsxs("div", {
+        }), scope !== '我的待办' && /*#__PURE__*/_jsxs("div", {
           className: "flex gap-2",
           children: [/*#__PURE__*/_jsx("button", {
             disabled: page === 1,
@@ -1382,7 +1385,7 @@ function ProcessingDetail({
         action: '待审核',
         comment: '处理结果提交后进入审核节点。'
       }]
-    }), isAdminOffice && row.status === '待审核' ? /*#__PURE__*/_jsxs("div", {
+    }), isAdminOffice && (row.status === '待审核' || row.status === '审核中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap justify-end gap-3",
       children: [/*#__PURE__*/_jsx("button", {
         onClick: () => setShowRejectModal(true),
@@ -2005,6 +2008,7 @@ function EntryMethodList({
   }];
   const [viewRow, setViewRow] = useState(null);
   const [focusFlow, setFocusFlow] = useState(false);
+  const [dispatchRow, setDispatchRow] = useState(null);
   const [listTab, setListTab] = useState('已派发工单');
   const dispatchedRows = allRows.filter(r => r.status === '已派发');
   const draftRows = allRows.filter(r => r.status === '草稿');
@@ -2126,10 +2130,17 @@ function EntryMethodList({
                 children: row.time
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
-                children: /*#__PURE__*/_jsx("button", {
-                  onClick: () => openDetail(row, false),
-                  className: "font-bold text-rizhao",
-                  children: "查看"
+                children: /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-2",
+                  children: [row.status === '草稿' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDispatchRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "派发"
+                  }), /*#__PURE__*/_jsx("button", {
+                    onClick: () => openDetail(row, false),
+                    className: "font-bold text-rizhao",
+                    children: "查看"
+                  })]
                 })
               })]
             }, row.no))
@@ -2143,6 +2154,10 @@ function EntryMethodList({
           children: "第 1 / 1 页"
         })]
       })]
+    }), dispatchRow && /*#__PURE__*/_jsx(DispatchModal, {
+      row: dispatchRow,
+      onClose: () => setDispatchRow(null),
+      onSave: () => { setDispatchRow(null); }
     })]
   });
 }
