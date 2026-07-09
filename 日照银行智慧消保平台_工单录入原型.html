@@ -1569,6 +1569,10 @@ function StandardComplaintForm({
   const [bizL1, setBizL1] = useState('');
   const [bizL2, setBizL2] = useState('');
   const [bizL3, setBizL3] = useState('');
+  const [showCascader, setShowCascader] = useState(false);
+  const [cascaderHoverL1, setCascaderHoverL1] = useState(null);
+  const [cascaderHoverL2, setCascaderHoverL2] = useState(null);
+  const cascaderSelect = (l1, l2, l3) => { setBizL1(l1); setBizL2(l2 || ''); setBizL3(l3 || ''); setShowCascader(false); setCascaderHoverL1(null); setCascaderHoverL2(null); };
   const bizData = {
     '贷款业务': { '个人住房贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '消费贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '经营性贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '其他贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'] },
     '银行卡': { '账户管理': ['开卡','销户','限额','转账次数','风控','其他'], '市场活动及增值服务': null, '收费及挂失': null, '其他': null },
@@ -1894,40 +1898,68 @@ function StandardComplaintForm({
               placeholder: "点击一键获取标签后生成"
             })]
           }), /*#__PURE__*/_jsxs("div", {
-            className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
-            children: [/*#__PURE__*/_jsx(Field, {
-              label: "* 业务类别大类",
-              type: "select",
-              options: bizL1Options,
-              value: bizL1,
-              setValue: handleBizL1Change
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 业务类别中类",
-              type: bizL2Options.length ? "select" : "input",
-              options: bizL2Options,
-              value: bizL2,
-              setValue: handleBizL2Change,
-              disabled: !bizL2Options.length,
-              placeholder: bizL2Options.length ? "请选择中类" : "无中类分类"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 业务类别小类",
-              type: bizL3Options.length ? "select" : "input",
-              options: bizL3Options,
-              value: bizL3,
-              setValue: setBizL3,
-              disabled: !bizL3Options.length,
-              placeholder: bizL3Options.length ? "请选择小类" : "无小类分类"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 投诉原因大类",
-              type: "select",
-              options: ['服务态度及质量', '业务办理', '收费及价格', '催收及征信', '其他']
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 投诉原因中类",
-              placeholder: "手工填写或由标签带出"
-            }), /*#__PURE__*/_jsx(Field, {
-              label: "* 投诉原因小类",
-              placeholder: "手工填写或由标签带出"
-            })]
+            className: "relative",
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "grid cursor-pointer grid-cols-1 gap-4 xl:grid-cols-3",
+              onClick: () => setShowCascader(true),
+              children: [/*#__PURE__*/_jsx(Field, {
+                label: "* 业务类别大类",
+                value: bizL1,
+                disabled: true,
+                placeholder: "点击选择大类"
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 业务类别中类",
+                value: bizL2,
+                disabled: true,
+                placeholder: bizL1 ? "点击选择中类" : "请先选择大类"
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 业务类别小类",
+                value: bizL3,
+                disabled: true,
+                placeholder: bizL2 ? "点击选择小类" : "请先选择中类"
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 投诉原因大类",
+                type: "select",
+                options: ['服务态度及质量', '业务办理', '收费及价格', '催收及征信', '其他']
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 投诉原因中类",
+                placeholder: "手工填写或由标签带出"
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 投诉原因小类",
+                placeholder: "手工填写或由标签带出"
+              })]
+            }), showCascader ? /*#__PURE__*/_jsxs("div", {
+              children: [/*#__PURE__*/_jsx("div", {
+                className: "fixed inset-0 z-40",
+                onClick: () => { setShowCascader(false); setCascaderHoverL1(null); setCascaderHoverL2(null); }
+              }), /*#__PURE__*/_jsxs("div", {
+                className: "absolute left-0 top-full z-50 mt-1 flex rounded-lg border border-slate-200 bg-white shadow-lg",
+                children: [/*#__PURE__*/_jsx("div", {
+                  className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                  children: Object.keys(bizData).map(l1 => /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (cascaderHoverL1 === l1 ? "bg-blue-100 text-blue-700 font-medium" : bizL1 === l1 ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                    onMouseEnter: () => { setCascaderHoverL1(l1); setCascaderHoverL2(null); },
+                    onClick: () => { if (bizData[l1] === null) cascaderSelect(l1, '', ''); },
+                    children: [/*#__PURE__*/_jsx("span", { children: l1 }), bizData[l1] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                  }, l1))
+                }), cascaderHoverL1 && bizData[cascaderHoverL1] ? /*#__PURE__*/_jsx("div", {
+                  className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                  children: Object.keys(bizData[cascaderHoverL1]).map(l2 => /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (cascaderHoverL2 === l2 ? "bg-blue-100 text-blue-700 font-medium" : bizL1 === cascaderHoverL1 && bizL2 === l2 ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                    onMouseEnter: () => setCascaderHoverL2(l2),
+                    onClick: () => { if (bizData[cascaderHoverL1][l2] === null) cascaderSelect(cascaderHoverL1, l2, ''); },
+                    children: [/*#__PURE__*/_jsx("span", { children: l2 }), bizData[cascaderHoverL1][l2] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                  }, l2))
+                }) : null, cascaderHoverL1 && cascaderHoverL2 && bizData[cascaderHoverL1] && bizData[cascaderHoverL1][cascaderHoverL2] ? /*#__PURE__*/_jsx("div", {
+                  className: "max-h-60 w-44 overflow-y-auto py-1",
+                  children: bizData[cascaderHoverL1][cascaderHoverL2].map(l3 => /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (bizL1 === cascaderHoverL1 && bizL2 === cascaderHoverL2 && bizL3 === l3 ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-blue-50"),
+                    onClick: () => cascaderSelect(cascaderHoverL1, cascaderHoverL2, l3),
+                    children: [/*#__PURE__*/_jsx("span", { children: l3 }), bizL1 === cascaderHoverL1 && bizL2 === cascaderHoverL2 && bizL3 === l3 ? /*#__PURE__*/_jsx("span", { className: "text-blue-600", children: "✓" }) : null]
+                  }, l3))
+                }) : null]
+              })]
+            }) : null]
           })]
         })
       }), /*#__PURE__*/_jsxs(StandardSection, {
