@@ -1597,7 +1597,25 @@ function StandardComplaintForm({
     '催收及征信': { '催收行为': ['暴力催收','频繁催收','骚扰第三方','其他'], '征信问题': ['错误上报','未授权查询','异议处理不及时','其他'], '其他': null },
     '其他': null
   };
-  const compCascaderSelect = (l1, l2, l3) => { setCompL1(l1); setCompL2(l2 || ''); setCompL3(l3 || ''); setShowCompCascader(false); setCompHoverL1(null); setCompHoverL2(null); };
+  const compCascaderSelect = (l1, l2, l3) => { setCompL1(l1); setCompL2(l2 || ''); setCompL3(l3 || ''); setReasonTag(l2 && l3 ? l1+' / '+l2+' / '+l3 : l2 ? l1+' / '+l2 : l1); setShowCompCascader(false); setCompHoverL1(null); setCompHoverL2(null); };
+  const [toast, setToast] = useState(null);
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
+  const productTagData = {
+    '个人贷款': { '个人住房贷款': ['一手房贷款','二手房贷款','组合贷款'], '个人消费贷款': ['信用消费贷','抵押消费贷'], '个人经营贷款': ['个人经营贷','小微企业主贷'], '其他': null },
+    '信用卡': { '标准信用卡': ['白金卡','金卡','普卡'], '联名信用卡': ['商超联名卡','航空联名卡','车主联名卡'], '其他': null },
+    '理财产品': { '自营理财': ['天天利','周周盈','月月宝','季季高'], '代销理财': ['代销基金','代销保险','代销信托'], '其他': null },
+    '存款业务': { '活期存款': null, '定期存款': ['整存整取','零存整取','大额存单'], '通知存款': null },
+    '电子银行': { '手机银行': ['转账','缴费','理财'], '网上银行': ['个人网银','企业网银'], '其他': null },
+    '其他': null
+  };
+  const [showProdTagCascader, setShowProdTagCascader] = useState(false);
+  const [prodTagHoverL1, setProdTagHoverL1] = useState(null);
+  const [prodTagHoverL2, setProdTagHoverL2] = useState(null);
+  const prodTagSelect = (l1, l2, l3) => { setProductTag(l2 && l3 ? l1+' / '+l2+' / '+l3 : l2 ? l1+' / '+l2 : l1); setShowProdTagCascader(false); setProdTagHoverL1(null); setProdTagHoverL2(null); };
+  const [showReasonTagCascader, setShowReasonTagCascader] = useState(false);
+  const [reasonTagHoverL1, setReasonTagHoverL1] = useState(null);
+  const [reasonTagHoverL2, setReasonTagHoverL2] = useState(null);
+  const reasonTagSelect = (l1, l2, l3) => { setCompL1(l1); setCompL2(l2 || ''); setCompL3(l3 || ''); setReasonTag(l2 && l3 ? l1+' / '+l2+' / '+l3 : l2 ? l1+' / '+l2 : l1); setShowReasonTagCascader(false); setReasonTagHoverL1(null); setReasonTagHoverL2(null); };
   const bizData = {
     '贷款业务': { '个人住房贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '消费贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '经营性贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '其他贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'] },
     '银行卡': { '账户管理': ['开卡','销户','限额','转账次数','风控','其他'], '市场活动及增值服务': null, '收费及挂失': null, '其他': null },
@@ -1758,7 +1776,7 @@ function StandardComplaintForm({
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "行内工单编号",
-            placeholder: "系统自动生成",
+            value: "RZYH2026070800001",
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单类型",
@@ -1911,16 +1929,112 @@ function StandardComplaintForm({
             })
           }), /*#__PURE__*/_jsxs("div", {
             className: `grid grid-cols-1 gap-4 rounded-2xl border p-4 lg:grid-cols-2 ${tagReady ? 'border-line-divider bg-mist/70' : 'border-slate-200 bg-slate-50'}`,
-            children: [/*#__PURE__*/_jsx(EditableTag, {
-              label: "* 投诉产品标签",
-              value: productTag,
-              setValue: setProductTag,
-              placeholder: "点击一键获取标签后生成"
-            }), /*#__PURE__*/_jsx(EditableTag, {
-              label: "* 投诉原因标签",
-              value: reasonTag,
-              setValue: setReasonTag,
-              placeholder: "点击一键获取标签后生成"
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "relative",
+              children: [/*#__PURE__*/_jsxs("label", {
+                className: "block cursor-pointer",
+                onClick: () => setShowProdTagCascader(true),
+                children: [/*#__PURE__*/_jsxs("div", {
+                  className: "mb-2 flex items-center justify-between",
+                  children: [/*#__PURE__*/_jsx("span", {
+                    className: "field-label",
+                    children: "* 投诉产品标签"
+                  }), /*#__PURE__*/_jsx("span", {
+                    className: "rounded-full bg-white px-2.5 py-1 text-xs font-bold text-rizhao ring-1 ring-line-divider",
+                    children: "可人工修改"
+                  })]
+                }), /*#__PURE__*/_jsx("div", {
+                  className: "field-box bg-white",
+                  children: /*#__PURE__*/_jsx("div", {
+                    className: "py-2 text-sm " + (productTag ? "text-slate-700" : "text-slate-400"),
+                    children: productTag || "点击一键获取标签后生成"
+                  })
+                })]
+              }), showProdTagCascader ? /*#__PURE__*/_jsxs("div", {
+                children: [/*#__PURE__*/_jsx("div", {
+                  className: "fixed inset-0 z-40",
+                  onClick: () => { setShowProdTagCascader(false); setProdTagHoverL1(null); setProdTagHoverL2(null); }
+                }), /*#__PURE__*/_jsxs("div", {
+                  className: "absolute left-0 top-full z-50 mt-1 flex rounded-lg border border-slate-200 bg-white shadow-lg",
+                  children: [/*#__PURE__*/_jsx("div", {
+                    className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                    children: Object.keys(productTagData).map(l1 => /*#__PURE__*/_jsxs("div", {
+                      className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (prodTagHoverL1 === l1 ? "bg-blue-100 text-blue-700 font-medium" : productTag && productTag.startsWith(l1) ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                      onMouseEnter: () => { setProdTagHoverL1(l1); setProdTagHoverL2(null); },
+                      onClick: () => { if (productTagData[l1] === null) prodTagSelect(l1, '', ''); },
+                      children: [/*#__PURE__*/_jsx("span", { children: l1 }), productTagData[l1] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                    }, l1))
+                  }), prodTagHoverL1 && productTagData[prodTagHoverL1] ? /*#__PURE__*/_jsx("div", {
+                    className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                    children: Object.keys(productTagData[prodTagHoverL1]).map(l2 => /*#__PURE__*/_jsxs("div", {
+                      className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (prodTagHoverL2 === l2 ? "bg-blue-100 text-blue-700 font-medium" : productTag && productTag.startsWith(prodTagHoverL1+' / '+l2) ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                      onMouseEnter: () => setProdTagHoverL2(l2),
+                      onClick: () => { if (productTagData[prodTagHoverL1][l2] === null) prodTagSelect(prodTagHoverL1, l2, ''); },
+                      children: [/*#__PURE__*/_jsx("span", { children: l2 }), productTagData[prodTagHoverL1][l2] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                    }, l2))
+                  }) : null, prodTagHoverL1 && prodTagHoverL2 && productTagData[prodTagHoverL1] && productTagData[prodTagHoverL1][prodTagHoverL2] ? /*#__PURE__*/_jsx("div", {
+                    className: "max-h-60 w-44 overflow-y-auto py-1",
+                    children: productTagData[prodTagHoverL1][prodTagHoverL2].map(l3 => /*#__PURE__*/_jsxs("div", {
+                      className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (productTag === prodTagHoverL1+' / '+prodTagHoverL2+' / '+l3 ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-blue-50"),
+                      onClick: () => prodTagSelect(prodTagHoverL1, prodTagHoverL2, l3),
+                      children: [/*#__PURE__*/_jsx("span", { children: l3 }), productTag === prodTagHoverL1+' / '+prodTagHoverL2+' / '+l3 ? /*#__PURE__*/_jsx("span", { className: "text-blue-600", children: "✓" }) : null]
+                    }, l3))
+                  }) : null]
+                })]
+              }) : null]
+            }), /*#__PURE__*/_jsxs("div", {
+              className: "relative",
+              children: [/*#__PURE__*/_jsxs("label", {
+                className: "block cursor-pointer",
+                onClick: () => setShowReasonTagCascader(true),
+                children: [/*#__PURE__*/_jsxs("div", {
+                  className: "mb-2 flex items-center justify-between",
+                  children: [/*#__PURE__*/_jsx("span", {
+                    className: "field-label",
+                    children: "* 投诉原因标签"
+                  }), /*#__PURE__*/_jsx("span", {
+                    className: "rounded-full bg-white px-2.5 py-1 text-xs font-bold text-rizhao ring-1 ring-line-divider",
+                    children: "可人工修改"
+                  })]
+                }), /*#__PURE__*/_jsx("div", {
+                  className: "field-box bg-white",
+                  children: /*#__PURE__*/_jsx("div", {
+                    className: "py-2 text-sm " + (reasonTag ? "text-slate-700" : "text-slate-400"),
+                    children: reasonTag || "点击一键获取标签后生成"
+                  })
+                })]
+              }), showReasonTagCascader ? /*#__PURE__*/_jsxs("div", {
+                children: [/*#__PURE__*/_jsx("div", {
+                  className: "fixed inset-0 z-40",
+                  onClick: () => { setShowReasonTagCascader(false); setReasonTagHoverL1(null); setReasonTagHoverL2(null); }
+                }), /*#__PURE__*/_jsxs("div", {
+                  className: "absolute left-0 top-full z-50 mt-1 flex rounded-lg border border-slate-200 bg-white shadow-lg",
+                  children: [/*#__PURE__*/_jsx("div", {
+                    className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                    children: Object.keys(compData).map(l1 => /*#__PURE__*/_jsxs("div", {
+                      className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (reasonTagHoverL1 === l1 ? "bg-blue-100 text-blue-700 font-medium" : reasonTag && reasonTag.startsWith(l1) ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                      onMouseEnter: () => { setReasonTagHoverL1(l1); setReasonTagHoverL2(null); },
+                      onClick: () => { if (compData[l1] === null) reasonTagSelect(l1, '', ''); },
+                      children: [/*#__PURE__*/_jsx("span", { children: l1 }), compData[l1] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                    }, l1))
+                  }), reasonTagHoverL1 && compData[reasonTagHoverL1] ? /*#__PURE__*/_jsx("div", {
+                    className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                    children: Object.keys(compData[reasonTagHoverL1]).map(l2 => /*#__PURE__*/_jsxs("div", {
+                      className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (reasonTagHoverL2 === l2 ? "bg-blue-100 text-blue-700 font-medium" : reasonTag && reasonTag.startsWith(reasonTagHoverL1+' / '+l2) ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                      onMouseEnter: () => setReasonTagHoverL2(l2),
+                      onClick: () => { if (compData[reasonTagHoverL1][l2] === null) reasonTagSelect(reasonTagHoverL1, l2, ''); },
+                      children: [/*#__PURE__*/_jsx("span", { children: l2 }), compData[reasonTagHoverL1][l2] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                    }, l2))
+                  }) : null, reasonTagHoverL1 && reasonTagHoverL2 && compData[reasonTagHoverL1] && compData[reasonTagHoverL1][reasonTagHoverL2] ? /*#__PURE__*/_jsx("div", {
+                    className: "max-h-60 w-44 overflow-y-auto py-1",
+                    children: compData[reasonTagHoverL1][reasonTagHoverL2].map(l3 => /*#__PURE__*/_jsxs("div", {
+                      className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (reasonTag === reasonTagHoverL1+' / '+reasonTagHoverL2+' / '+l3 ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-blue-50"),
+                      onClick: () => reasonTagSelect(reasonTagHoverL1, reasonTagHoverL2, l3),
+                      children: [/*#__PURE__*/_jsx("span", { children: l3 }), reasonTag === reasonTagHoverL1+' / '+reasonTagHoverL2+' / '+l3 ? /*#__PURE__*/_jsx("span", { className: "text-blue-600", children: "✓" }) : null]
+                    }, l3))
+                  }) : null]
+                })]
+              }) : null]
             })]
           }), /*#__PURE__*/_jsxs("div", {
             className: "relative",
@@ -2098,9 +2212,10 @@ function StandardComplaintForm({
         className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
           className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
+          onClick: () => showToast('工单已保存'),
           children: "保存"
       }), /*#__PURE__*/_jsx("button", {
-          onClick: footerMode === 'dispatch' ? onDispatch : undefined,
+          onClick: () => { if (footerMode === 'dispatch' && onDispatch) onDispatch(); showToast('工单已派发'); },
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "派发"
         })]
@@ -2109,6 +2224,9 @@ function StandardComplaintForm({
       candidates: customerCandidates,
       onClose: () => setShowCustomerModal(false),
       onConfirm: confirmCustomer
+    }), toast && /*#__PURE__*/_jsx("div", {
+      className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
+      children: toast
     })]
   });
 }
@@ -2638,7 +2756,7 @@ function BatchImport({
   return /*#__PURE__*/_jsxs("div", {
     className: "grid grid-cols-1 gap-5 lg:grid-cols-[320px_minmax(0,1fr)]",
     children: [/*#__PURE__*/_jsxs("aside", {
-        className: "rounded-2xl border border-slate-200 bg-white p-4",
+        className: "self-start sticky top-4 rounded-2xl border border-slate-200 bg-white p-4",
         children: [/*#__PURE__*/_jsxs("div", {
           className: "mb-3 flex items-center justify-between",
           children: [/*#__PURE__*/_jsx("div", {
