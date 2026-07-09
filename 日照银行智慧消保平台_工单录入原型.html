@@ -3822,57 +3822,54 @@ function DataScopePanel({ scope, onChange }) {
 }
 
 // ─── 用户管理 ─────────────────────────────────────────────
-const orgLevelMap = [
-  { match: /^总行(?!部)(?!.*部室)/, level: '总行', scope: '本机构及下辖' },
-  { match: /^总行部室$|^总行.*部$|^总行.*处$|^总行.*中心$/, level: '总行部室', scope: '本部室' },
-  { match: /一级行/, level: '一级行', scope: '本机构及下辖' },
-  { match: /分行.*部$|分行.*部室/, level: '一级行部室', scope: '本部室' },
-  { match: /中支.*部$|中支.*部室/, level: '中支部室', scope: '本部室' },
-  { match: /中支.*消保岗|中支.*管理/, level: '分支管理机构', scope: '本机构及下辖' },
-  { match: /支行.*消保岗/, level: '分支管理机构', scope: '本机构及下辖' },
-  { match: /营业部$/, level: '营业部', scope: '本营业部' },
-  { match: /网点$/, level: '网点', scope: '本网点' },
-  { match: /支行$/, level: '支行', scope: '本支行' },
-  { match: /.*/, level: '支行', scope: '本支行' }
-];
-const resolveOrg = org => {
-  for (const { match, level, scope } of orgLevelMap) {
-    if (match.test(org)) return { level, scope };
-  }
-  return { level: '支行', scope: '本支行/本网点/本营业部' };
-};
 const userListData = [
-  { name: '赵一明', empId: '100001', account: 'zhaoyiming', org: '总行消保岗', role: '机构管理员', status: true },
-  { name: '钱立新', empId: '100002', account: 'qianlixin', org: '银河中支消保岗', role: '机构管理员', status: true },
-  { name: '孙海燕', empId: '100003', account: 'sunhaiyan', org: '山海天支行消保岗', role: '机构管理员', status: true },
-  { name: '李国华', empId: '100004', account: 'liguohua', org: '开发区中支消保岗', role: '机构管理员', status: true },
-  { name: '周晓东', empId: '100005', account: 'zhouxiaodong', org: '人力资源部', role: '投诉处理员', status: true },
-  { name: '吴晓婷', empId: '100006', account: 'wuxiaoting', org: '发展规划部', role: '投诉处理员', status: true },
-  { name: '郑文博', empId: '100007', account: 'zhengwenbo', org: '青岛分行零售金融部', role: '投诉处理员', status: true },
-  { name: '王丽萍', empId: '100008', account: 'wangliping', org: '银河中支公司部', role: '投诉处理员', status: true },
-  { name: '冯志强', empId: '100009', account: 'fengzhiqiang', org: '银河中支风险部', role: '投诉处理员', status: true },
-  { name: '陈嘉欣', empId: '100010', account: 'chenjiaxin', org: '日照港口支行', role: '投诉处理员', status: true },
-  { name: '褚卫东', empId: '100011', account: 'chuweidong', org: '银河中支营业部', role: '投诉处理员', status: true },
-  { name: '卫兰', empId: '100012', account: 'weilan', org: '黄海一路网点', role: '投诉处理员', status: true },
-  { name: '蒋明辉', empId: '100013', account: 'jiangminghui', org: '青岛分行', role: '机构管理员', status: true },
-  { name: '沈雅琴', empId: '100014', account: 'shenyaqin', org: '总行科技部', role: '投诉处理员', status: false },
-  { name: '韩磊', empId: '100015', account: 'hanlei', org: '东港支行', role: '投诉处理员', status: true }
-].map(u => {
-  const { level, scope } = resolveOrg(u.org);
-  return { ...u, orgLevel: level, dataScope: scope };
-});
+  { name: '赵一明', empId: '100001', orgName: '日照银行', orgCode: 'RZ001', deptName: '总行消保岗', deptCode: 'ZB001', gender: '男', phone: '13800001001', position: '消保主管', status: true, idType: '身份证', idNumber: '110101199001011234', personType: '正式员工' },
+  { name: '钱立新', empId: '100002', orgName: '日照银行', orgCode: 'RZ001', deptName: '银河中支消保岗', deptCode: 'YH001', gender: '男', phone: '13800001002', position: '消保专员', status: true, idType: '身份证', idNumber: '110101199002021235', personType: '正式员工' },
+  { name: '孙海燕', empId: '100003', orgName: '日照银行', orgCode: 'RZ001', deptName: '山海天支行消保岗', deptCode: 'SHT001', gender: '女', phone: '13800001003', position: '消保专员', status: true, idType: '身份证', idNumber: '110101199003031236', personType: '正式员工' },
+  { name: '李国华', empId: '100004', orgName: '日照银行', orgCode: 'RZ001', deptName: '开发区中支消保岗', deptCode: 'KFQ001', gender: '男', phone: '13800001004', position: '消保专员', status: true, idType: '身份证', idNumber: '110101199004041237', personType: '正式员工' },
+  { name: '周晓东', empId: '100005', orgName: '日照银行', orgCode: 'RZ001', deptName: '人力资源部', deptCode: 'RL001', gender: '男', phone: '13800001005', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199005051238', personType: '正式员工' },
+  { name: '吴晓婷', empId: '100006', orgName: '日照银行', orgCode: 'RZ001', deptName: '发展规划部', deptCode: 'FG001', gender: '女', phone: '13800001006', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199006061239', personType: '正式员工' },
+  { name: '郑文博', empId: '100007', orgName: '青岛分行', orgCode: 'QD001', deptName: '零售金融部', deptCode: 'LS001', gender: '男', phone: '13800001007', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199007071240', personType: '正式员工' },
+  { name: '王丽萍', empId: '100008', orgName: '青岛分行', orgCode: 'QD001', deptName: '银河中支公司部', deptCode: 'GS001', gender: '女', phone: '13800001008', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199008081241', personType: '正式员工' },
+  { name: '冯志强', empId: '100009', orgName: '青岛分行', orgCode: 'QD001', deptName: '银河中支风险部', deptCode: 'FX001', gender: '男', phone: '13800001009', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199009091242', personType: '正式员工' },
+  { name: '陈嘉欣', empId: '100010', orgName: '日照银行', orgCode: 'RZ001', deptName: '日照港口支行', deptCode: 'GK001', gender: '女', phone: '13800001010', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199010101243', personType: '派遣员工' },
+  { name: '褚卫东', empId: '100011', orgName: '日照银行', orgCode: 'RZ001', deptName: '银河中支营业部', deptCode: 'YY001', gender: '男', phone: '13800001011', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199011111244', personType: '正式员工' },
+  { name: '卫兰', empId: '100012', orgName: '日照银行', orgCode: 'RZ001', deptName: '黄海一路网点', deptCode: 'HH001', gender: '女', phone: '13800001012', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199012121245', personType: '派遣员工' },
+  { name: '蒋明辉', empId: '100013', orgName: '青岛分行', orgCode: 'QD001', deptName: '青岛分行', deptCode: 'QD001', gender: '男', phone: '13800001013', position: '机构管理员', status: true, idType: '身份证', idNumber: '110101199013131246', personType: '正式员工' },
+  { name: '沈雅琴', empId: '100014', orgName: '日照银行', orgCode: 'RZ001', deptName: '总行科技部', deptCode: 'KJ001', gender: '女', phone: '13800001014', position: '投诉处理员', status: false, idType: '身份证', idNumber: '110101199014141247', personType: '正式员工' },
+  { name: '韩磊', empId: '100015', orgName: '日照银行', orgCode: 'RZ001', deptName: '东港支行', deptCode: 'DG001', gender: '男', phone: '13800001015', position: '投诉处理员', status: true, idType: '身份证', idNumber: '110101199015151248', personType: '正式员工' }
+];
 
 function UserManager() {
   const [searchName, setSearchName] = useState('');
   const [searchEmpId, setSearchEmpId] = useState('');
   const [searchOrg, setSearchOrg] = useState('');
-  const [searchRole, setSearchRole] = useState('');
+  const [searchDept, setSearchDept] = useState('');
+  const [searchPhone, setSearchPhone] = useState('');
+  const [searchPosition, setSearchPosition] = useState('');
+  const [searchPersonType, setSearchPersonType] = useState('');
+  const [searchIdType, setSearchIdType] = useState('');
   const [searchStatus, setSearchStatus] = useState('');
+  const resetSearch = () => {
+    setSearchName('');
+    setSearchEmpId('');
+    setSearchOrg('');
+    setSearchDept('');
+    setSearchPhone('');
+    setSearchPosition('');
+    setSearchPersonType('');
+    setSearchIdType('');
+    setSearchStatus('');
+  };
   const filtered = userListData.filter(u => {
     if (searchName && !u.name.includes(searchName)) return false;
     if (searchEmpId && !u.empId.includes(searchEmpId)) return false;
-    if (searchOrg && !u.org.includes(searchOrg)) return false;
-    if (searchRole && u.role !== searchRole) return false;
+    if (searchOrg && !u.orgName.includes(searchOrg) && !u.orgCode.includes(searchOrg)) return false;
+    if (searchDept && !u.deptName.includes(searchDept) && !u.deptCode.includes(searchDept)) return false;
+    if (searchPhone && !u.phone.includes(searchPhone)) return false;
+    if (searchPosition && !u.position.includes(searchPosition)) return false;
+    if (searchPersonType && !u.personType.includes(searchPersonType)) return false;
+    if (searchIdType && !u.idType.includes(searchIdType)) return false;
     if (searchStatus !== '' && (searchStatus === '启用') !== u.status) return false;
     return true;
   });
@@ -3897,7 +3894,7 @@ function UserManager() {
         }), /*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("div", {
             className: "field-label mb-1",
-            children: "工号"
+            children: "员工号"
           }), /*#__PURE__*/_jsx("div", {
             className: "field-box",
             children: /*#__PURE__*/_jsx("input", {
@@ -3913,7 +3910,7 @@ function UserManager() {
           }), /*#__PURE__*/_jsx("div", {
             className: "field-box",
             children: /*#__PURE__*/_jsx("input", {
-              placeholder: "请输入",
+              placeholder: "名称或编号",
               value: searchOrg,
               onChange: e => setSearchOrg(e.target.value)
             })
@@ -3921,13 +3918,61 @@ function UserManager() {
         }), /*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("div", {
             className: "field-label mb-1",
-            children: "角色"
+            children: "部门"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "名称或编号",
+              value: searchDept,
+              onChange: e => setSearchDept(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "手机号"
           }), /*#__PURE__*/_jsx("div", {
             className: "field-box",
             children: /*#__PURE__*/_jsx("input", {
               placeholder: "请输入",
-              value: searchRole,
-              onChange: e => setSearchRole(e.target.value)
+              value: searchPhone,
+              onChange: e => setSearchPhone(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "职务"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchPosition,
+              onChange: e => setSearchPosition(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "人员类型"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchPersonType,
+              onChange: e => setSearchPersonType(e.target.value)
+            })
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "field-label mb-1",
+            children: "证件类型"
+          }), /*#__PURE__*/_jsx("div", {
+            className: "field-box",
+            children: /*#__PURE__*/_jsx("input", {
+              placeholder: "请输入",
+              value: searchIdType,
+              onChange: e => setSearchIdType(e.target.value)
             })
           })]
         }), /*#__PURE__*/_jsxs("div", {
@@ -3946,9 +3991,11 @@ function UserManager() {
           className: "flex gap-2",
           children: [/*#__PURE__*/_jsx("button", {
             className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+            onClick: () => {},
             children: "查询"
           }), /*#__PURE__*/_jsx("button", {
             className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
+            onClick: resetSearch,
             children: "重置"
           })]
         })]
@@ -3960,8 +4007,8 @@ function UserManager() {
         children: [/*#__PURE__*/_jsx("thead", {
           children: /*#__PURE__*/_jsx("tr", {
             className: "border-b border-slate-200 bg-mist/60",
-            children: ['姓名', '工号', '登录账号', '所属机构', '使用机构层级', '角色', '数据范围', '状态', '操作'].map(h => /*#__PURE__*/_jsx("th", {
-              className: "px-4 py-3 font-bold text-slate-600",
+            children: ['机构名称', '机构编号', '部门名称', '部门编号', '员工号', '姓名', '性别', '手机号', '职务', '状态', '证件类型', '证件号', '人员类型', '操作'].map(h => /*#__PURE__*/_jsx("th", {
+              className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap",
               children: h
             }, h))
           })
@@ -3969,40 +4016,52 @@ function UserManager() {
           children: filtered.map((u, i) => /*#__PURE__*/_jsx("tr", {
             className: "border-b border-slate-100 hover:bg-mist/40",
             children: [/*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3 font-bold",
-              children: u.name
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.orgName
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3",
+              className: "px-4 py-3 whitespace-nowrap text-slate-600",
+              children: u.orgCode
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.deptName
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 whitespace-nowrap text-slate-600",
+              children: u.deptCode
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 whitespace-nowrap",
               children: u.empId
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3 text-slate-600",
-              children: u.account
+              className: "px-4 py-3 whitespace-nowrap font-bold",
+              children: u.name
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3",
-              children: u.org
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.gender
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3",
-              children: /*#__PURE__*/_jsx("span", {
-                className: "rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700",
-                children: u.orgLevel
-              })
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.phone
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3",
-              children: /*#__PURE__*/_jsx("span", {
-                className: "rounded-full bg-mist px-2 py-0.5 text-xs font-bold text-rizhao",
-                children: u.role
-              })
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.position
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3 text-slate-600",
-              children: u.dataScope
-            }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3",
+              className: "px-4 py-3 whitespace-nowrap",
               children: /*#__PURE__*/_jsx("span", {
                 className: `rounded-full px-2 py-0.5 text-xs font-bold ${u.status ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
                 children: u.status ? '启用' : '停用'
               })
             }), /*#__PURE__*/_jsx("td", {
-              className: "px-4 py-3",
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.idType
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 whitespace-nowrap",
+              children: u.idNumber
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 whitespace-nowrap",
+              children: /*#__PURE__*/_jsx("span", {
+                className: "rounded-full bg-mist px-2 py-0.5 text-xs font-bold text-rizhao",
+                children: u.personType
+              })
+            }), /*#__PURE__*/_jsx("td", {
+              className: "px-4 py-3 whitespace-nowrap",
               children: /*#__PURE__*/_jsxs("div", {
                 className: "flex gap-2",
                 children: [/*#__PURE__*/_jsx("button", {
@@ -4010,10 +4069,7 @@ function UserManager() {
                   children: "查看"
                 }), /*#__PURE__*/_jsx("button", {
                   className: "text-sm font-bold text-rizhao",
-                  children: "分配角色"
-                }), /*#__PURE__*/_jsx("button", {
-                  className: "text-sm font-bold text-rizhao",
-                  children: "数据范围"
+                  children: "编辑"
                 }), /*#__PURE__*/_jsx("button", {
                   className: `text-sm font-bold ${u.status ? 'text-red-500' : 'text-green-600'}`,
                   children: u.status ? '停用' : '启用'
