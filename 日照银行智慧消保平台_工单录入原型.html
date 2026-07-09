@@ -1572,7 +1572,32 @@ function StandardComplaintForm({
   const [showCascader, setShowCascader] = useState(false);
   const [cascaderHoverL1, setCascaderHoverL1] = useState(null);
   const [cascaderHoverL2, setCascaderHoverL2] = useState(null);
+  const [attachments, setAttachments] = useState([]);
+  const handleUpload = () => {
+    if (attachments.length === 0) {
+      setAttachments([
+        { name: '客户身份证复印件.jpg', size: '2.3 MB', date: '2026-07-09', uploader: '张经理' },
+        { name: '投诉录音转写.docx', size: '156 KB', date: '2026-07-09', uploader: '张经理' },
+      ]);
+    } else {
+      setAttachments([]);
+    }
+  };
   const cascaderSelect = (l1, l2, l3) => { setBizL1(l1); setBizL2(l2 || ''); setBizL3(l3 || ''); setShowCascader(false); setCascaderHoverL1(null); setCascaderHoverL2(null); };
+  const [compL1, setCompL1] = useState('');
+  const [compL2, setCompL2] = useState('');
+  const [compL3, setCompL3] = useState('');
+  const [showCompCascader, setShowCompCascader] = useState(false);
+  const [compHoverL1, setCompHoverL1] = useState(null);
+  const [compHoverL2, setCompHoverL2] = useState(null);
+  const compData = {
+    '服务态度及质量': { '服务态度': ['语气生硬','服务冷漠','推诿不处理','其他'], '业务素质': ['业务不熟','解答错误','操作失误','其他'], '办事效率': ['等待时间过长','处理超时','反复跑腿','其他'], '其他': null },
+    '业务办理': { '办理流程': ['流程复杂','资料要求不合理','未一次性告知','其他'], '办理结果': ['未按时办结','办理结果有误','拒绝办理','其他'], '其他': null },
+    '收费及价格': { '收费不合理': ['超标准收费','强制收费','重复收费','其他'], '未明码标价': ['未公示收费标准','收费标准不清','其他'], '其他': null },
+    '催收及征信': { '催收行为': ['暴力催收','频繁催收','骚扰第三方','其他'], '征信问题': ['错误上报','未授权查询','异议处理不及时','其他'], '其他': null },
+    '其他': null
+  };
+  const compCascaderSelect = (l1, l2, l3) => { setCompL1(l1); setCompL2(l2 || ''); setCompL3(l3 || ''); setShowCompCascader(false); setCompHoverL1(null); setCompHoverL2(null); };
   const bizData = {
     '贷款业务': { '个人住房贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '消费贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '经营性贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'], '其他贷款': ['办理问题','协商还款','息费及定价问题','催收','征信','中介','其他'] },
     '银行卡': { '账户管理': ['开卡','销户','限额','转账次数','风控','其他'], '市场活动及增值服务': null, '收费及挂失': null, '其他': null },
@@ -1917,16 +1942,6 @@ function StandardComplaintForm({
                 value: bizL3,
                 disabled: true,
                 placeholder: bizL2 ? "点击选择小类" : "请先选择中类"
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 投诉原因大类",
-                type: "select",
-                options: ['服务态度及质量', '业务办理', '收费及价格', '催收及征信', '其他']
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 投诉原因中类",
-                placeholder: "手工填写或由标签带出"
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 投诉原因小类",
-                placeholder: "手工填写或由标签带出"
               })]
             }), showCascader ? /*#__PURE__*/_jsxs("div", {
               children: [/*#__PURE__*/_jsx("div", {
@@ -1960,6 +1975,59 @@ function StandardComplaintForm({
                 }) : null]
               })]
             }) : null]
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "relative",
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "grid cursor-pointer grid-cols-1 gap-4 xl:grid-cols-3",
+              onClick: () => setShowCompCascader(true),
+              children: [/*#__PURE__*/_jsx(Field, {
+                label: "* 投诉原因大类",
+                value: compL1,
+                disabled: true,
+                placeholder: "点击选择大类"
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 投诉原因中类",
+                value: compL2,
+                disabled: true,
+                placeholder: compL1 ? "点击选择中类" : "请先选择大类"
+              }), /*#__PURE__*/_jsx(Field, {
+                label: "* 投诉原因小类",
+                value: compL3,
+                disabled: true,
+                placeholder: compL2 ? "点击选择小类" : "请先选择中类"
+              })]
+            }), showCompCascader ? /*#__PURE__*/_jsxs("div", {
+              children: [/*#__PURE__*/_jsx("div", {
+                className: "fixed inset-0 z-40",
+                onClick: () => { setShowCompCascader(false); setCompHoverL1(null); setCompHoverL2(null); }
+              }), /*#__PURE__*/_jsxs("div", {
+                className: "absolute left-0 top-full z-50 mt-1 flex rounded-lg border border-slate-200 bg-white shadow-lg",
+                children: [/*#__PURE__*/_jsx("div", {
+                  className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                  children: Object.keys(compData).map(l1 => /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (compHoverL1 === l1 ? "bg-blue-100 text-blue-700 font-medium" : compL1 === l1 ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                    onMouseEnter: () => { setCompHoverL1(l1); setCompHoverL2(null); },
+                    onClick: () => { if (compData[l1] === null) compCascaderSelect(l1, '', ''); },
+                    children: [/*#__PURE__*/_jsx("span", { children: l1 }), compData[l1] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                  }, l1))
+                }), compHoverL1 && compData[compHoverL1] ? /*#__PURE__*/_jsx("div", {
+                  className: "max-h-60 w-44 overflow-y-auto border-r border-slate-100 py-1",
+                  children: Object.keys(compData[compHoverL1]).map(l2 => /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (compHoverL2 === l2 ? "bg-blue-100 text-blue-700 font-medium" : compL1 === compHoverL1 && compL2 === l2 ? "bg-blue-50 text-blue-600" : "hover:bg-gray-50"),
+                    onMouseEnter: () => setCompHoverL2(l2),
+                    onClick: () => { if (compData[compHoverL1][l2] === null) compCascaderSelect(compHoverL1, l2, ''); },
+                    children: [/*#__PURE__*/_jsx("span", { children: l2 }), compData[compHoverL1][l2] !== null ? /*#__PURE__*/_jsx("span", { className: "text-slate-300 ml-auto", children: "›" }) : null]
+                  }, l2))
+                }) : null, compHoverL1 && compHoverL2 && compData[compHoverL1] && compData[compHoverL1][compHoverL2] ? /*#__PURE__*/_jsx("div", {
+                  className: "max-h-60 w-44 overflow-y-auto py-1",
+                  children: compData[compHoverL1][compHoverL2].map(l3 => /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center justify-between px-3 py-2 text-sm cursor-pointer " + (compL1 === compHoverL1 && compL2 === compHoverL2 && compL3 === l3 ? "bg-blue-50 text-blue-700 font-medium" : "hover:bg-blue-50"),
+                    onClick: () => compCascaderSelect(compHoverL1, compHoverL2, l3),
+                    children: [/*#__PURE__*/_jsx("span", { children: l3 }), compL1 === compHoverL1 && compL2 === compHoverL2 && compL3 === l3 ? /*#__PURE__*/_jsx("span", { className: "text-blue-600", children: "✓" }) : null]
+                  }, l3))
+                }) : null]
+              })]
+            }) : null]
           })]
         })
       }), /*#__PURE__*/_jsxs(StandardSection, {
@@ -1968,7 +2036,8 @@ function StandardComplaintForm({
           className: "mb-4 flex items-center gap-3",
           children: [/*#__PURE__*/_jsx("button", {
             className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
-            children: "上传"
+            onClick: handleUpload,
+            children: attachments.length === 0 ? "上传" : "清空"
           }), /*#__PURE__*/_jsx("span", {
             className: "text-sm text-slate-500",
             children: "支持多种格式"
@@ -1986,13 +2055,28 @@ function StandardComplaintForm({
                 }, head))
               })
             }), /*#__PURE__*/_jsx("tbody", {
-              children: /*#__PURE__*/_jsx("tr", {
+              children: attachments.length === 0 ? /*#__PURE__*/_jsx("tr", {
                 children: /*#__PURE__*/_jsx("td", {
-                  className: "px-4 py-5 text-slate-400",
+                  className: "px-4 py-5 text-center text-slate-400",
                   colSpan: "4",
                   children: "暂无附件"
                 })
-              })
+              }) : attachments.map((att, i) => /*#__PURE__*/_jsxs("tr", {
+                className: i % 2 === 0 ? "bg-white" : "bg-gray-50/50",
+                children: [/*#__PURE__*/_jsx("td", {
+                  className: "px-4 py-3 text-slate-700",
+                  children: att.name
+                }), /*#__PURE__*/_jsx("td", {
+                  className: "px-4 py-3 text-slate-500",
+                  children: att.size
+                }), /*#__PURE__*/_jsx("td", {
+                  className: "px-4 py-3 text-slate-500",
+                  children: att.date
+                }), /*#__PURE__*/_jsx("td", {
+                  className: "px-4 py-3 text-slate-500",
+                  children: att.uploader
+                })]
+              }, i))
             })]
           })
         })]
