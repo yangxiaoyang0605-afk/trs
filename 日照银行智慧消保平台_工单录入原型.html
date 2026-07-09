@@ -523,7 +523,7 @@ function App() {
         isSuperAdmin: isSuperAdmin
       }), /*#__PURE__*/_jsxs("main", {
         className: "flex-1 min-w-0",
-        children: [/*#__PURE__*/_jsx(Topbar, { role: role, setRole: setRole }), /*#__PURE__*/_jsx("div", {
+        children: [/*#__PURE__*/_jsx(Topbar, { mainTab: mainTab, role: role, setRole: setRole }), /*#__PURE__*/_jsx("div", {
           className: "px-6 py-6",
           children: /*#__PURE__*/_jsxs("section", {
             className: "rounded-[18px] border border-white/70 bg-white/82 shadow-mid backdrop-blur",
@@ -659,7 +659,7 @@ function Sidebar({
   });
 }
 const roleLabels = { complaint_handler: '投诉处理员', admin_office: '消保办管理员', org_admin: '机构管理员' };
-function Topbar({ role, setRole }) {
+function Topbar({ mainTab, role, setRole }) {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   return /*#__PURE__*/_jsx("header", {
     className: "sticky top-0 z-10 border-b border-white/70 bg-white/78 backdrop-blur",
@@ -667,7 +667,7 @@ function Topbar({ role, setRole }) {
       className: "flex h-[76px] items-center justify-end px-8",
       children: /*#__PURE__*/_jsxs("div", {
         className: "flex items-center gap-3",
-        children: [/*#__PURE__*/_jsxs("div", {
+        children: [mainTab === '处理工单' && /*#__PURE__*/_jsxs("div", {
           className: "relative",
           children: [/*#__PURE__*/_jsx("button", {
             onClick: () => setShowRoleMenu(!showRoleMenu),
@@ -831,6 +831,11 @@ function ProcessingWorkspace({
   }, {
     no: 'TS202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '信用卡中心', level: '重要', status: '待审核', remain: '已超期', handler: '王主管', content: '客户反映征信异议，已处理待审核。'
   }];
+  const myPendingAssignRows = [{
+    no: 'TS202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '东港支行', level: '重要', status: '待分配', remain: '剩余 4 天', handler: '', content: '客户反映经营贷办理进度问题，需分配处理员。'
+  }, {
+    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '12345政务热线', customer: '吴女士', org: '东港支行', level: '普通', status: '待分配', remain: '剩余 3 天', handler: '', content: '客户咨询银行卡交易限额，需分配处理员。'
+  }];
   const scopeRows = Array.from({ length: 8 }, (_, index) => ({
     no: `TS20260705${String(index + 1).padStart(4, '0')}`,
     title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉', '经营贷办理进度反馈', '还款提醒争议', '柜面业务办理时效'][index % 8],
@@ -849,6 +854,12 @@ function ProcessingWorkspace({
     name: '待审核工单', count: pendingReviewRows.length, note: '待审核的处理结果', rows: pendingReviewRows
   }, {
     name: '权限范围工单', count: scopeRows.length, note: '本角色权限范围内工单', rows: scopeRows
+  }] : role === 'org_admin' ? [{
+    name: '我的待办', count: myPendingAssignRows.length, note: '需本人处理', rows: myPendingAssignRows
+  }, {
+    name: '本机构工单', count: sameOrgRows.length, note: '本机构全部工单', rows: sameOrgRows
+  }, {
+    name: '下辖机构工单', count: childOrgRows.length, note: '下辖机构工单', rows: childOrgRows
   }] : [{
     name: '我的待办',
     count: 3,
@@ -991,6 +1002,21 @@ function ProcessingWorkspace({
                     className: "font-bold text-orange-500",
                     children: "收回"
                   })]
+                }) : role === 'org_admin' ? /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-2",
+                  children: [row.status === '待分配' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDispatchRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "分配"
+                  }), (row.status === '待处理' || row.status === '处理中' || row.status === '待审核' || row.status === '已办结') && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "查看"
+                  }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setRecallRow(row),
+                    className: "font-bold text-orange-500",
+                    children: "收回"
+                  })]
                 }) : /*#__PURE__*/_jsx("button", {
                   onClick: () => setDetailRow(row),
                   className: "font-bold text-rizhao",
@@ -1019,11 +1045,15 @@ function ProcessingWorkspace({
           })]
         })]
       })]
-    }), dispatchRow && /*#__PURE__*/_jsx(DispatchModal, {
+    }), dispatchRow && (role === 'org_admin' ? /*#__PURE__*/_jsx(AssignModal, {
       row: dispatchRow,
       onClose: () => setDispatchRow(null),
       onSave: () => { setDispatchRow(null); }
-    }), recallRow && /*#__PURE__*/_jsx(RecallModal, {
+    }) : /*#__PURE__*/_jsx(DispatchModal, {
+      row: dispatchRow,
+      onClose: () => setDispatchRow(null),
+      onSave: () => { setDispatchRow(null); }
+    })), recallRow && /*#__PURE__*/_jsx(RecallModal, {
       row: recallRow,
       onClose: () => setRecallRow(null),
       onSave: () => { setRecallRow(null); }
@@ -1037,7 +1067,9 @@ function ProcessingDetail({
   reasonTag
 }) {
   const isAdminOffice = role === 'admin_office';
+  const isOrgAdmin = role === 'org_admin';
   const isComplaintHandler = role === 'complaint_handler';
+  const isReadOnly = isAdminOffice || isOrgAdmin;
   const [processResult, setProcessResult] = useState('');
   const [processConclusion, setProcessConclusion] = useState('');
   const [contactResult, setContactResult] = useState('');
@@ -1047,6 +1079,8 @@ function ProcessingDetail({
   const [showNewComm, setShowNewComm] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showOrgAssignModal, setShowOrgAssignModal] = useState(false);
+  const [showOrgRecallModal, setShowOrgRecallModal] = useState(false);
   const [toast, setToast] = useState(null);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
 
@@ -1168,7 +1202,7 @@ function ProcessingDetail({
         label: '附件状态',
         value: '暂无附件'
       }]
-    }), isComplaintHandler && /*#__PURE__*/_jsx(StandardSection, {
+    }), !isReadOnly && /*#__PURE__*/_jsx(StandardSection, {
       title: "联系处理",
       children: /*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap gap-3",
@@ -1188,7 +1222,7 @@ function ProcessingDetail({
       })
     }), /*#__PURE__*/_jsxs(StandardSection, {
       title: "处理结果",
-      children: isAdminOffice ? /*#__PURE__*/_jsx("div", {
+      children: isReadOnly ? /*#__PURE__*/_jsx("div", {
         className: "rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600",
         children: "投诉处理员尚未提交处理结果，或处理结果仅限处理环节查看。"
       }) : [/*#__PURE__*/_jsxs("div", {
@@ -1334,6 +1368,20 @@ function ProcessingDetail({
         className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
         children: "审核通过并关单"
       })]
+    }) : isOrgAdmin && row.status === '待分配' ? /*#__PURE__*/_jsxs("div", {
+      className: "flex flex-wrap justify-end gap-3",
+      children: [/*#__PURE__*/_jsx("button", {
+        onClick: () => setShowOrgAssignModal(true),
+        className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
+        children: "分配"
+      })]
+    }) : isOrgAdmin && row.status === '待处理' ? /*#__PURE__*/_jsxs("div", {
+      className: "flex flex-wrap justify-end gap-3",
+      children: [/*#__PURE__*/_jsx("button", {
+        onClick: () => setShowOrgRecallModal(true),
+        className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
+        children: "收回"
+      })]
     }) : isComplaintHandler ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap items-center justify-between gap-3",
       children: [/*#__PURE__*/_jsx("button", {
@@ -1367,6 +1415,14 @@ function ProcessingDetail({
       currentHandler: row.handler,
       onClose: () => setShowTransfer(false),
       onSave: () => { setShowTransfer(false); }
+    }), showOrgAssignModal && /*#__PURE__*/_jsx(AssignModal, {
+      row: row,
+      onClose: () => setShowOrgAssignModal(false),
+      onSave: () => { showToast('已分配处理员'); setShowOrgAssignModal(false); }
+    }), showOrgRecallModal && /*#__PURE__*/_jsx(RecallModal, {
+      row: row,
+      onClose: () => setShowOrgRecallModal(false),
+      onSave: () => { showToast('工单已收回，状态变为待分配'); setShowOrgRecallModal(false); }
     }), showRejectModal && /*#__PURE__*/_jsx(RejectModal, {
       onClose: () => setShowRejectModal(false),
       onSave: reason => { showToast('审核不通过，工单已退回处理环节'); setShowRejectModal(false); }
@@ -1837,6 +1893,57 @@ function RejectModal({ onClose, onSave }) {
           onClick: canSave ? () => onSave(rejectReason) : undefined,
           className: `rounded-xl px-5 py-2 text-sm font-black text-white shadow-mid ${canSave ? 'bg-rizhao' : 'bg-slate-300 cursor-not-allowed'}`,
           children: "确认"
+        })]
+      })]
+    })]
+  });
+}
+function AssignModal({ row, onClose, onSave }) {
+  const handlers = ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'];
+  const [selectedHandler, setSelectedHandler] = useState('');
+  const canSave = selectedHandler;
+  return /*#__PURE__*/_jsxs("div", {
+    className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: "w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "text-xl font-black text-ink",
+          children: "分配处理员"
+        }), /*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: onClose,
+          className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-line-divider hover:text-rizhao",
+          children: "关闭"
+        })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "space-y-4 px-6 py-5",
+        children: [/*#__PURE__*/_jsx(Field, {
+          label: "工单编号",
+          value: row.no,
+          disabled: true
+        }), /*#__PURE__*/_jsx(Field, {
+          label: "工单标题",
+          value: row.title,
+          disabled: true
+        }), /*#__PURE__*/_jsx(Field, {
+          label: "* 处理员",
+          type: "select",
+          options: handlers,
+          value: selectedHandler,
+          setValue: setSelectedHandler
+        })]
+      }), /*#__PURE__*/_jsx("div", {
+        className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-4",
+        children: [/*#__PURE__*/_jsx("button", {
+          onClick: onClose,
+          className: "rounded-xl border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700",
+          children: "取消"
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: canSave ? onSave : undefined,
+          className: `rounded-xl px-5 py-2 text-sm font-black text-white shadow-mid ${canSave ? 'bg-rizhao' : 'bg-slate-300 cursor-not-allowed'}`,
+          children: "确认分配"
         })]
       })]
     })]
