@@ -759,6 +759,7 @@ function ProcessingWorkspace({
   const [detailRow, setDetailRow] = useState(null);
   const [dispatchRow, setDispatchRow] = useState(null);
   const [recallRow, setRecallRow] = useState(null);
+  const [transferRow, setTransferRow] = useState(null);
   const myRows = [{
     no: 'TS202607020002',
     title: '信用卡还款协商',
@@ -766,7 +767,7 @@ function ProcessingWorkspace({
     customer: '李女士',
     org: '信用卡中心',
     level: '重要',
-    status: '处理中',
+    status: '待处理',
     remain: '剩余 1 天 6 小时',
     handler: '张经理',
     content: content || '客户反映信用卡还款协商沟通不充分，要求银行核实并反馈处理结果。'
@@ -777,7 +778,7 @@ function ProcessingWorkspace({
     customer: '周先生',
     org: '东港支行',
     level: '重要',
-    status: '处理中',
+    status: '待处理',
     remain: '剩余 2 天',
     handler: '张经理',
     content: '客户反映贷款提前还款费用说明不清晰，要求核实费用计算依据。'
@@ -788,7 +789,7 @@ function ProcessingWorkspace({
     customer: '马先生',
     org: '开发区支行',
     level: '普通',
-    status: '已派发',
+    status: '处理中',
     remain: '剩余 3 天',
     handler: '张经理',
     content: '客户反映柜面业务办理等待时间较长，要求反馈处理情况。'
@@ -802,7 +803,7 @@ function ProcessingWorkspace({
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士'][index % 5],
     org: '信用卡中心',
     level: index % 3 === 0 ? '重要' : '普通',
-    status: index % 2 === 0 ? '处理中' : '已派发',
+    status: ['待处理', '处理中', '待审核'][index % 3],
     remain: `剩余 ${index % 4 + 1} 天`,
     handler: ['张经理', '李经理', '王主管'][index % 3],
     content: '客户反映相关业务办理问题，要求银行核实后反馈处理结果。'
@@ -816,7 +817,7 @@ function ProcessingWorkspace({
     customer: ['赵先生', '张女士', '李女士', '孙女士', '马先生'][index % 5],
     org: ['东港支行', '岚山支行', '莒县支行', '五莲支行', '开发区支行'][index % 5],
     level: index % 4 === 0 ? '重要' : '普通',
-    status: index % 2 === 0 ? '处理中' : '已派发',
+    status: ['待处理', '处理中', '待审核'][index % 3],
     remain: `剩余 ${index % 5 + 1} 天`,
     handler: ['赵专员', '陈专员', '刘专员'][index % 3],
     content: '客户反映下辖机构相关业务办理问题，要求机构核实并反馈处理意见。'
@@ -843,7 +844,7 @@ function ProcessingWorkspace({
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '赵先生', '孙女士', '马先生'][index % 8],
     org: ['东港支行', '岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心'][index % 6],
     level: index % 3 === 0 ? '重要' : '普通',
-    status: [['待派发', '待处理', '处理中', '待审核', '已办结'][index % 5]],
+    status: [['待派发', '待分配', '待处理', '处理中', '待审核', '已办结'][index % 6]],
     remain: index % 4 === 0 ? '已超期' : `剩余 ${index % 4 + 1} 天`,
     handler: ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'][index % 6],
     content: '权限范围内工单内容。'
@@ -993,10 +994,14 @@ function ProcessingWorkspace({
                     onClick: () => setDispatchRow(row),
                     className: "font-bold text-rizhao",
                     children: "派发"
-                  }), (row.status === '待处理' || row.status === '处理中' || row.status === '待审核' || row.status === '已办结') && /*#__PURE__*/_jsx("button", {
+                  }), row.status === '待审核' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setDetailRow(row),
                     className: "font-bold text-rizhao",
-                    children: row.status === '待审核' ? '审核' : row.status === '待处理' ? '查看' : '查看'
+                    children: "审核"
+                  }) : (row.status === '待处理' || row.status === '待分配' || row.status === '处理中' || row.status === '已办结') && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "查看"
                   }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
@@ -1017,10 +1022,25 @@ function ProcessingWorkspace({
                     className: "font-bold text-orange-500",
                     children: "收回"
                   })]
-                }) : /*#__PURE__*/_jsx("button", {
-                  onClick: () => setDetailRow(row),
-                  className: "font-bold text-rizhao",
-                  children: row.status === '待处理' || row.status === '已派发' ? '处理' : row.status === '处理中' ? '继续处理' : '查看'
+                }) : /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-2",
+                  children: [row.status === '待处理' ? /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "处理"
+                  }) : row.status === '处理中' ? /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "继续处理"
+                  }) : /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDetailRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "查看"
+                  }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setTransferRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "转办"
+                  })]
                 })
               })]
             }, row.no))
@@ -1057,6 +1077,11 @@ function ProcessingWorkspace({
       row: recallRow,
       onClose: () => setRecallRow(null),
       onSave: () => { setRecallRow(null); }
+    }), transferRow && /*#__PURE__*/_jsx(TransferModal, {
+      row: transferRow,
+      currentHandler: transferRow.handler,
+      onClose: () => setTransferRow(null),
+      onSave: () => { setTransferRow(null); }
     })]
   });
 }
@@ -1382,9 +1407,9 @@ function ProcessingDetail({
         className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
         children: "收回"
       })]
-    }) : isComplaintHandler ? /*#__PURE__*/_jsxs("div", {
+    }) : isComplaintHandler && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap items-center justify-between gap-3",
-      children: [/*#__PURE__*/_jsx("button", {
+      children: [row.status === '待处理' && /*#__PURE__*/_jsx("button", {
         onClick: () => setShowTransfer(true),
         className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
         children: "转办"
@@ -1412,6 +1437,7 @@ function ProcessingDetail({
       onClose: () => setShowNewComm(false),
       onSave: rec => { addCommRecord({ type: 'manual', time: new Date().toISOString().slice(0, 16).replace('T', ' '), ...rec }); setShowNewComm(false); }
     }), showTransfer && /*#__PURE__*/_jsx(TransferModal, {
+      row: row,
       currentHandler: row.handler,
       onClose: () => setShowTransfer(false),
       onSave: () => { setShowTransfer(false); }
@@ -1683,7 +1709,7 @@ function NewCommunicationModal({ onClose, onSave }) {
     })]
   });
 }
-function TransferModal({ currentHandler, onClose, onSave }) {
+function TransferModal({ currentHandler, onClose, onSave, row }) {
   const handlers = ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'];
   const [selectedHandler, setSelectedHandler] = useState('');
   const [transferReason, setTransferReason] = useState('');
@@ -1706,6 +1732,10 @@ function TransferModal({ currentHandler, onClose, onSave }) {
       }), /*#__PURE__*/_jsxs("div", {
         className: "space-y-4 px-6 py-5",
         children: [/*#__PURE__*/_jsx(Field, {
+          label: "当前处理人",
+          value: currentHandler,
+          disabled: true
+        }), /*#__PURE__*/_jsx(Field, {
           label: "* 接收处理员",
           type: "select",
           options: handlers.filter(h => h !== currentHandler),
