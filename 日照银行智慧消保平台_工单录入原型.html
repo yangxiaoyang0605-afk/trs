@@ -856,6 +856,30 @@ function ProcessingWorkspace({
     handler: ['赵专员', '陈专员', '刘专员'][index % 3],
     content: '下辖机构工单内容。'
   }));
+  const orgSameOrgRows = Array.from({ length: 6 }, (_, index) => ({
+    no: `TS20260712${String(index + 1).padStart(3, '0')}`,
+    title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉', '柜面业务办理时效'][index % 6],
+    channel: ['省监管局', '12378监管热线', '12345政务热线', '客服中心'][index % 4],
+    customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '马先生'][index % 6],
+    org: '东港支行',
+    level: index % 3 === 0 ? '重要' : '普通',
+    status: ['待分配', '待处理', '处理中', '待审核', '审核中', '已办结'][index % 6],
+    remain: index % 3 === 0 ? '已超期' : `剩余 ${index % 3 + 1} 天`,
+    handler: ['张经理', '李经理', '王主管'][index % 3],
+    content: '本机构工单。'
+  }));
+  const orgChildOrgRows = Array.from({ length: 6 }, (_, index) => ({
+    no: `TS20260713${String(index + 1).padStart(3, '0')}`,
+    title: ['经营贷办理进度反馈', '账户服务咨询投诉', '还款提醒争议', '网点服务态度反馈', '贷款资料补充说明', '提前还款费用争议'][index % 6],
+    channel: ['国家局', '省监管局', '12378监管热线', '12345政务热线'][index % 4],
+    customer: ['赵先生', '张女士', '李女士', '孙女士', '马先生', '周先生'][index % 6],
+    org: ['岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心', '山海天支行'][index % 6],
+    level: index % 4 === 0 ? '重要' : '普通',
+    status: ['待分配', '待处理', '处理中', '待审核', '审核中', '已办结'][index % 6],
+    remain: `剩余 ${index % 4 + 1} 天`,
+    handler: ['赵专员', '陈专员', '刘专员'][index % 3],
+    content: '下辖机构工单。'
+  }));
   const groups = role === 'admin_office' ? [{
     name: '我的待办', count: adminMyRows.length, note: '需本人处理', rows: adminMyRows
   }, {
@@ -865,9 +889,9 @@ function ProcessingWorkspace({
   }] : role === 'org_admin' ? [{
     name: '我的待办', count: myPendingAssignRows.length, note: '需本人处理', rows: myPendingAssignRows
   }, {
-    name: '本机构工单', count: sameOrgRows.length, note: '本机构全部工单', rows: sameOrgRows
+    name: '本机构工单', count: orgSameOrgRows.length, note: '本机构全部工单', rows: orgSameOrgRows
   }, {
-    name: '下辖机构工单', count: childOrgRows.length, note: '下辖机构工单', rows: childOrgRows
+    name: '下辖机构工单', count: orgChildOrgRows.length, note: '下辖机构工单', rows: orgChildOrgRows
   }] : [{
     name: '我的待办',
     count: 3,
@@ -1020,6 +1044,10 @@ function ProcessingWorkspace({
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
                     children: "收回"
+                  }), row.status === '处理中' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => setTransferRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "转发"
                   }), /*#__PURE__*/_jsx("button", {
                     onClick: () => setDetailRow(row),
                     className: "font-bold text-rizhao",
@@ -1403,12 +1431,16 @@ function ProcessingDetail({
         className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
         children: "分配"
       })]
-    }) : isOrgAdmin && row.status === '待处理' ? /*#__PURE__*/_jsxs("div", {
+    }) : isOrgAdmin && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap justify-end gap-3",
-      children: [/*#__PURE__*/_jsx("button", {
+      children: [row.status === '待处理' && /*#__PURE__*/_jsx("button", {
         onClick: () => setShowOrgRecallModal(true),
         className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
         children: "收回"
+      }), row.status === '处理中' && /*#__PURE__*/_jsx("button", {
+        onClick: () => setShowTransfer(true),
+        className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
+        children: "转发"
       })]
     }) : isComplaintHandler && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap items-center justify-between gap-3",
