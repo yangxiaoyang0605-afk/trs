@@ -418,27 +418,28 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   <style>
     body {
       font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
-      background:
-        radial-gradient(circle at 88% 8%, rgba(255,138,24,.15), transparent 28%),
-        linear-gradient(135deg, #fff7f2 0%, #f7f8fa 38%, #eef1f5 100%);
+      background: #F6F6F6;
+      color: #202020;
+      font-size: 14px;
+      line-height: 1.5;
     }
     .thin-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
-    .thin-scroll::-webkit-scrollbar-thumb { background: #cfd5dd; border-radius: 999px; }
-    .field-label { color: #4b5563; font-weight: 600; font-size: 13px; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #D2D2D2; border-radius: 4px; }
+    .field-label { color: #707070; font-weight: 600; font-size: 14px; }
     .field-box {
-      border: 1px solid #d9dee7;
-      border-radius: 10px;
-      background: white;
+      border: 1px solid #E4E4E4;
+      border-radius: 12px;
+      background: #FFFFFF;
       min-height: 42px;
       display: flex;
       align-items: center;
       padding: 0 12px;
-      color: #111827;
+      color: #202020;
       font-size: 14px;
     }
     .field-box:focus-within {
       border-color: #EE7800;
-      box-shadow: 0 0 0 3px rgba(238,120,0,.12);
+      box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
     }
     input, select, textarea {
       outline: none;
@@ -451,6 +452,67 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .bg-rizhao { background-color: #EE7800; }
     .text-rizhao { color: #EE7800; }
     .border-rizhao { border-color: #EE7800; }
+    .rz-shell { background: #F6F6F6; }
+    .rz-frame {
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 10px 210px 10px minmax(0, 1200px) 10px;
+      max-width: 1440px;
+      min-height: 100vh;
+      margin: 0 auto;
+    }
+    .rz-content { grid-column: 4; min-width: 0; }
+    .rz-page-pad { padding: 24px 0; }
+    .rz-main-card {
+      overflow: hidden;
+      border: 1px solid #EDEDED;
+      border-radius: 16px;
+      background: #FFFFFF;
+      box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
+    }
+    .rz-section-title { font-size: 20px; line-height: 1.5; letter-spacing: 0; }
+    @media (min-width: 1800px) {
+      .rz-frame {
+        grid-template-columns: 24px 264px 16px minmax(0, 1592px) 24px;
+        max-width: 1920px;
+      }
+      .rz-content { grid-column: 4; }
+    }
+    @media (max-width: 1279px) {
+      .rz-frame {
+        display: flex;
+        padding: 0;
+        max-width: none;
+      }
+      .rz-content { flex: 1 1 auto; }
+    }
+    .rz-sidebar { grid-column: 2; width: 210px !important; }
+    @media (min-width: 1800px) {
+      .rz-sidebar { width: 264px !important; }
+    }
+    .rounded-3xl, .rounded-2xl { border-radius: 16px !important; }
+    .rounded-xl { border-radius: 12px !important; }
+    .rounded-lg { border-radius: 12px !important; }
+    .rounded-full { border-radius: 999px !important; }
+    .shadow-sm, .shadow-lg, .shadow-2xl {
+      box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08) !important;
+    }
+    .border-slate-100, .border-slate-200, .border-slate-300 { border-color: #E4E4E4 !important; }
+    .bg-slate-50, .bg-slate-100, .bg-gray-50, .bg-gray-100 { background-color: #F6F6F6 !important; }
+    .bg-white\/82, .bg-white\/78, .bg-white\/60 { background-color: #FFFFFF !important; }
+    .text-slate-400, .text-gray-400 { color: #C1C1C1 !important; }
+    .text-slate-500, .text-gray-500 { color: #949494 !important; }
+    .text-slate-600, .text-slate-700, .text-gray-600, .text-gray-700 { color: #707070 !important; }
+    .text-red-500, .text-red-600, .text-red-700 { color: #F5555E !important; }
+    .bg-red-50 { background-color: #FFEDEE !important; }
+    .border-red-200 { border-color: #FFB8BD !important; }
+    .text-green-600, .text-green-700, .text-emerald-700 { color: #16C181 !important; }
+    .bg-green-50, .bg-emerald-50 { background-color: #E9FAF3 !important; }
+    .text-orange-600, .text-amber-600 { color: #FCB723 !important; }
+    .bg-orange-50 { background-color: #FFF7E2 !important; }
+    .bg-amber-400 { background-color: #FCB723 !important; }
+    .bg-green-500 { background-color: #16C181 !important; }
+    .bg-red-500 { background-color: #F5555E !important; }
   </style>
 </head>
 <body>
@@ -511,9 +573,9 @@ function App() {
     setTagReady(true);
   };
   return /*#__PURE__*/_jsx("div", {
-    className: "min-h-screen text-ink",
+    className: "rz-shell min-h-screen text-ink",
     children: /*#__PURE__*/_jsxs("div", {
-      className: "flex min-h-screen",
+      className: "rz-frame",
       children: [/*#__PURE__*/_jsx(Sidebar, {
         mainTab: mainTab,
         setMainTab: setMainTab,
@@ -522,13 +584,13 @@ function App() {
         setAdminTab: setAdminTab,
         isSuperAdmin: isSuperAdmin
       }), /*#__PURE__*/_jsxs("main", {
-        className: "flex-1 min-w-0",
+        className: "rz-content",
         children: [/*#__PURE__*/_jsx(Topbar, { mainTab: mainTab, role: role, setRole: setRole }), /*#__PURE__*/_jsx("div", {
-          className: "px-6 py-6",
+          className: "rz-page-pad",
           children: /*#__PURE__*/_jsxs("section", {
-            className: "rounded-[18px] border border-white/70 bg-white/82 shadow-mid backdrop-blur",
+            className: "rz-main-card",
             children: [/*#__PURE__*/_jsx("div", {
-              className: "border-b border-slate-200 px-6 py-6",
+              className: "border-b border-slate-200 px-6 py-5",
               children: /*#__PURE__*/_jsx("div", {
                 className: "flex flex-wrap items-center justify-between gap-4",
                 children: /*#__PURE__*/_jsxs("div", {
@@ -536,7 +598,7 @@ function App() {
                     className: "text-sm font-semibold text-rizhao",
                     children: [mainTab === '后台管理' ? '后台管理 / ' : '投诉处理 / ', mainTab === '后台管理' ? adminTab : mainTab]
                   }), /*#__PURE__*/_jsx("h1", {
-                    className: "mt-1 text-2xl font-bold tracking-tight",
+                    className: "rz-section-title mt-1 font-bold",
                     children: mainTab === '录入工单' && entryTab !== '列表' ? entryTab : mainTab === '后台管理' ? adminTab : mainTab
                   })]
                 })
@@ -590,7 +652,7 @@ function Sidebar({
     if (name === '录入工单') setEntryTab('列表');
   };
   return /*#__PURE__*/_jsx("aside", {
-    className: "w-[292px] shrink-0 bg-ink text-white",
+    className: "rz-sidebar shrink-0 bg-ink text-white",
     children: /*#__PURE__*/_jsxs("div", {
       className: "flex h-full flex-col",
       children: [/*#__PURE__*/_jsx("div", {
