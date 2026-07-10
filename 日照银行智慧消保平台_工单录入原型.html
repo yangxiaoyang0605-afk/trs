@@ -724,7 +724,8 @@ function EntryWorkspace(props) {
         reasonTag: reasonTag,
         setReasonTag: setReasonTag,
         tagReady: tagReady,
-        handleTag: handleTag
+        handleTag: handleTag,
+        setEntryTab: setEntryTab
       })]
     }) : /*#__PURE__*/_jsxs(_Fragment, {
       children: [/*#__PURE__*/_jsxs("div", {
@@ -2444,7 +2445,10 @@ function StandardComplaintForm({
   hideHeader = false,
   footerMode = 'submit',
   onDispatch,
-  disableCustomerSearch = false
+  disableCustomerSearch = false,
+  onSaveDraft,
+  onSaveConfirm,
+  rowStatus
 }) {
   const [showHistory, setShowHistory] = useState(false);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
@@ -3097,7 +3101,18 @@ function StandardComplaintForm({
             options: ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员']
           })]
         })
-      }), /*#__PURE__*/_jsxs("div", {
+      }), footerMode === 'batch_confirm' ? /*#__PURE__*/_jsxs("div", {
+        className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
+        children: [/*#__PURE__*/_jsx("button", {
+          className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
+          onClick: () => { if (onSaveDraft) onSaveDraft(); },
+          children: "保存草稿"
+        }), rowStatus !== '已确认' ? /*#__PURE__*/_jsx("button", {
+          onClick: () => { if (onSaveConfirm) onSaveConfirm(); },
+          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
+          children: "保存并确认"
+        }) : null]
+      }) : /*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
           className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
@@ -3485,107 +3500,98 @@ function BatchImport({
   reasonTag,
   setReasonTag,
   tagReady,
-  handleTag
+  handleTag,
+  setEntryTab
 }) {
-  const [isUploaded, setIsUploaded] = useState(false);
-  const [isParsed, setIsParsed] = useState(false);
-  const [isImported, setIsImported] = useState(false);
-  const [page, setPage] = useState(1);
   const pageSize = 10;
-  const initialImportedRows = [{
-    no: 'DR202607020001',
-    title: '贷款利息争议处理',
-    channel: '省监管局',
-    customer: '王先生'
-  }, {
-    no: 'DR202607020002',
-    title: '信用卡还款协商',
-    channel: '12378',
-    customer: '李女士'
-  }, {
-    no: 'DR202607020003',
-    title: '账户服务咨询投诉',
-    channel: '12345政务热线',
-    customer: '张女士'
-  }, {
-    no: 'DR202607020004',
-    title: '经营贷办理进度反馈',
-    channel: '国家局',
-    customer: '赵先生'
-  }, {
-    no: 'DR202607020005',
-    title: '网点服务体验投诉',
-    channel: '客服中心',
-    customer: '陈女士'
-  }, {
-    no: 'DR202607020006',
-    title: '提前还款费用争议',
-    channel: '省监管局',
-    customer: '周先生'
-  }, {
-    no: 'DR202607020007',
-    title: '银行卡交易限额咨询',
-    channel: '12345政务热线',
-    customer: '吴女士'
-  }, {
-    no: 'DR202607020008',
-    title: '征信异议处理',
-    channel: '12378',
-    customer: '刘先生'
-  }, {
-    no: 'DR202607020009',
-    title: '贷款资料补充说明',
-    channel: '国家局',
-    customer: '孙女士'
-  }, {
-    no: 'DR202607020010',
-    title: '柜面业务办理时效',
-    channel: '客服中心',
-    customer: '马先生'
-  }, {
-    no: 'DR202607020011',
-    title: '理财收益争议',
-    channel: '12378',
-    customer: '郑女士'
-  }, {
-    no: 'DR202607020012',
-    title: '社保卡激活投诉',
-    channel: '省监管局',
-    customer: '宋先生'
-  }, {
-    no: 'DR202607020013',
-    title: '信用卡盗刷处理',
-    channel: '国家局',
-    customer: '唐女士'
-  }, {
-    no: 'DR202607020014',
-    title: '外汇汇款延迟',
-    channel: '客服中心',
-    customer: '秦先生'
-  }, {
-    no: 'DR202607020015',
-    title: '对公开户咨询',
-    channel: '12345政务热线',
-    customer: '许女士'
-  }];
-  const [importedRows, setImportedRows] = useState(initialImportedRows);
-  const [selectedNo, setSelectedNo] = useState(initialImportedRows[0].no);
-  const selectedRow = importedRows.find(row => row.no === selectedNo) || importedRows[0];
-  const dispatchCurrent = () => {
-    if (!selectedRow) return;
-    const remainingRows = importedRows.filter(row => row.no !== selectedRow.no);
-    setImportedRows(remainingRows);
-    setSelectedNo(remainingRows[0] ? remainingRows[0].no : '');
-  };
-  const startUploadAndParse = () => {
-    setIsUploaded(true);
-    setIsParsed(false);
+  const [phase, setPhase] = useState('upload');
+  const [uploadState, setUploadState] = useState('idle');
+  const [parseError, setParseError] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [selectedNo, setSelectedNo] = useState(null);
+  const [page, setPage] = useState(1);
+  const [allChecked, setAllChecked] = useState(false);
+  const [errorTriggered, setErrorTriggered] = useState(false);
+  const [showReUploadConfirm, setShowReUploadConfirm] = useState(false);
+  const [toast, setToast] = useState(null);
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
+  const pageRows = rows.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.ceil(rows.length / pageSize);
+  const selectedRow = rows.find(r => r.no === selectedNo) || null;
+
+  const total = rows.length;
+  const pendingCnt = rows.filter(r => r.status === '待确认').length;
+  const confirmedCnt = rows.filter(r => r.status === '已确认').length;
+  const failedCnt = rows.filter(r => r.status === '校验失败').length;
+
+  const initialRows = [
+    { no: 'DR202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020002', title: '信用卡还款协商', channel: '12378', customer: '李女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020003', title: '账户服务咨询投诉', channel: '12345政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020007', title: '银行卡交易限额咨询', channel: '12345政务热线', customer: '吴女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020009', title: '贷款资料补充说明', channel: '国家局', customer: '孙女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020010', title: '柜面业务办理时效', channel: '客服中心', customer: '马先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020011', title: '理财收益争议', channel: '12378', customer: '郑女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020012', title: '社保卡激活投诉', channel: '省监管局', customer: '宋先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020013', title: '信用卡盗刷处理', channel: '国家局', customer: '唐女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020014', title: '外汇汇款延迟', channel: '客服中心', customer: '秦先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020015', title: '对公开户咨询', channel: '12345政务热线', customer: '许女士', status: '待确认', checked: false, errors: null }
+  ];
+
+  function handleDownload() { showToast('标准模板下载成功。'); }
+  function handleUpload() {
+    setUploadState('uploaded');
     setTimeout(() => {
-      setIsParsed(true);
-      setTimeout(() => setIsImported(true), 800);
-    }, 900);
-  };
-  if (!isImported) {
+      setUploadState('parsing');
+      setTimeout(() => {
+        setUploadState('parsed');
+        const parsed = initialRows.map(r => ({ ...r, checked: false }));
+        setRows(parsed);
+        setSelectedNo(parsed[0].no);
+        setPhase('confirm');
+      }, 900);
+    }, 300);
+  }
+  function handleReUpload() {
+    setPhase('upload');
+    setUploadState('idle');
+    setParseError(null);
+    setRows([]);
+    setSelectedNo(null);
+    setPage(1);
+    setAllChecked(false);
+    setErrorTriggered(false);
+  }
+  function handleSaveDraft() { showToast('草稿数据已保存，请确认后提交。'); }
+  function handleSaveConfirm() {
+    const cur = rows.find(r => r.no === selectedNo);
+    if (!cur || !cur.no) return;
+    setRows(prev => prev.map(r => r.no === selectedNo ? { ...r, status: '已确认', errors: null } : r));
+    const next = rows.find(r => r.status === '待确认' && r.no !== selectedNo);
+    if (next) setSelectedNo(next.no);
+    showToast('数据已确认');
+  }
+  function handleBatchConfirm() {
+    const checked = rows.filter(r => r.checked);
+    if (checked.length === 0) { showToast('请先选择需要确认的数据。'); return; }
+    setRows(prev => prev.map(r => r.checked ? { ...r, status: '已确认', checked: false } : r));
+    setAllChecked(false);
+    showToast('已确认 ' + checked.length + ' 条数据');
+  }
+
+  function statusBadge(s) {
+    if (s === '待确认') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-orange-50 px-2 py-0.5 text-xs font-bold text-orange-600", children: s });
+    if (s === '已确认') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-green-50 px-2 py-0.5 text-xs font-bold text-green-700", children: s });
+    if (s === '校验失败') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600", children: s });
+    return null;
+  }
+
+  // ── Upload Phase ──
+  if (phase === 'upload') {
     return /*#__PURE__*/_jsxs("section", {
       className: "rounded-2xl border border-slate-200 bg-white p-8",
       children: [/*#__PURE__*/_jsxs("div", {
@@ -3596,55 +3602,96 @@ function BatchImport({
             children: "批量导入"
           }), /*#__PURE__*/_jsx("div", {
             className: "mt-1 text-sm text-slate-500",
-            children: "先下载模板填写数据，上传后系统解析并导入为待填写工单。"
+            children: "请使用系统标准模板填写并上传。仅支持 .xlsx 文件。"
           })]
         }), /*#__PURE__*/_jsx("span", {
           className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
-          children: isParsed ? "解析完成" : isUploaded ? "解析中" : "下载模板"
+          children: uploadState === 'parsed' ? "解析完成" : uploadState === 'parsing' ? "解析中" : uploadState === 'uploaded' ? "上传成功" : "下载模板"
         })]
+      }), /*#__PURE__*/_jsx("div", {
+        className: "mt-4 flex gap-3",
+        children: /*#__PURE__*/_jsx("button", {
+          onClick: handleDownload,
+          className: "rounded-xl border border-rizhao bg-white px-5 py-2 text-sm font-bold text-rizhao",
+          children: "下载标准模板"
+        })
       }), /*#__PURE__*/_jsxs("div", {
-        className: `mt-6 rounded-3xl border border-dashed px-8 py-12 text-center ${isUploaded ? 'border-line-divider bg-mist/60' : 'border-slate-300 bg-slate-50'}`,
+        className: `mt-6 rounded-3xl border border-dashed px-8 py-12 text-center ${uploadState === 'idle' ? 'border-slate-300 bg-slate-50' : 'border-line-divider bg-mist/60'}`,
         children: [/*#__PURE__*/_jsx("div", {
           className: "mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl font-black text-rizhao shadow-sm",
           children: "↑"
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-5 text-lg font-black text-ink",
-          children: isUploaded ? "投诉批量导入模板.xlsx" : "上传批量数据"
+          children: uploadState === 'idle' ? "上传批量数据" : "投诉批量导入模板.xlsx"
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-2 text-sm text-slate-500",
-          children: isUploaded ? "文件已上传，系统正在解析字段和数据内容。" : "先下载模板并按格式填写，再上传批量数据，系统自动解析。"
-        }),         !isUploaded && /*#__PURE__*/_jsx("button", {
-          onClick: () => startUploadAndParse(),
+          children: uploadState === 'idle' ? "仅支持 .xlsx 文件" : "上传成功，正在解析"
+        }), uploadState === 'idle' && /*#__PURE__*/_jsx("button", {
+          onClick: handleUpload,
           className: "mt-6 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "上传数据"
-        }), isUploaded && /*#__PURE__*/_jsxs("div", {
+        }), (uploadState === 'uploaded' || uploadState === 'parsing') && /*#__PURE__*/_jsxs("div", {
           className: "mx-auto mt-6 max-w-xl",
           children: [/*#__PURE__*/_jsxs("div", {
             className: "mb-2 flex items-center justify-between text-sm font-bold text-slate-600",
-            children: [/*#__PURE__*/_jsx("span", {
-              children: isParsed ? "解析完成，正在进入导入界面" : "解析中"
-            }), /*#__PURE__*/_jsx("span", {
-              children: isParsed ? "100%" : "72%"
-            })]
+            children: [/*#__PURE__*/_jsx("span", { children: "解析中" }), /*#__PURE__*/_jsx("span", { children: "72%" })]
           }), /*#__PURE__*/_jsx("div", {
             className: "h-3 overflow-hidden rounded-full bg-white",
-            children: /*#__PURE__*/_jsx("div", {
-              className: "h-full rounded-full bg-rizhao transition-all duration-700",
-              style: {
-                width: isParsed ? '100%' : '72%'
-              }
-            })
+            children: /*#__PURE__*/_jsx("div", { className: "h-full rounded-full bg-rizhao transition-all duration-700", style: { width: '72%' } })
           }), /*#__PURE__*/_jsx("div", {
             className: "mt-3 text-sm text-slate-500",
-            children: isParsed ? "已识别 10 笔工单，字段校验通过。" : "正在校验字段、必填项和数据格式。"
+            children: "正在校验字段、必填项和数据格式。"
           })]
+        }), uploadState === 'parsed' && /*#__PURE__*/_jsxs("div", {
+          className: "mx-auto mt-6 max-w-xl",
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "mb-2 flex items-center justify-between text-sm font-bold text-slate-600",
+            children: [/*#__PURE__*/_jsx("span", { children: "解析完成" }), /*#__PURE__*/_jsx("span", { children: "100%" })]
+          }), /*#__PURE__*/_jsx("div", {
+            className: "h-3 overflow-hidden rounded-full bg-white",
+            children: /*#__PURE__*/_jsx("div", { className: "h-full rounded-full bg-rizhao", style: { width: '100%' } })
+          }), /*#__PURE__*/_jsx("div", {
+            className: "mt-3 text-sm text-slate-500",
+            children: "本次共解析出 15 条有效数据"
+          })]
+        }), parseError && /*#__PURE__*/_jsx("div", {
+          className: "mt-4 text-sm font-bold text-red-500",
+          children: parseError
         })]
       })]
     });
   }
+
+  // ── Complete Phase ──
+  if (phase === 'complete') {
+    return /*#__PURE__*/_jsxs("section", {
+      className: "flex min-h-[360px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center",
+      children: [/*#__PURE__*/_jsx("div", {
+        className: "mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 text-3xl font-black text-green-600 shadow-sm",
+        children: "✓"
+      }), /*#__PURE__*/_jsx("div", {
+        className: "mt-5 text-xl font-black text-ink",
+        children: "本批次数据已成功提交入库"
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "mt-3 space-y-1 text-sm text-slate-500",
+        children: [/*#__PURE__*/_jsx("div", { children: "有效数据：" + total + " 条" }), /*#__PURE__*/_jsx("div", { children: "成功入库：" + total + " 条" })]
+      }), /*#__PURE__*/_jsx("button", {
+        onClick: () => { setEntryTab('列表'); },
+        className: "mt-8 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
+        children: "返回工单录入"
+      })]
+    });
+  }
+
+  // ── Confirm Phase ──
   return /*#__PURE__*/_jsxs("div", {
-    className: "grid grid-cols-1 gap-5 lg:grid-cols-[320px_minmax(0,1fr)]",
-    children: [/*#__PURE__*/_jsxs("aside", {
+    className: "space-y-4",
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: "flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-4",
+      children: [/*#__PURE__*/_jsx("span", { className: "text-sm font-bold text-slate-600", children: "有效数据 " + total }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "|" }), /*#__PURE__*/_jsx("span", { className: "text-sm text-orange-600 font-bold", children: "待确认 " + pendingCnt }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "|" }), /*#__PURE__*/_jsx("span", { className: "text-sm text-green-600 font-bold", children: "已确认 " + confirmedCnt }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "|" }), /*#__PURE__*/_jsx("span", { className: "text-sm text-red-600 font-bold", children: "校验失败 " + failedCnt })]
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "grid grid-cols-1 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]",
+      children: [/*#__PURE__*/_jsxs("aside", {
         className: "self-start sticky top-4 rounded-2xl border border-slate-200 bg-white p-4",
         children: [/*#__PURE__*/_jsxs("div", {
           className: "mb-3 flex items-center justify-between",
@@ -3653,44 +3700,99 @@ function BatchImport({
             children: "导入工单列表"
           }), /*#__PURE__*/_jsx("div", {
             className: "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600",
-            children: `共 ${importedRows.length} 笔`
+            children: "共 " + rows.length + " 笔"
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "mb-3 flex items-center gap-2",
+          children: [/*#__PURE__*/_jsx("input", {
+            type: "checkbox",
+            checked: allChecked && pageRows.every(r => r.checked),
+            onChange: e => {
+              const chk = e.target.checked;
+              setAllChecked(chk);
+              setRows(prev => prev.map(r => pageRows.some(pr => pr.no === r.no) ? { ...r, checked: chk } : r));
+            },
+            className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
+          }), /*#__PURE__*/_jsx("span", { className: "text-xs text-slate-500", children: "全选" }), /*#__PURE__*/_jsx("button", {
+            onClick: handleBatchConfirm,
+            className: "ml-2 rounded-lg bg-rizhao px-3 py-1.5 text-xs font-bold text-white",
+            children: "批量确认"
           })]
         }), /*#__PURE__*/_jsx("div", {
           className: "space-y-2",
-          children: importedRows.slice((page - 1) * pageSize, page * pageSize).map(row => /*#__PURE__*/_jsxs("button", {
-            type: "button",
-            onClick: () => setSelectedNo(row.no),
-            className: `w-full rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light hover:bg-mist/40'}`,
-            children: [/*#__PURE__*/_jsx("div", {
-              className: "text-sm font-black text-rizhao",
-              children: row.no
-            }), /*#__PURE__*/_jsx("div", {
-              className: "mt-2 line-clamp-1 text-sm font-bold text-ink",
-              children: row.title
+          children: pageRows.map(row => /*#__PURE__*/_jsxs("div", {
+            className: `flex cursor-pointer items-start gap-2 rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light'}`,
+            children: [/*#__PURE__*/_jsx("input", {
+              type: "checkbox",
+              checked: row.checked || false,
+              onChange: e => {
+                const chk = e.target.checked;
+                setRows(prev => prev.map(r => r.no === row.no ? { ...r, checked: chk } : r));
+                if (!chk) setAllChecked(false);
+              },
+              onClick: e => e.stopPropagation(),
+              className: "mt-1 h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao shrink-0"
             }), /*#__PURE__*/_jsxs("div", {
-              className: "mt-1 flex items-center justify-between gap-2 text-xs text-slate-500",
-              children: [/*#__PURE__*/_jsx("span", {
-                children: row.channel
-              }), /*#__PURE__*/_jsx("span", {
-                children: row.customer
+              className: "flex-1 min-w-0",
+              onClick: () => { setSelectedNo(row.no); setPage(Math.floor(rows.indexOf(row) / pageSize) + 1); },
+              children: [/*#__PURE__*/_jsx("div", {
+                className: "text-sm font-black text-rizhao",
+                children: row.no
+              }), /*#__PURE__*/_jsx("div", {
+                className: "mt-1 line-clamp-1 text-sm font-bold text-ink",
+                children: row.title
+              }), /*#__PURE__*/_jsxs("div", {
+                className: "mt-1 flex items-center justify-between gap-2 text-xs text-slate-500",
+                children: [/*#__PURE__*/_jsx("span", { children: row.channel }), /*#__PURE__*/_jsx("span", { children: row.customer })]
+              }), /*#__PURE__*/_jsx("div", {
+                className: "mt-1.5",
+                children: statusBadge(row.status)
+              }), row.errors && row.errors.length > 0 && /*#__PURE__*/_jsx("div", {
+                className: "mt-1 text-xs text-red-500",
+                children: row.errors.map(e => e.message).join('；')
               })]
             })]
           }, row.no))
-        }), importedRows.length >= pageSize && /*#__PURE__*/_jsxs("div", {
+        }), rows.length > pageSize && /*#__PURE__*/_jsxs("div", {
           className: "mt-3 flex items-center justify-center gap-2 text-sm",
           children: [/*#__PURE__*/_jsx("button", {
             onClick: () => setPage(Math.max(1, page - 1)),
             disabled: page === 1,
-            className: `rounded-lg border px-3 py-1.5 text-xs font-bold ${page === 1 ? 'border-slate-200 text-slate-400' : 'border-line-divider text-slate-600 hover:text-rizhao'}`,
+            className: "rounded-lg border px-3 py-1.5 text-xs font-bold " + (page === 1 ? 'border-slate-200 text-slate-400' : 'border-line-divider text-slate-600 hover:text-rizhao'),
             children: "‹"
-          }), /*#__PURE__*/_jsx("span", {
-            className: "text-xs text-slate-500",
-            children: `${page} / ${Math.ceil(importedRows.length / pageSize)}`
-          }), /*#__PURE__*/_jsx("button", {
-            onClick: () => setPage(Math.min(Math.ceil(importedRows.length / pageSize), page + 1)),
-            disabled: page === Math.ceil(importedRows.length / pageSize),
-            className: `rounded-lg border px-3 py-1.5 text-xs font-bold ${page === Math.ceil(importedRows.length / pageSize) ? 'border-slate-200 text-slate-400' : 'border-line-divider text-slate-600 hover:text-rizhao'}`,
+          }), /*#__PURE__*/_jsx("span", { className: "text-xs text-slate-500", children: page + ' / ' + totalPages }), /*#__PURE__*/_jsx("button", {
+            onClick: () => setPage(Math.min(totalPages, page + 1)),
+            disabled: page === totalPages,
+            className: "rounded-lg border px-3 py-1.5 text-xs font-bold " + (page === totalPages ? 'border-slate-200 text-slate-400' : 'border-line-divider text-slate-600 hover:text-rizhao'),
             children: "›"
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "mt-4 flex gap-2 border-t border-slate-200 pt-4",
+          children: [/*#__PURE__*/_jsx("button", {
+            onClick: () => setShowReUploadConfirm(true),
+            className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-xs font-bold text-slate-600",
+            children: "重新上传"
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "flex-1",
+            children: [/*#__PURE__*/_jsx("button", {
+              onClick: () => {
+                const notConfirmed = rows.filter(r => r.status !== '已确认');
+                if (notConfirmed.length > 0) { showToast('存在未确认的数据，请先确认后再提交。'); return; }
+                if (!errorTriggered) {
+                  setErrorTriggered(true);
+                  const errRow = rows[4];
+                  if (errRow) {
+                    setRows(prev => prev.map((r, i) => i === 4 ? { ...r, status: '校验失败', errors: [{ field: '投诉人姓名', message: '第 5 行：投诉人姓名未填写' }] } : r));
+                    setSelectedNo(errRow.no);
+                    showToast('存在必填项未填写，请补充后再提交。');
+                  }
+                  return;
+                }
+                setPhase('complete');
+              },
+              className: "w-full rounded-lg bg-rizhao px-4 py-2 text-xs font-bold text-white",
+              children: "提交入库"
+            })]
           })]
         })]
       }), selectedRow ? /*#__PURE__*/_jsx("section", {
@@ -3705,21 +3807,48 @@ function BatchImport({
           tagReady: tagReady,
           handleTag: handleTag,
           hideHeader: true,
-          footerMode: "dispatch",
-          onDispatch: dispatchCurrent
+          footerMode: "batch_confirm",
+          onSaveDraft: handleSaveDraft,
+          onSaveConfirm: handleSaveConfirm,
+          rowStatus: selectedRow ? selectedRow.status : '待确认',
+          key: selectedNo
         })
-      }) : /*#__PURE__*/_jsxs("section", {
+      }) : /*#__PURE__*/_jsx("section", {
         className: "flex min-h-[360px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center",
+        children: /*#__PURE__*/_jsx("div", {
+          className: "text-sm text-slate-500",
+          children: "请从左侧选择数据查看"
+        })
+      })]
+    }), toast && /*#__PURE__*/_jsx("div", {
+      className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
+      children: toast
+    }), showReUploadConfirm && /*#__PURE__*/_jsxs("div", {
+      className: "fixed inset-0 z-50 flex items-center justify-center bg-black/30",
+      onClick: e => { if (e.target === e.currentTarget) setShowReUploadConfirm(false); },
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-high",
+        onClick: e => e.stopPropagation(),
         children: [/*#__PURE__*/_jsx("div", {
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "text-xl font-black text-ink",
-            children: "本批次工单已全部派发"
-          }), /*#__PURE__*/_jsx("div", {
-            className: "mt-2 text-sm text-slate-500",
-            children: "左侧列表为空，代表导入工单已全部进入后续处理流程。"
+          className: "text-base font-black text-ink",
+          children: "重新上传"
+        }), /*#__PURE__*/_jsx("p", {
+          className: "mt-2 text-sm text-slate-600",
+          children: "重新上传后，将重新解析本批次数据，是否继续？"
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "mt-6 flex justify-end gap-3",
+          children: [/*#__PURE__*/_jsx("button", {
+            className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-slate-600",
+            onClick: () => setShowReUploadConfirm(false),
+            children: "取消"
+          }), /*#__PURE__*/_jsx("button", {
+            className: "rounded-lg bg-rizhao px-4 py-2 text-sm font-bold text-white",
+            onClick: () => { setShowReUploadConfirm(false); handleReUpload(); },
+            children: "继续上传"
           })]
         })]
       })]
+    })]
   });
 }
 function LedgerExportWorkspace() {
