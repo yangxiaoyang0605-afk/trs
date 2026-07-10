@@ -4802,32 +4802,65 @@ function UserManager() {
 }
 
 // ─── 机构管理 ─────────────────────────────────────────────
-const orgTree = {
-  name: '日照银行', children: [
-    { name: '总行', children: [
-      { name: '消保岗' },
-      { name: '总行部室' }
-    ]},
-    { name: '青岛分行' },
-    { name: '莒县支行' },
-    { name: '东港支行' },
-    { name: '岚山支行' },
-    { name: '五莲支行' },
-    { name: '开发区支行' },
-    { name: '信用卡中心' }
+const orgTypeOptions = ['总行', '分行', '支行', '总行部门', '内设部门', '营业网点'];
+
+let _oid = 100;
+function _nid() { return 'org_' + (++_oid); }
+
+function _findNode(tree, id) {
+  if (tree.id === id) return tree;
+  if (tree.children) for (const c of tree.children) { const f = _findNode(c, id); if (f) return f; }
+  return null;
+}
+
+function _findParent(tree, id) {
+  if (tree.children) for (const c of tree.children) { if (c.id === id) return tree; const f = _findParent(c, id); if (f) return f; }
+  return null;
+}
+
+function _flatten(tree, pid) {
+  const r = [{ ...tree, _pid: pid || null }];
+  if (tree.children) for (const c of tree.children) r.push(..._flatten(c, tree.id));
+  return r;
+}
+
+function _getOptions(tree, exId) {
+  if (tree.status === '作废' || tree.id === exId) return [];
+  const r = [{ id: tree.id, name: tree.name, depth: 0 }];
+  if (tree.children) for (const c of tree.children) { const sub = _getOptions(c, exId); sub.forEach(s => { s.depth++; r.push(s); }); }
+  return r;
+}
+
+const _initTree = {
+  id: 'org_1', name: '日照银行', code: 'RZ001', type: '总行', status: '正常',
+  children: [
+    { id: 'org_2', name: '总行', code: 'ZB001', type: '总行部门', status: '正常',
+      children: [
+        { id: 'org_3', name: '消保岗', code: 'ZBXB001', type: '内设部门', status: '正常' },
+        { id: 'org_4', name: '总行部室', code: 'ZBBS001', type: '内设部门', status: '正常' }
+      ]
+    },
+    { id: 'org_5', name: '青岛分行', code: 'QD001', type: '分行', status: '正常' },
+    { id: 'org_6', name: '莒县支行', code: 'JX001', type: '支行', status: '正常' },
+    { id: 'org_7', name: '东港支行', code: 'DG001', type: '支行', status: '正常' },
+    { id: 'org_8', name: '岚山支行', code: 'LS001', type: '支行', status: '正常' },
+    { id: 'org_9', name: '五莲支行', code: 'WL001', type: '支行', status: '正常' },
+    { id: 'org_10', name: '开发区支行', code: 'KFQ001', type: '支行', status: '正常' },
+    { id: 'org_11', name: '信用卡中心', code: 'XY001', type: '内设部门', status: '正常' }
   ]
 };
 
-function OrgNode({ node, depth, onSelect, selected }) {
+function OrgNode({ node, depth, onSelect, selectedId }) {
   const [expanded, setExpanded] = useState(true);
   const hasChildren = node.children && node.children.length > 0;
+  const isSel = selectedId === node.id;
   return /*#__PURE__*/_jsxs("div", {
     children: [/*#__PURE__*/_jsxs("div", {
-      className: `flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-mist ${selected ? 'bg-rizhao/10 font-bold text-rizhao' : ''}`,
+      className: `flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm transition hover:bg-mist ${isSel ? 'bg-rizhao/10 font-bold text-rizhao' : ''}`,
       style: { paddingLeft: 12 + depth * 20 },
       onClick: () => {
         if (hasChildren) setExpanded(!expanded);
-        onSelect(node);
+        onSelect(node.id);
       },
       children: [hasChildren && /*#__PURE__*/_jsx("span", {
         className: "text-xs text-slate-400",
@@ -4836,65 +4869,311 @@ function OrgNode({ node, depth, onSelect, selected }) {
         className: "w-3"
       }), /*#__PURE__*/_jsx("span", {
         className: "font-bold",
-        children: node.name
+        children: node.status === '作废' ? node.name + '（已作废）' : node.name
       })]
     }), hasChildren && expanded && node.children.map(child => /*#__PURE__*/_jsx(OrgNode, {
       node: child,
       depth: depth + 1,
       onSelect: onSelect,
-      selected: selected && selected.name === child.name
-    }, child.name))]
+      selectedId: selectedId
+    }, child.id))]
   });
 }
 
 function OrgManager() {
-  const [selectedOrg, setSelectedOrg] = useState(null);
+  const [tree, setTree] = useState(JSON.parse(JSON.stringify(_initTree)));
+  const [selId, setSelId] = useState(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [showVoid, setShowVoid] = useState(false);
+
+  const [aName, setAName] = useState('');
+  const [aCode, setACode] = useState('');
+  const [aPid, setAPid] = useState('');
+  const [aType, setAType] = useState('');
+
+  const [eId, setEId] = useState(null);
+  const [ePid, setEPid] = useState('');
+  const [eType, setEType] = useState('');
+
+  const [vId, setVId] = useState(null);
+
+  const flat = _flatten(tree);
+  const rows = selId ? flat.filter(n => n.id === selId || n._pid === selId) : flat.filter(n => n._pid === null || n._pid === tree.id);
+
+  function pName(id) { const p = _findParent(tree, id); return p ? p.name : '-'; }
+  function startAdd() { setAName(''); setACode(''); setAPid(selId || tree.id); setAType(''); setShowAdd(true); }
+  function doAdd() {
+    if (!aName.trim() || !aCode.trim()) return;
+    const cl = JSON.parse(JSON.stringify(tree));
+    const pr = _findNode(cl, aPid);
+    if (!pr) return;
+    const n = { id: _nid(), name: aName.trim(), code: aCode.trim(), type: aType || '内设部门', status: '正常' };
+    if (!pr.children) pr.children = [];
+    pr.children.push(n);
+    setTree(cl);
+    setShowAdd(false);
+  }
+  function startEdit(id) {
+    const n = _findNode(tree, id); if (!n) return;
+    const p = _findParent(tree, id);
+    setEId(id); setEPid(p ? p.id : ''); setEType(n.type); setShowEdit(true);
+  }
+  function doEdit() {
+    if (!eId) return;
+    const cl = JSON.parse(JSON.stringify(tree));
+    const n = _findNode(cl, eId); if (!n) return;
+    const op = _findParent(cl, eId);
+    const opId = op ? op.id : null;
+    n.type = eType;
+    if (ePid !== opId) {
+      if (op && op.children) op.children = op.children.filter(c => c.id !== eId);
+      const np = _findNode(cl, ePid);
+      if (np) { if (!np.children) np.children = []; np.children.push(n); }
+    }
+    setTree(cl);
+    setShowEdit(false);
+    setEId(null);
+  }
+  function startVoid(id) { setVId(id); setShowVoid(true); }
+  function doVoid() {
+    if (!vId) return;
+    const cl = JSON.parse(JSON.stringify(tree));
+    const n = _findNode(cl, vId);
+    if (n) { n.status = '作废'; setTree(cl); }
+    setShowVoid(false); setVId(null);
+  }
+
+  function Modal({ show, onClose, title, children }) {
+    if (!show) return null;
+    return /*#__PURE__*/_jsxs("div", {
+      className: "fixed inset-0 z-50 flex items-center justify-center bg-black/30",
+      onClick: e => { if (e.target === e.currentTarget) onClose(); },
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-high",
+        onClick: e => e.stopPropagation(),
+        children: [/*#__PURE__*/_jsxs("div", {
+          className: "border-b border-slate-200 px-6 py-4",
+          children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: title })]
+        }), /*#__PURE__*/_jsx("div", { className: "px-6 py-5", children: children })]
+      })]
+    });
+  }
+
+  const addOpts = _getOptions(tree);
+
   return /*#__PURE__*/_jsxs("div", {
     className: "flex gap-6",
     children: [/*#__PURE__*/_jsx("div", {
       className: "w-[300px] shrink-0 rounded-2xl border border-slate-200 bg-white p-4",
       children: /*#__PURE__*/_jsx("div", {
         className: "space-y-0.5",
-        children: /*#__PURE__*/_jsx(OrgNode, { node: orgTree, depth: 0, onSelect: setSelectedOrg, selected: selectedOrg })
+        children: /*#__PURE__*/_jsx(OrgNode, { node: tree, depth: 0, onSelect: setSelId, selectedId: selId })
       })
-    }), /*#__PURE__*/_jsx("div", {
-      className: "flex-1 min-w-0",
-      children: !selectedOrg ? /*#__PURE__*/_jsxs("div", {
-        className: "flex h-full min-h-[200px] items-center justify-center rounded-2xl border border-slate-200 bg-white",
-        children: [/*#__PURE__*/_jsx("span", {
-          className: "text-sm text-slate-400",
-          children: "请从左侧选择机构查看详情"
-        })]
-      }) : /*#__PURE__*/_jsxs("div", {
-        className: "rounded-2xl border border-slate-200 bg-white p-6",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "text-lg font-black",
-          children: "机构详情"
-        }), /*#__PURE__*/_jsx("div", {
-          className: "mt-6 grid grid-cols-2 gap-6",
-          children: ['机构编码', '机构名称', '机构简称', '机构类型', '上级机构', '机构层级', '机构状态'].map(field => /*#__PURE__*/_jsxs("div", {
-            children: [/*#__PURE__*/_jsx("div", {
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "flex-1 min-w-0 space-y-4",
+      children: [/*#__PURE__*/_jsx("div", {
+        className: "flex justify-end",
+        children: /*#__PURE__*/_jsx("button", {
+          className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+          onClick: startAdd,
+          children: "+ 新增机构"
+        })
+      }), /*#__PURE__*/_jsx("div", {
+        className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white",
+        children: /*#__PURE__*/_jsxs("table", {
+          className: "w-full text-left text-sm",
+          children: [/*#__PURE__*/_jsx("thead", {
+            children: /*#__PURE__*/_jsx("tr", {
+              className: "border-b border-slate-200 bg-mist/60",
+              children: ['机构名称', '上级机构', '机构类型', '操作'].map(h => /*#__PURE__*/_jsx("th", {
+                className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap",
+                children: h
+              }, h))
+            })
+          }), /*#__PURE__*/_jsx("tbody", {
+            children: rows.length === 0 ? /*#__PURE__*/_jsx("tr", {
+              children: /*#__PURE__*/_jsx("td", {
+                className: "px-4 py-8 text-center text-sm text-slate-400",
+                colSpan: 4,
+                children: "暂无机构数据"
+              })
+            }) : rows.map(o => /*#__PURE__*/_jsxs("tr", {
+              className: "border-b border-slate-100 hover:bg-mist/40",
+              children: [/*#__PURE__*/_jsxs("td", {
+                className: "px-4 py-3 whitespace-nowrap font-bold",
+                children: [o.name, o.status === '作废' ? /*#__PURE__*/_jsx("span", {
+                  className: "ml-2 rounded bg-red-50 px-1.5 py-0.5 text-xs text-red-500",
+                  children: "已作废"
+                }) : null]
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-4 py-3 whitespace-nowrap text-slate-500",
+                children: pName(o.id)
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-4 py-3 whitespace-nowrap",
+                children: o.type
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-4 py-3 whitespace-nowrap",
+                children: /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-2",
+                  children: [/*#__PURE__*/_jsx("button", {
+                    className: "rounded-lg border border-line-divider bg-white px-3 py-1.5 text-xs font-bold text-rizhao",
+                    onClick: () => startEdit(o.id),
+                    children: "修改"
+                  }), o.status !== '作废' && /*#__PURE__*/_jsx("button", {
+                    className: "rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-500",
+                    onClick: () => startVoid(o.id),
+                    children: "作废"
+                  })]
+                })
+              })]
+            }, o.id))
+          })]
+        })
+      }), /*#__PURE__*/_jsx(Modal, {
+        show: showAdd,
+        onClose: () => setShowAdd(false),
+        title: "新增机构",
+        children: /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "mb-4",
+            children: [/*#__PURE__*/_jsxs("div", {
               className: "field-label mb-1",
-              children: field
+              children: ["机构名称", /*#__PURE__*/_jsx("span", { className: "text-red-500 ml-0.5", children: "*" })]
             }), /*#__PURE__*/_jsx("div", {
               className: "field-box",
-              children: /*#__PURE__*/_jsx("div", {
-                className: "py-2 text-sm text-slate-600",
-                children: "—"
+              children: /*#__PURE__*/_jsx("input", {
+                placeholder: "请输入机构名称",
+                value: aName,
+                onChange: e => setAName(e.target.value)
               })
             })]
-          }, field))
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "mt-6 flex gap-3",
-          children: [/*#__PURE__*/_jsx("button", {
-            className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
-            children: "编辑"
-          }), /*#__PURE__*/_jsx("button", {
-            className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
-            children: "停用机构"
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "mb-4",
+            children: [/*#__PURE__*/_jsxs("div", {
+              className: "field-label mb-1",
+              children: ["机构编号", /*#__PURE__*/_jsx("span", { className: "text-red-500 ml-0.5", children: "*" })]
+            }), /*#__PURE__*/_jsx("div", {
+              className: "field-box",
+              children: /*#__PURE__*/_jsx("input", {
+                placeholder: "请输入机构编号",
+                value: aCode,
+                onChange: e => setACode(e.target.value)
+              })
+            })]
+          }), /*#__PURE__*/_jsx("div", {
+            className: "mb-4",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "field-label mb-1",
+              children: "上级机构"
+            }), /*#__PURE__*/_jsx("div", {
+              className: "field-box",
+              children: /*#__PURE__*/_jsx("select", {
+                value: aPid,
+                onChange: e => setAPid(e.target.value),
+                children: addOpts.map(o => /*#__PURE__*/_jsx("option", {
+                  value: o.id,
+                  children: '\u00A0'.repeat(o.depth * 2) + o.name
+                }, o.id))
+              })
+            })]
+          }), /*#__PURE__*/_jsx("div", {
+            className: "mb-4",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "field-label mb-1",
+              children: "机构类型"
+            }), /*#__PURE__*/_jsx("div", {
+              className: "field-box",
+              children: /*#__PURE__*/_jsx("select", {
+                value: aType,
+                onChange: e => setAType(e.target.value),
+                children: [/*#__PURE__*/_jsx("option", { value: "", children: "请选择" })].concat(
+                  orgTypeOptions.map(t => /*#__PURE__*/_jsx("option", { value: t, children: t }, t))
+                )
+              })
+            })]
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "mt-6 flex justify-end gap-3",
+            children: [/*#__PURE__*/_jsx("button", {
+              className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
+              onClick: () => setShowAdd(false),
+              children: "取消"
+            }), /*#__PURE__*/_jsx("button", {
+              className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+              onClick: doAdd,
+              children: "确认新增"
+            })]
           })]
-        })]
-      })
+        })
+      }), /*#__PURE__*/_jsx(Modal, {
+        show: showEdit,
+        onClose: () => setShowEdit(false),
+        title: "修改机构",
+        children: /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "mb-4",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "field-label mb-1",
+              children: "上级机构"
+            }), /*#__PURE__*/_jsx("div", {
+              className: "field-box",
+              children: /*#__PURE__*/_jsx("select", {
+                value: ePid,
+                onChange: e => setEPid(e.target.value),
+                children: _getOptions(tree, eId).map(o => /*#__PURE__*/_jsx("option", {
+                  value: o.id,
+                  children: '\u00A0'.repeat(o.depth * 2) + o.name
+                }, o.id))
+              })
+            })]
+          }), /*#__PURE__*/_jsx("div", {
+            className: "mb-4",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "field-label mb-1",
+              children: "机构类型"
+            }), /*#__PURE__*/_jsx("div", {
+              className: "field-box",
+              children: /*#__PURE__*/_jsx("select", {
+                value: eType,
+                onChange: e => setEType(e.target.value),
+                children: orgTypeOptions.map(t => /*#__PURE__*/_jsx("option", { value: t, children: t }, t))
+              })
+            })]
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "mt-6 flex justify-end gap-3",
+            children: [/*#__PURE__*/_jsx("button", {
+              className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
+              onClick: () => setShowEdit(false),
+              children: "取消"
+            }), /*#__PURE__*/_jsx("button", {
+              className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
+              onClick: doEdit,
+              children: "保存修改"
+            })]
+          })]
+        })
+      }), /*#__PURE__*/_jsx(Modal, {
+        show: showVoid,
+        onClose: () => setShowVoid(false),
+        title: "作废机构",
+        children: /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsx("p", {
+            className: "text-sm text-slate-600",
+            children: "确认作废该机构？"
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "mt-6 flex justify-end gap-3",
+            children: [/*#__PURE__*/_jsx("button", {
+              className: "rounded-lg border border-line-divider bg-white px-5 py-2 text-sm font-bold text-slate-600",
+              onClick: () => setShowVoid(false),
+              children: "取消"
+            }), /*#__PURE__*/_jsx("button", {
+              className: "rounded-lg bg-red-500 px-5 py-2 text-sm font-bold text-white",
+              onClick: doVoid,
+              children: "确认作废"
+            })]
+          })]
+        })
+      })]
     })]
   });
 }
