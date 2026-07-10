@@ -1022,6 +1022,15 @@ function ProcessingWorkspace({
         })]
       }, item.name))
     }), /*#__PURE__*/_jsxs("section", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "标题", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '12378监管热线', '12345政务热线', '客服中心'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "mt-4 flex justify-end gap-3",
+        children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
+      })]
+    }), /*#__PURE__*/_jsxs("section", {
       className: "overflow-hidden rounded-2xl border border-slate-200 bg-white",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4",
@@ -1230,7 +1239,7 @@ function ProcessingDetail({
     label: '是否重办',
     value: '否'
   }];
-  const complainantFields = [{
+  const customerFields = [{
     label: '投诉人姓名',
     value: row.customer
   }, {
@@ -1242,19 +1251,13 @@ function ProcessingDetail({
   }, {
     label: '联系电话',
     value: '156****2816'
+  }];
+  const complaintFields = [{
+    label: '被投诉机构',
+    value: row.org
   }, {
     label: '投诉人诉求',
     value: '协商处理'
-  }, {
-    label: '业务类别',
-    value: '银行卡业务 / 信用卡'
-  }, {
-    label: '投诉原因',
-    value: '业务办理 / 还款与协商争议'
-  }];
-  const orgFields = [{
-    label: '被投诉机构',
-    value: row.org
   }, {
     label: '是否现场',
     value: '否'
@@ -1262,6 +1265,13 @@ function ProcessingDetail({
     label: '办理时限',
     value: '2026-07-04 18:00'
   }, {
+    label: '业务类别',
+    value: '银行卡业务 / 信用卡'
+  }, {
+    label: '投诉原因',
+    value: '业务办理 / 还款与协商争议'
+  }];
+  const assignFields = [{
     label: '处理机构',
     value: row.org
   }, {
@@ -1291,21 +1301,31 @@ function ProcessingDetail({
       title: "工单信息",
       fields: detailFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "投诉人信息",
-      fields: complainantFields
-    }), /*#__PURE__*/_jsxs(ReadOnlySection, {
-      title: "被投诉信息",
-      fields: orgFields,
-      children: /*#__PURE__*/_jsxs("div", {
-        className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "field-label mb-2",
+      title: "客户信息",
+      fields: customerFields
+    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+      title: "投诉信息",
+      fields: complaintFields
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
+        children: [/*#__PURE__*/_jsx("span", {
+          className: "h-7 w-1.5 rounded-full bg-rizhao"
+        }), /*#__PURE__*/_jsx("h3", {
+          className: "text-base font-black text-ink",
           children: "投诉内容"
-        }), /*#__PURE__*/_jsx("div", {
+        })]
+      }), /*#__PURE__*/_jsx("div", {
+        className: "rounded-xl border border-slate-200 bg-slate-50 p-4",
+        children: /*#__PURE__*/_jsx("div", {
           className: "text-sm leading-7 text-slate-700",
           children: row.content
-        })]
-      })
+        })
+      })]
+    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+      title: "指派处理",
+      fields: assignFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "标签信息",
       fields: [{
@@ -2285,7 +2305,7 @@ function ReadOnlyComplaintDetail({
     label: '是否重办',
     value: '否'
   }];
-  const complainantFields = [{
+  const customerFields = [{
     label: '投诉人姓名',
     value: row.customer
   }, {
@@ -2297,19 +2317,13 @@ function ReadOnlyComplaintDetail({
   }, {
     label: '联系电话',
     value: '138****0919'
+  }];
+  const complaintFields = [{
+    label: '被投诉机构',
+    value: row.org
   }, {
     label: '投诉人诉求',
     value: '协商处理'
-  }, {
-    label: '业务类别',
-    value: '贷款业务 / 个人贷款'
-  }, {
-    label: '投诉原因',
-    value: '业务办理 / 还款与征信异议'
-  }];
-  const orgFields = [{
-    label: '被投诉机构',
-    value: row.org
   }, {
     label: '是否现场',
     value: '否'
@@ -2317,6 +2331,13 @@ function ReadOnlyComplaintDetail({
     label: '办理时限',
     value: '2026-07-04 18:00'
   }, {
+    label: '业务类别',
+    value: '贷款业务 / 个人贷款'
+  }, {
+    label: '投诉原因',
+    value: '业务办理 / 还款与征信异议'
+  }];
+  const assignFields = [{
     label: '处理机构',
     value: row.org
   }, {
@@ -2346,21 +2367,31 @@ function ReadOnlyComplaintDetail({
       title: "工单信息",
       fields: detailFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "投诉人信息",
-      fields: complainantFields
-    }), /*#__PURE__*/_jsxs(ReadOnlySection, {
-      title: "被投诉信息",
-      fields: orgFields,
-      children: /*#__PURE__*/_jsxs("div", {
-        className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "field-label mb-2",
+      title: "客户信息",
+      fields: customerFields
+    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+      title: "投诉信息",
+      fields: complaintFields
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
+        children: [/*#__PURE__*/_jsx("span", {
+          className: "h-7 w-1.5 rounded-full bg-rizhao"
+        }), /*#__PURE__*/_jsx("h3", {
+          className: "text-base font-black text-ink",
           children: "投诉内容"
-        }), /*#__PURE__*/_jsx("div", {
+        })]
+      }), /*#__PURE__*/_jsx("div", {
+        className: "rounded-xl border border-slate-200 bg-slate-50 p-4",
+        children: /*#__PURE__*/_jsx("div", {
           className: "text-sm leading-7 text-slate-700",
           children: "客户反映业务办理过程中存在沟通不充分、办理进度不清晰等问题，要求银行核实并反馈处理结果。"
-        })]
-      })
+        })
+      })]
+    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+      title: "指派处理",
+      fields: assignFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "标签信息",
       fields: [{
@@ -2512,7 +2543,9 @@ function StandardComplaintForm({
   onSaveConfirm,
   rowStatus
 }) {
+  const [orderNo, setOrderNo] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [historyTab, setHistoryTab] = useState('自建单');
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [complainantName, setComplainantName] = useState('王先生');
   const [gender, setGender] = useState('');
@@ -2731,7 +2764,7 @@ function StandardComplaintForm({
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "行内工单编号",
-            value: "RZYH2026070800001",
+            value: orderNo || "保存草稿或派发后自动生成",
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单类型",
@@ -2757,7 +2790,7 @@ function StandardComplaintForm({
             options: ['普通', '重要', '紧急']
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 办理时限",
-            placeholder: "受理时间 + 3 个工作日（系统自动计算）",
+            placeholder: "派发时间 + 3 个工作日（系统自动计算）",
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 是否重办",
@@ -2786,12 +2819,11 @@ function StandardComplaintForm({
             })]
           }), /*#__PURE__*/_jsxs("div", {
             className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
-            children: [/*#__PURE__*/_jsx(SearchField, {
+            children: [/*#__PURE__*/_jsx(Field, {
               label: "* 投诉人姓名",
               placeholder: "请输入投诉人姓名",
               value: complainantName,
-              setValue: setComplainantName,
-              onSearch: disableCustomerSearch ? undefined : () => setShowCustomerModal(true)
+              setValue: setComplainantName
             }), /*#__PURE__*/_jsx(Field, {
               label: "性别",
               type: "select",
@@ -2803,11 +2835,12 @@ function StandardComplaintForm({
               placeholder: "选填，若提供则填写",
               value: idNo,
               setValue: setIdNo
-            }), /*#__PURE__*/_jsx(Field, {
+            }), /*#__PURE__*/_jsx(SearchField, {
               label: "* 联系电话",
               placeholder: "请输入联系电话",
               value: contactPhone,
-              setValue: setContactPhone
+              setValue: setContactPhone,
+              onSearch: () => setShowCustomerModal(true)
             }), /*#__PURE__*/_jsx(Field, {
               label: "卡号",
               placeholder: "选填，若提供则填写"
@@ -2816,12 +2849,20 @@ function StandardComplaintForm({
             className: "overflow-hidden rounded-2xl border border-line-divider bg-white",
             children: [/*#__PURE__*/_jsxs("div", {
               className: "flex items-center justify-between bg-mist px-4 py-3",
-              children: [/*#__PURE__*/_jsx("div", {
-                className: "font-black text-rizhao",
-                children: "历史投诉列表"
+              children: [/*#__PURE__*/_jsxs("div", {
+                className: "flex gap-4",
+                children: [/*#__PURE__*/_jsx("button", {
+                  onClick: () => setHistoryTab('自建单'),
+                  className: "font-black " + (historyTab === '自建单' ? 'text-rizhao' : 'text-slate-500'),
+                  children: "自建单历史"
+                }), /*#__PURE__*/_jsx("button", {
+                  onClick: () => setHistoryTab('客服来电'),
+                  className: "font-black " + (historyTab === '客服来电' ? 'text-rizhao' : 'text-slate-500'),
+                  children: "客服来电历史"
+                })]
               }), /*#__PURE__*/_jsx("div", {
                 className: "text-sm font-bold text-slate-500",
-                children: "共 4 条，覆盖 96588、国家局、政务热线、省监管局"
+                children: "共 " + historyRows.length + " 条"
               })]
             }), /*#__PURE__*/_jsx("div", {
               className: "overflow-x-auto",
@@ -2993,26 +3034,22 @@ function StandardComplaintForm({
             })]
           }), /*#__PURE__*/_jsxs("div", {
             className: "relative",
-            children: [/*#__PURE__*/_jsxs("div", {
-              className: "grid cursor-pointer grid-cols-1 gap-4 xl:grid-cols-3",
-              onClick: () => setShowCascader(true),
-              children: [/*#__PURE__*/_jsx(Field, {
-                label: "* 业务类别大类",
-                value: bizL1,
-                disabled: true,
-                placeholder: "点击选择大类"
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 业务类别中类",
-                value: bizL2,
-                disabled: true,
-                placeholder: bizL1 ? "点击选择中类" : "请先选择大类"
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 业务类别小类",
-                value: bizL3,
-                disabled: true,
-                placeholder: bizL2 ? "点击选择小类" : "请先选择中类"
-              })]
-            }), showCascader ? /*#__PURE__*/_jsxs("div", {
+              children: [/*#__PURE__*/_jsxs("label", {
+                className: "block w-1/2 cursor-pointer",
+                children: [/*#__PURE__*/_jsx("div", {
+                  className: "field-label mb-2",
+                  children: "* 业务类别大-中-小类"
+                }), /*#__PURE__*/_jsx("div", {
+                  className: "field-box",
+                  children: /*#__PURE__*/_jsx("select", {
+                    onMouseDown: e => { e.preventDefault(); setShowCascader(true); },
+                    className: "cursor-pointer",
+                    children: /*#__PURE__*/_jsx("option", {
+                      children: [bizL1, bizL2, bizL3].filter(Boolean).join(' / ') || "点击选择"
+                    })
+                  })
+                })]
+              }), showCascader ? /*#__PURE__*/_jsxs("div", {
               children: [/*#__PURE__*/_jsx("div", {
                 className: "fixed inset-0 z-40",
                 onClick: () => { setShowCascader(false); setCascaderHoverL1(null); setCascaderHoverL2(null); }
@@ -3046,24 +3083,20 @@ function StandardComplaintForm({
             }) : null]
           }), /*#__PURE__*/_jsxs("div", {
             className: "relative",
-            children: [/*#__PURE__*/_jsxs("div", {
-              className: "grid cursor-pointer grid-cols-1 gap-4 xl:grid-cols-3",
-              onClick: () => setShowCompCascader(true),
-              children: [/*#__PURE__*/_jsx(Field, {
-                label: "* 投诉原因大类",
-                value: compL1,
-                disabled: true,
-                placeholder: "点击选择大类"
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 投诉原因中类",
-                value: compL2,
-                disabled: true,
-                placeholder: compL1 ? "点击选择中类" : "请先选择大类"
-              }), /*#__PURE__*/_jsx(Field, {
-                label: "* 投诉原因小类",
-                value: compL3,
-                disabled: true,
-                placeholder: compL2 ? "点击选择小类" : "请先选择中类"
+            children: [/*#__PURE__*/_jsxs("label", {
+              className: "block w-1/2 cursor-pointer",
+              children: [/*#__PURE__*/_jsx("div", {
+                className: "field-label mb-2",
+                children: "* 投诉原因大-中-小类"
+              }), /*#__PURE__*/_jsx("div", {
+                className: "field-box",
+                children: /*#__PURE__*/_jsx("select", {
+                  onMouseDown: e => { e.preventDefault(); setShowCompCascader(true); },
+                  className: "cursor-pointer",
+                  children: /*#__PURE__*/_jsx("option", {
+                    children: [compL1, compL2, compL3].filter(Boolean).join(' / ') || "点击选择"
+                  })
+                })
               })]
             }), showCompCascader ? /*#__PURE__*/_jsxs("div", {
               children: [/*#__PURE__*/_jsx("div", {
@@ -3167,10 +3200,10 @@ function StandardComplaintForm({
         className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
           className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
-          onClick: () => { if (onSaveDraft) onSaveDraft(); },
+          onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); if (onSaveDraft) onSaveDraft(); },
           children: "保存草稿"
         }), rowStatus !== '已确认' ? /*#__PURE__*/_jsx("button", {
-          onClick: () => { if (onSaveConfirm) onSaveConfirm(); },
+          onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); if (onSaveConfirm) onSaveConfirm(); },
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "保存并确认"
         }) : null]
@@ -3178,10 +3211,10 @@ function StandardComplaintForm({
         className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
           className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
-          onClick: () => showToast('工单已保存'),
+          onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); showToast('工单已保存'); },
           children: "保存"
       }), /*#__PURE__*/_jsx("button", {
-          onClick: () => { if (footerMode === 'dispatch' && onDispatch) onDispatch(); showToast('工单已派发'); },
+          onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); if (footerMode === 'dispatch' && onDispatch) onDispatch(); showToast('工单已派发'); },
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "派发"
         })]
@@ -3204,17 +3237,12 @@ function CustomerConfirmModal({
   return /*#__PURE__*/_jsx("div", {
     className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
     children: /*#__PURE__*/_jsxs("div", {
-      className: "w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl",
+      className: "w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
-        children: [/*#__PURE__*/_jsxs("div", {
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "text-xl font-black text-ink",
-            children: "客户信息确认"
-          }), /*#__PURE__*/_jsx("div", {
-            className: "mt-1 text-sm text-slate-500",
-            children: "查询可能返回多个客户，请人工确认后回填投诉人信息。"
-          })]
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "text-xl font-black text-ink",
+          children: "客户信息确认"
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
@@ -3224,11 +3252,11 @@ function CustomerConfirmModal({
       }), /*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto px-6 py-5",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full min-w-[920px] text-left text-sm",
+          className: "w-full min-w-[600px] text-left text-sm",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-mist text-slate-700",
             children: /*#__PURE__*/_jsx("tr", {
-              children: ['客户姓名', '性别', '身份证号', '联系电话', '数据来源', '匹配说明', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+              children: ['客户姓名', '性别', '身份证号', '联系电话', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-4 py-3 font-black whitespace-nowrap",
                 children: head
               }, head))
@@ -3250,12 +3278,6 @@ function CustomerConfirmModal({
                 className: "px-4 py-4 whitespace-nowrap",
                 children: customer.phone
               }), /*#__PURE__*/_jsx("td", {
-                className: "px-4 py-4 whitespace-nowrap",
-                children: customer.source
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-4 py-4 text-slate-600",
-                children: customer.remark
-              }), /*#__PURE__*/_jsx("td", {
                 className: "px-4 py-4",
                 children: /*#__PURE__*/_jsx("button", {
                   type: "button",
@@ -3267,9 +3289,6 @@ function CustomerConfirmModal({
             }, customer.id))
           })]
         })
-      }), /*#__PURE__*/_jsx("div", {
-        className: "border-t border-slate-100 px-6 py-4 text-sm text-slate-500",
-        children: "确认后将自动回填性别、身份证号、联系电话；如无匹配，可关闭弹窗后手工录入。"
       })]
     })
   });
