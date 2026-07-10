@@ -456,8 +456,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .rz-frame {
       box-sizing: border-box;
       display: grid;
-      grid-template-columns: 10px 210px 10px minmax(0, 1200px) 10px;
-      max-width: 1440px;
+      grid-template-columns: 10px 292px 10px minmax(0, 1200px) 10px;
+      max-width: 1522px;
       min-height: 100vh;
       margin: 0 auto;
     }
@@ -473,7 +473,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .rz-section-title { font-size: 20px; line-height: 1.5; letter-spacing: 0; }
     @media (min-width: 1800px) {
       .rz-frame {
-        grid-template-columns: 24px 264px 16px minmax(0, 1592px) 24px;
+        grid-template-columns: 24px 292px 16px minmax(0, 1564px) 24px;
         max-width: 1920px;
       }
       .rz-content { grid-column: 4; }
@@ -486,9 +486,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       }
       .rz-content { flex: 1 1 auto; }
     }
-    .rz-sidebar { grid-column: 2; width: 210px !important; }
+    .rz-sidebar { grid-column: 2; width: 292px !important; }
     @media (min-width: 1800px) {
-      .rz-sidebar { width: 264px !important; }
+      .rz-sidebar { width: 292px !important; }
     }
     .rounded-3xl, .rounded-2xl { border-radius: 16px !important; }
     .rounded-xl { border-radius: 12px !important; }
@@ -513,6 +513,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .bg-amber-400 { background-color: #FCB723 !important; }
     .bg-green-500 { background-color: #16C181 !important; }
     .bg-red-500 { background-color: #F5555E !important; }
+    .rz-overdue-row,
+    .rz-overdue-row * {
+      color: #F5555E !important;
+    }
   </style>
 </head>
 <body>
@@ -1061,7 +1065,7 @@ function ProcessingWorkspace({
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: visibleRows.map(row => /*#__PURE__*/_jsxs("tr", {
-              className: "hover:bg-mist/50",
+              className: `hover:bg-mist/50 ${row.remain?.includes('已超期') ? 'rz-overdue-row' : ''}`,
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
@@ -1270,6 +1274,12 @@ function ProcessingDetail({
   }, {
     label: '投诉原因',
     value: '业务办理 / 还款与协商争议'
+  }, {
+    label: '投诉产品标签',
+    value: productTag
+  }, {
+    label: '投诉原因标签',
+    value: reasonTag
   }];
   const assignFields = [{
     label: '处理机构',
@@ -1327,15 +1337,6 @@ function ProcessingDetail({
       title: "指派处理",
       fields: assignFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "标签信息",
-      fields: [{
-        label: '投诉产品标签',
-        value: productTag
-      }, {
-        label: '投诉原因标签',
-        value: reasonTag
-      }]
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "原始附件",
       fields: [{
         label: '附件状态',
@@ -1359,44 +1360,6 @@ function ProcessingDetail({
           children: "新增联系人与沟通记录"
         })]
       })
-    }), /*#__PURE__*/_jsxs(StandardSection, {
-      title: "处理结果",
-      children: isReadOnly ? /*#__PURE__*/_jsx("div", {
-        className: "rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600",
-        children: "投诉处理员尚未提交处理结果，或处理结果仅限处理环节查看。"
-      }) : [/*#__PURE__*/_jsxs("div", {
-        className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
-        children: [/*#__PURE__*/_jsx(Field, {
-          label: "* 处理结论",
-          type: "select",
-          options: ['已联系客户并解释', '已与客户达成一致', '需补充材料', '无法联系客户', '其他'],
-          value: processConclusion,
-          setValue: setProcessConclusion
-        }), /*#__PURE__*/_jsx(Field, {
-          label: "* 联系结果",
-          type: "select",
-          options: ['已联系', '未联系上', '无需联系'],
-          value: contactResult,
-          setValue: setContactResult
-        }), /*#__PURE__*/_jsx("div", {
-          className: "xl:col-span-2",
-          children: /*#__PURE__*/_jsx(TextArea, {
-            label: "* 处理意见",
-            placeholder: "请输入核实情况、处理过程、客户沟通情况及最终处理意见",
-            value: processResult,
-            setValue: setProcessResult
-          })
-        })]
-      }), /*#__PURE__*/_jsxs("div", {
-        className: "mt-4 flex items-center gap-3",
-        children: [/*#__PURE__*/_jsx("button", {
-          className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
-          children: "上传处理附件"
-        }), /*#__PURE__*/_jsx("span", {
-          className: "text-sm text-slate-500",
-          children: "可上传沟通记录、证明材料等"
-        })]
-      })]
     }), /*#__PURE__*/_jsx(StandardSection, {
       title: "联系与沟通记录",
       children: commRecords.length === 0 ? /*#__PURE__*/_jsx("div", {
@@ -1476,6 +1439,44 @@ function ProcessingDetail({
           })]
         }, idx))
       })
+    }), /*#__PURE__*/_jsxs(StandardSection, {
+      title: "处理结果",
+      children: isReadOnly ? /*#__PURE__*/_jsx("div", {
+        className: "rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600",
+        children: "投诉处理员尚未提交处理结果，或处理结果仅限处理环节查看。"
+      }) : [/*#__PURE__*/_jsxs("div", {
+        className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
+        children: [/*#__PURE__*/_jsx(Field, {
+          label: "* 处理结论",
+          type: "select",
+          options: ['已联系客户并解释', '已与客户达成一致', '需补充材料', '无法联系客户', '其他'],
+          value: processConclusion,
+          setValue: setProcessConclusion
+        }), /*#__PURE__*/_jsx(Field, {
+          label: "* 联系结果",
+          type: "select",
+          options: ['已联系', '未联系上', '无需联系'],
+          value: contactResult,
+          setValue: setContactResult
+        }), /*#__PURE__*/_jsx("div", {
+          className: "xl:col-span-2",
+          children: /*#__PURE__*/_jsx(TextArea, {
+            label: "* 处理意见",
+            placeholder: "请输入核实情况、处理过程、客户沟通情况及最终处理意见",
+            value: processResult,
+            setValue: setProcessResult
+          })
+        })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "mt-4 flex items-center gap-3",
+        children: [/*#__PURE__*/_jsx("button", {
+          className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
+          children: "上传处理附件"
+        }), /*#__PURE__*/_jsx("span", {
+          className: "text-sm text-slate-500",
+          children: "可上传沟通记录、证明材料等"
+        })]
+      })]
     }), /*#__PURE__*/_jsx(FlowRecordSection, {
       records: [{
         time: '2026-07-02 10:18',
@@ -2336,6 +2337,12 @@ function ReadOnlyComplaintDetail({
   }, {
     label: '投诉原因',
     value: '业务办理 / 还款与征信异议'
+  }, {
+    label: '投诉产品标签',
+    value: '个人贷款 / 消费贷款'
+  }, {
+    label: '投诉原因标签',
+    value: '业务办理 / 还款与征信异议'
   }];
   const assignFields = [{
     label: '处理机构',
@@ -2392,15 +2399,6 @@ function ReadOnlyComplaintDetail({
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: assignFields
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "标签信息",
-      fields: [{
-        label: '投诉产品标签',
-        value: '个人贷款 / 消费贷款'
-      }, {
-        label: '投诉原因标签',
-        value: '业务办理 / 还款与征信异议'
-      }]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "附件",
       fields: [{
@@ -3768,9 +3766,6 @@ function BatchImport({
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-4",
     children: [/*#__PURE__*/_jsxs("div", {
-      className: "flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white px-6 py-4",
-      children: [/*#__PURE__*/_jsx("span", { className: "text-sm font-bold text-slate-600", children: "有效数据 " + total }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "|" }), /*#__PURE__*/_jsx("span", { className: "text-sm text-orange-600 font-bold", children: "待确认 " + pendingCnt }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "|" }), /*#__PURE__*/_jsx("span", { className: "text-sm text-green-600 font-bold", children: "已确认 " + confirmedCnt }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "|" }), /*#__PURE__*/_jsx("span", { className: "text-sm text-red-600 font-bold", children: "校验失败 " + failedCnt })]
-    }), /*#__PURE__*/_jsxs("div", {
       className: "grid grid-cols-1 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]",
       children: [/*#__PURE__*/_jsxs("aside", {
         className: "self-start sticky top-4 rounded-2xl border border-slate-200 bg-white p-4",
@@ -3783,39 +3778,13 @@ function BatchImport({
             className: "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600",
             children: "共 " + rows.length + " 笔"
           })]
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "mb-3 flex items-center gap-2",
-          children: [/*#__PURE__*/_jsx("input", {
-            type: "checkbox",
-            checked: allChecked && pageRows.every(r => r.checked),
-            onChange: e => {
-              const chk = e.target.checked;
-              setAllChecked(chk);
-              setRows(prev => prev.map(r => pageRows.some(pr => pr.no === r.no) ? { ...r, checked: chk } : r));
-            },
-            className: "h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao"
-          }), /*#__PURE__*/_jsx("span", { className: "text-xs text-slate-500", children: "全选" }), /*#__PURE__*/_jsx("button", {
-            onClick: handleBatchConfirm,
-            className: "ml-2 rounded-lg bg-rizhao px-3 py-1.5 text-xs font-bold text-white",
-            children: "批量确认"
-          })]
         }), /*#__PURE__*/_jsx("div", {
           className: "space-y-2",
           children: pageRows.map(row => /*#__PURE__*/_jsxs("div", {
-            className: `flex cursor-pointer items-start gap-2 rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light'}`,
-            children: [/*#__PURE__*/_jsx("input", {
-              type: "checkbox",
-              checked: row.checked || false,
-              onChange: e => {
-                const chk = e.target.checked;
-                setRows(prev => prev.map(r => r.no === row.no ? { ...r, checked: chk } : r));
-                if (!chk) setAllChecked(false);
-              },
-              onClick: e => e.stopPropagation(),
-              className: "mt-1 h-4 w-4 rounded border-slate-300 text-rizhao focus:ring-rizhao shrink-0"
-            }), /*#__PURE__*/_jsxs("div", {
+            className: `cursor-pointer rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light'}`,
+            onClick: () => { setSelectedNo(row.no); setPage(Math.floor(rows.indexOf(row) / pageSize) + 1); },
+            children: [/*#__PURE__*/_jsxs("div", {
               className: "flex-1 min-w-0",
-              onClick: () => { setSelectedNo(row.no); setPage(Math.floor(rows.indexOf(row) / pageSize) + 1); },
               children: [/*#__PURE__*/_jsx("div", {
                 className: "text-sm font-black text-rizhao",
                 children: row.no
@@ -3825,9 +3794,6 @@ function BatchImport({
               }), /*#__PURE__*/_jsxs("div", {
                 className: "mt-1 flex items-center justify-between gap-2 text-xs text-slate-500",
                 children: [/*#__PURE__*/_jsx("span", { children: row.channel }), /*#__PURE__*/_jsx("span", { children: row.customer })]
-              }), /*#__PURE__*/_jsx("div", {
-                className: "mt-1.5",
-                children: statusBadge(row.status)
               }), row.errors && row.errors.length > 0 && /*#__PURE__*/_jsx("div", {
                 className: "mt-1 text-xs text-red-500",
                 children: row.errors.map(e => e.message).join('；')
@@ -3853,27 +3819,6 @@ function BatchImport({
             onClick: () => setShowReUploadConfirm(true),
             className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-xs font-bold text-slate-600",
             children: "重新上传"
-          }), /*#__PURE__*/_jsxs("div", {
-            className: "flex-1",
-            children: [/*#__PURE__*/_jsx("button", {
-              onClick: () => {
-                const notConfirmed = rows.filter(r => r.status !== '已确认');
-                if (notConfirmed.length > 0) { showToast('存在未确认的数据，请先确认后再提交。'); return; }
-                if (!errorTriggered) {
-                  setErrorTriggered(true);
-                  const errRow = rows[4];
-                  if (errRow) {
-                    setRows(prev => prev.map((r, i) => i === 4 ? { ...r, status: '校验失败', errors: [{ field: '投诉人姓名', message: '第 5 行：投诉人姓名未填写' }] } : r));
-                    setSelectedNo(errRow.no);
-                    showToast('存在必填项未填写，请补充后再提交。');
-                  }
-                  return;
-                }
-                setPhase('complete');
-              },
-              className: "w-full rounded-lg bg-rizhao px-4 py-2 text-xs font-bold text-white",
-              children: "提交入库"
-            })]
           })]
         })]
       }), selectedRow ? /*#__PURE__*/_jsx("section", {
@@ -4398,6 +4343,12 @@ function LedgerEditPage({
       }, {
         label: '处理人',
         value: '张经理'
+      }, {
+        label: '投诉产品标签',
+        value: '个人贷款 / 消费贷款'
+      }, {
+        label: '投诉原因标签',
+        value: '业务办理 / 还款与征信异议'
       }],
       children: /*#__PURE__*/_jsxs("div", {
         className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
@@ -4409,15 +4360,6 @@ function LedgerEditPage({
           children: row.content
         })]
       })
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "标签信息",
-      fields: [{
-        label: '投诉产品标签',
-        value: '个人贷款 / 消费贷款'
-      }, {
-        label: '投诉原因标签',
-        value: '业务办理 / 还款与征信异议'
-      }]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "附件",
       fields: [{
