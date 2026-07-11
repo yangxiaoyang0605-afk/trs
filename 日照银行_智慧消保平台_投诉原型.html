@@ -2631,6 +2631,28 @@ function StandardComplaintForm({
   const bizL3Options = bizL1 && bizL2 && bizData[bizL1] && bizData[bizL1][bizL2] ? bizData[bizL1][bizL2] : [];
   const handleBizL1Change = v => { setBizL1(v); setBizL2(''); setBizL3(''); };
   const handleBizL2Change = v => { setBizL2(v); setBizL3(''); };
+  const handleHistorySearch = () => {
+    if (showHistory) {
+      setShowHistory(false);
+      return;
+    }
+    const hasName = complainantName.trim().length > 0;
+    const hasPhone = contactPhone.trim().length > 0;
+    const hasIdNo = idNo.trim().length > 0;
+    if (hasName && !hasPhone && !hasIdNo) {
+      showToast('条件不足，请填写手机号或者身份证号。');
+      return;
+    }
+    if (!hasName && (hasPhone || hasIdNo)) {
+      showToast('请填写姓名。');
+      return;
+    }
+    if (!hasName && !hasPhone && !hasIdNo) {
+      showToast('请填写姓名和手机号，或姓名和身份证号。');
+      return;
+    }
+    setShowHistory(true);
+  };
   // 客户查询返回多条候选记录，需要业务人员人工确认后再回填。
   const customerCandidates = [{
     id: 'C001',
@@ -2811,7 +2833,7 @@ function StandardComplaintForm({
               children: "可按姓名、电话、证件号辅助核查客户历史投诉"
             }), /*#__PURE__*/_jsx("button", {
               type: "button",
-              onClick: () => setShowHistory(!showHistory),
+              onClick: handleHistorySearch,
               className: "rounded-xl border border-line-divider bg-mist px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
               children: showHistory ? "收起历史投诉" : "查询历史投诉"
             })]
