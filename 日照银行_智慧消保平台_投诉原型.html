@@ -416,12 +416,16 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
 
   </script>
   <style>
+    html, body, #root {
+      height: 100%;
+    }
     body {
       font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
       background: #F6F6F6;
       color: #202020;
       font-size: 14px;
       line-height: 1.5;
+      overflow: hidden;
     }
     .thin-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
     .thin-scroll::-webkit-scrollbar-thumb { background: #D2D2D2; border-radius: 4px; }
@@ -441,6 +445,39 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       border-color: #EE7800;
       box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
     }
+    .role-select-box {
+      min-height: 34px;
+      border-radius: 8px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+    .role-select-box summary::-webkit-details-marker { display: none; }
+    .role-list-table td:nth-child(8) > span {
+      position: relative;
+      display: inline-flex;
+      width: 36px;
+      height: 20px;
+      padding: 0 !important;
+      border-radius: 999px;
+      background: #3B82F6 !important;
+      color: transparent !important;
+      font-size: 0;
+      opacity: .78;
+    }
+    .role-list-table td:nth-child(8) > span::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+    .role-list-table td:last-child > div { gap: 8px !important; }
+    .role-list-table th:nth-child(8),
+    .role-list-table td:nth-child(8) { white-space: nowrap; }
     input, select, textarea {
       outline: none;
       width: 100%;
@@ -452,7 +489,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .bg-rizhao { background-color: #EE7800; }
     .text-rizhao { color: #EE7800; }
     .border-rizhao { border-color: #EE7800; }
-    .rz-shell { background: #F6F6F6; }
+    .rz-shell {
+      height: 100vh;
+      min-height: 0 !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      background: #F6F6F6;
+    }
     .rz-frame {
       box-sizing: border-box;
       position: relative;
@@ -461,16 +504,27 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       grid-template-rows: 76px 8px minmax(0, 1fr);
       width: 100%;
       max-width: 1440px;
-      min-height: 100vh;
+      height: 100vh;
+      min-height: 0;
       margin: 0 auto;
       padding: 0 10px;
     }
     .rz-content { display: contents; }
-    .rz-topbar { grid-column: 1 / -1; grid-row: 1; }
-    .rz-page-pad { grid-column: 3; grid-row: 3; min-width: 0; padding: 0 0 24px; }
-    .rz-main-card {
-      min-height: 100%;
+    .rz-topbar { grid-column: 1 / -1; grid-row: 1; height: 76px; min-height: 76px; max-height: 76px; }
+    .rz-page-pad {
+      grid-column: 3;
+      grid-row: 3;
+      box-sizing: border-box;
+      min-width: 0;
+      min-height: 0;
+      padding: 0 0 24px;
       overflow: hidden;
+    }
+    .rz-main-card {
+      height: 100%;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
       border: 1px solid #EDEDED;
       border-radius: 16px;
       background: #FFFFFF;
@@ -482,8 +536,20 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         grid-template-columns: 210px 10px minmax(900px, 1fr);
       }
     }
-    .rz-sidebar { grid-column: 1; grid-row: 3; width: 210px !important; min-width: 210px; margin-bottom: 24px; border-radius: 16px; overflow: visible; }
-    .rz-sidebar > div { border-radius: 16px; }
+    .rz-sidebar {
+      grid-column: 1;
+      grid-row: 3;
+      width: 210px !important;
+      min-width: 210px;
+      min-height: 0;
+      margin-bottom: 24px;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .rz-sidebar > div { min-height: 0; border-radius: 16px; overflow: hidden; }
+    .rz-sidebar nav { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.22) transparent; }
+    .rz-sidebar nav::-webkit-scrollbar { width: 4px; }
+    .rz-sidebar nav::-webkit-scrollbar-thumb { border-radius: 999px; background: rgba(255,255,255,.22); }
     .rz-sidebar-brand {
       position: absolute;
       top: 0;
@@ -529,6 +595,17 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .rz-overdue-row,
     .rz-overdue-row * {
       color: #F5555E !important;
+    }
+    .rz-processing-table th,
+    .rz-processing-table td {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
+    .rz-processing-table th:last-child,
+    .rz-processing-table td.rz-operation-cell {
+      width: 160px !important;
+      min-width: 160px !important;
+      max-width: 160px !important;
     }
   </style>
 </head>
@@ -613,20 +690,6 @@ function App() {
           children: /*#__PURE__*/_jsxs("section", {
             className: "rz-main-card",
             children: [/*#__PURE__*/_jsx("div", {
-              className: `${mainTab === '录入工单' ? 'hidden' : ''} border-b border-slate-200 px-6 py-5`,
-              children: /*#__PURE__*/_jsx("div", {
-                className: "flex flex-wrap items-center justify-between gap-4",
-                children: /*#__PURE__*/_jsxs("div", {
-                  children: [/*#__PURE__*/_jsxs("p", {
-                    className: "text-sm font-semibold text-rizhao",
-                    children: [mainTab === '后台管理' ? '后台管理 / ' : '投诉处理 / ', mainTab === '后台管理' ? adminTab : mainTab]
-                  }), /*#__PURE__*/_jsx("h1", {
-                    className: "rz-section-title mt-1 font-bold",
-                    children: mainTab === '录入工单' && entryTab !== '列表' ? entryTab : mainTab === '后台管理' ? adminTab : mainTab
-                  })]
-                })
-              })
-            }), /*#__PURE__*/_jsx("div", {
               className: "p-6",
               children: mainTab === '录入工单' ? /*#__PURE__*/_jsx(EntryWorkspace, {
                 entryTab: entryTab,
@@ -704,15 +767,15 @@ function Sidebar({
           })]
         })
       }), /*#__PURE__*/_jsx("nav", {
-        className: "flex-1 space-y-2 overflow-y-auto px-4 py-5",
+        className: "flex-1 space-y-1 overflow-y-auto px-3 py-3",
         children: visibleMenus.map((item, index) => /*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("button", {
             onClick: () => item.name === '投诉管理' ? openSubMenu('录入工单') : item.name === '后台管理' ? setMainTab('后台管理') : setMainTab(item.name),
-            className: `group w-full rounded-xl px-4 py-3 text-left transition ${isPrimaryActive(item.name) ? 'bg-white text-ink shadow-lg' : 'text-white/76 hover:bg-white/8 hover:text-white'}`,
+            className: `group w-full rounded-xl px-3 py-2 text-left transition ${isPrimaryActive(item.name) ? 'bg-white text-ink shadow-lg' : 'text-white/76 hover:bg-white/8 hover:text-white'}`,
             children: /*#__PURE__*/_jsxs("div", {
-              className: "flex items-center gap-3",
+              className: "flex items-center gap-2",
               children: [/*#__PURE__*/_jsx("span", {
-                className: `flex h-8 w-8 items-center justify-center rounded-lg text-sm font-black ${isPrimaryActive(item.name) ? 'bg-rizhao text-white' : 'bg-white/10 text-white/80'}`,
+                className: `flex h-7 w-7 items-center justify-center rounded-lg text-xs font-black ${isPrimaryActive(item.name) ? 'bg-rizhao text-white' : 'bg-white/10 text-white/80'}`,
                 children: index + 1
               }), /*#__PURE__*/_jsxs("div", {
                 children: [/*#__PURE__*/_jsx("div", {
@@ -725,34 +788,34 @@ function Sidebar({
               })]
             })
           }), item.name === '投诉管理' && /*#__PURE__*/_jsxs("div", {
-            className: "ml-4 mt-2 space-y-1 border-l border-white/14 pl-3",
+            className: "ml-4 mt-1 space-y-0.5 border-l border-white/14 pl-2",
             children: [/*#__PURE__*/_jsx("div", {
-              className: "rounded-lg px-3 py-2 text-sm font-bold text-white",
+              className: "rounded-lg px-2 py-1 text-xs font-bold text-white",
               children: "投诉处理"
             }), /*#__PURE__*/_jsx("div", {
-              className: "ml-2 space-y-1 border-l border-white/14 pl-2",
+              className: "ml-2 space-y-0.5 border-l border-white/14 pl-2",
               children: subMenus.map(name => /*#__PURE__*/_jsx("button", {
                 onClick: () => openSubMenu(name),
-                className: `block w-full rounded-lg px-3 py-2 text-left text-xs font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+                className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
                 children: name
               }, name))
             }), /*#__PURE__*/_jsx("button", {
               onClick: () => setMainTab('报表管理'),
-              className: `block w-full rounded-lg px-3 py-2 text-left text-sm font-bold transition ${mainTab === '报表管理' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === '报表管理' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
               children: "报表管理"
             }), /*#__PURE__*/_jsx("button", {
               onClick: () => setMainTab('统计分析'),
-              className: `block w-full rounded-lg px-3 py-2 text-left text-sm font-bold transition ${mainTab === '统计分析' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === '统计分析' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
               children: "统计分析"
             })]
           }), item.name === '后台管理' && /*#__PURE__*/_jsx("div", {
-            className: "ml-5 mt-2 space-y-1 border-l border-white/14 pl-4",
+            className: "ml-4 mt-1 space-y-0.5 border-l border-white/14 pl-2",
             children: adminSubMenus.map(name => /*#__PURE__*/_jsx("button", {
               onClick: () => {
                 setMainTab('后台管理');
                 setAdminTab(name);
               },
-              className: `block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold transition ${mainTab === '后台管理' && adminTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === '后台管理' && adminTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
               children: name
             }, name))
           })]
@@ -765,7 +828,7 @@ const roleLabels = { complaint_handler: '投诉处理员', admin_office: '消保
 function Topbar({ mainTab, role, setRole }) {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   return /*#__PURE__*/_jsx("header", {
-    className: "rz-topbar sticky top-0 z-10 rounded-b-2xl border-b border-white/70 bg-white/78 backdrop-blur",
+    className: "rz-topbar z-10 rounded-b-2xl border-b border-white/70 bg-white/78 backdrop-blur",
     children: /*#__PURE__*/_jsx("div", {
       className: "flex h-[76px] items-center justify-end px-6",
       children: /*#__PURE__*/_jsxs(_Fragment, {
@@ -873,6 +936,8 @@ function ProcessingWorkspace({
   const [scope, setScope] = useState('我的待办');
   const [page, setPage] = useState(1);
   const [detailRow, setDetailRow] = useState(null);
+  const [detailMode, setDetailMode] = useState('view');
+  const [transferredNos, setTransferredNos] = useState([]);
   const [dispatchRow, setDispatchRow] = useState(null);
   const [recallRow, setRecallRow] = useState(null);
   const [transferRow, setTransferRow] = useState(null);
@@ -1024,7 +1089,12 @@ function ProcessingWorkspace({
     note: '下辖机构处理中工单',
     rows: childOrgRows
   }];
-  const currentGroup = groups.find(item => item.name === scope) || groups[0];
+  const effectiveGroups = groups.map(item => item.name === '我的待办' ? {
+    ...item,
+    rows: item.rows.filter(row => !transferredNos.includes(row.no)),
+    count: item.rows.filter(row => !transferredNos.includes(row.no)).length
+  } : item);
+  const currentGroup = effectiveGroups.find(item => item.name === scope) || effectiveGroups[0];
   const pageSize = scope === '我的待办' ? 3 : 5;
   const totalPages = Math.max(1, Math.ceil(currentGroup.rows.length / pageSize));
   const visibleRows = currentGroup.rows.slice((page - 1) * pageSize, page * pageSize);
@@ -1042,6 +1112,7 @@ function ProcessingWorkspace({
       }), /*#__PURE__*/_jsx(ProcessingDetail, {
         role: role,
         row: detailRow,
+        mode: detailMode,
         productTag: productTag || '个人贷款 / 消费贷款',
         reasonTag: reasonTag || '业务办理 / 还款与征信异议'
       })]
@@ -1051,7 +1122,7 @@ function ProcessingWorkspace({
     className: "space-y-5",
     children: [/*#__PURE__*/_jsx("div", {
       className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
-      children: groups.map(item => /*#__PURE__*/_jsxs("button", {
+      children: effectiveGroups.map(item => /*#__PURE__*/_jsxs("button", {
         type: "button",
         onClick: () => switchScope(item.name),
         className: `rounded-2xl border bg-white p-5 text-left transition ${scope === item.name ? 'border-rizhao shadow-low' : 'border-slate-200 hover:border-line-divider'}`,
@@ -1077,8 +1148,8 @@ function ProcessingWorkspace({
     }), /*#__PURE__*/_jsxs("section", {
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
-        className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "标题", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
+        className: "grid grid-cols-1 gap-4 lg:grid-cols-4",
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人姓名", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-4 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -1102,12 +1173,12 @@ function ProcessingWorkspace({
       }), /*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full min-w-[1040px] text-left text-sm",
+          className: "rz-processing-table w-full min-w-[1080px] text-left text-sm whitespace-nowrap",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-slate-100 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-              children: ['行内工单编号', '标题', '反映渠道', '投诉人', '处理机构', '级别', '状态', '剩余处理时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
-                className: "px-5 py-4 font-black",
+              children: ['行内工单编号', '标题', '投诉反映渠道', '投诉人姓名', '处理机构', '工单级别', '工单状态', '剩余处理时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+                className: "whitespace-nowrap px-5 py-4 font-black",
                 children: head
               }, head))
             })
@@ -1143,60 +1214,56 @@ function ProcessingWorkspace({
                 className: `px-5 py-4 ${row.remain?.includes('已超期') ? 'text-red-500 font-bold' : row.remain?.includes('即将超期') ? 'text-orange-500 font-bold' : 'text-slate-500'}`,
                 children: row.remain
               }), /*#__PURE__*/_jsx("td", {
-                className: "px-5 py-4",
+                className: "rz-operation-cell whitespace-nowrap px-3 py-4",
                 children: role === 'admin_office' ? /*#__PURE__*/_jsxs("div", {
-                  className: "flex gap-2",
-                  children: [(row.status === '待审核' || row.status === '审核中') && /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
+                  className: "flex items-center gap-3 whitespace-nowrap",
+                  children: [/*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('view'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
-                    children: "审核"
-                  }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
+                    children: "查看"
+                  }), (row.status === '待审核' || row.status === '审核中') ? /*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('process'); setDetailRow(row); },
+                    className: "font-bold text-rizhao",
+                    children: "处理"
+                  }) : null, scope === '下辖机构工单' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
                     children: "收回"
-                  }), /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
+                  }) : null]
+                }) : role === 'org_admin' ? /*#__PURE__*/_jsxs("div", {
+                  className: `grid items-center gap-2 whitespace-nowrap ${scope === '下辖机构工单' ? 'grid-cols-4' : 'grid-cols-3'}`,
+                  children: [/*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('view'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "查看"
-                  })]
-                }) : role === 'org_admin' ? /*#__PURE__*/_jsxs("div", {
-                  className: "flex gap-2",
-                  children: [row.status === '待分配' && /*#__PURE__*/_jsx("button", {
+                  }), row.status === '待分配' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setDispatchRow(row),
                     className: "font-bold text-rizhao",
                     children: "分配"
-                  }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
+                  }) : /*#__PURE__*/_jsx("span", {}), scope === '下辖机构工单' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
                     children: "收回"
-                  }), row.status === '处理中' && /*#__PURE__*/_jsx("button", {
+                  }) : null, row.status === '处理中' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setTransferRow(row),
                     className: "font-bold text-rizhao",
                     children: "转发"
-                  }), /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
+                  }) : /*#__PURE__*/_jsx("span", {})]
+                }) : /*#__PURE__*/_jsxs("div", {
+                  className: `grid items-center gap-2 whitespace-nowrap ${scope === '下辖机构工单' ? 'grid-cols-4' : 'grid-cols-3'}`,
+                  children: [/*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('view'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "查看"
-                  })]
-                }) : /*#__PURE__*/_jsxs("div", {
-                  className: "flex gap-2",
-                  children: [row.status === '待处理' && /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
+                  }), (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('process'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "处理"
-                  }), row.status === '待处理' && /*#__PURE__*/_jsx("button", {
+                  }) : /*#__PURE__*/_jsx("span", {}), row.status === '待处理' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setTransferRow(row),
                     className: "font-bold text-rizhao",
                     children: "转办"
-                  }), row.status === '处理中' && /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "处理"
-                  }), /*#__PURE__*/_jsx("button", {
-                    onClick: () => setDetailRow(row),
-                    className: "font-bold text-rizhao",
-                    children: "查看"
-                  })]
+                  }) : /*#__PURE__*/_jsx("span", {}), scope === '下辖机构工单' ? /*#__PURE__*/_jsx("button", { onClick: () => setRecallRow(row), className: "font-bold text-orange-500", children: "收回" }) : null]
                 })
               })]
             }, row.no))
@@ -1237,20 +1304,24 @@ function ProcessingWorkspace({
       row: transferRow,
       currentHandler: transferRow.handler,
       onClose: () => setTransferRow(null),
-      onSave: () => { setTransferRow(null); }
+      onSave: () => {
+        if (scope === '我的待办') setTransferredNos(prev => [...prev, transferRow.no]);
+        setTransferRow(null);
+      }
     })]
   });
 }
 function ProcessingDetail({
   role,
   row,
+  mode,
   productTag,
   reasonTag
 }) {
   const isAdminOffice = role === 'admin_office';
   const isOrgAdmin = role === 'org_admin';
   const isComplaintHandler = role === 'complaint_handler';
-  const isReadOnly = isAdminOffice || isOrgAdmin;
+  const isReadOnly = mode === 'view' || isAdminOffice || isOrgAdmin;
   const [processResult, setProcessResult] = useState('');
   const [processConclusion, setProcessConclusion] = useState('');
   const [contactResult, setContactResult] = useState('');
@@ -1260,9 +1331,12 @@ function ProcessingDetail({
   const [showNewComm, setShowNewComm] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
+  const [showApproveConfirm, setShowApproveConfirm] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showOrgAssignModal, setShowOrgAssignModal] = useState(false);
   const [showOrgRecallModal, setShowOrgRecallModal] = useState(false);
   const [toast, setToast] = useState(null);
+  const [previewFile, setPreviewFile] = useState(null);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
 
   const addCommRecord = record => setCommRecords(prev => [record, ...prev]);
@@ -1339,24 +1413,7 @@ function ProcessingDetail({
   }];
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
-    children: [/*#__PURE__*/_jsxs("div", {
-      className: "rounded-2xl border border-slate-200 bg-white px-6 py-5",
-      children: [/*#__PURE__*/_jsxs("div", {
-        className: "flex flex-wrap items-center justify-between gap-3",
-        children: [/*#__PURE__*/_jsxs("div", {
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "text-xl font-black text-ink",
-            children: "处理工单"
-          }), /*#__PURE__*/_jsx("div", {
-            className: "mt-1 text-sm text-slate-500",
-            children: `${row.title} / ${row.channel}`
-          })]
-        }), /*#__PURE__*/_jsx("span", {
-          className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
-          children: row.status
-        })]
-      })]
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+    children: [/*#__PURE__*/_jsx(ReadOnlySection, {
       title: "工单信息",
       fields: detailFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
@@ -1385,12 +1442,25 @@ function ProcessingDetail({
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: assignFields
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "原始附件",
-      fields: [{
-        label: '附件状态',
-        value: '暂无附件'
-      }]
+    }), /*#__PURE__*/_jsx(StandardSection, {
+      title: "附件",
+      children: /*#__PURE__*/_jsx("div", {
+        className: "overflow-hidden rounded-xl border border-slate-200",
+        children: /*#__PURE__*/_jsxs("table", {
+          className: "w-full text-left text-sm",
+          children: [/*#__PURE__*/_jsx("thead", {
+            className: "bg-slate-50 text-slate-500",
+            children: /*#__PURE__*/_jsx("tr", {
+              children: ['附件名称', '大小', '上传日期', '上传人员', '操作'].map(head => /*#__PURE__*/_jsx("th", { className: "px-4 py-3 font-bold", children: head }, head))
+            })
+          }), /*#__PURE__*/_jsx("tbody", {
+            className: "divide-y divide-slate-100",
+            children: [['客户身份证复印件.jpg', '2.3 MB'], ['投诉录音转写.docx', '156 KB']].map(file => /*#__PURE__*/_jsxs("tr", {
+              children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: file[0] }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: file[1] }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: "2026-07-09" }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: "张经理" }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsx("button", { onClick: () => setPreviewFile({ name: file[0], size: file[1] }), className: "font-bold text-rizhao", children: "在线预览" }) })]
+            }, file[0]))
+          })]
+        })
+      })
     }), !isReadOnly && /*#__PURE__*/_jsx(StandardSection, {
       title: "联系处理",
       children: /*#__PURE__*/_jsxs("div", {
@@ -1553,7 +1623,7 @@ function ProcessingDetail({
         className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
         children: "审核不通过"
       }), /*#__PURE__*/_jsx("button", {
-        onClick: () => showToast('审核通过，工单已办结'),
+        onClick: () => setShowApproveConfirm(true),
         className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
         children: "审核通过并关单"
       })]
@@ -1588,7 +1658,7 @@ function ProcessingDetail({
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
           children: "保存处理意见"
         }), /*#__PURE__*/_jsx("button", {
-          onClick: () => showToast('已提交审核'),
+          onClick: () => setShowSubmitConfirm(true),
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "提交审核"
         })]
@@ -1620,7 +1690,19 @@ function ProcessingDetail({
     }), showRejectModal && /*#__PURE__*/_jsx(RejectModal, {
       onClose: () => setShowRejectModal(false),
       onSave: reason => { showToast('审核不通过，工单已退回处理环节'); setShowRejectModal(false); }
-    }), toast && /*#__PURE__*/_jsx("div", {
+    }), showApproveConfirm && /*#__PURE__*/_jsx(ActionConfirmModal, {
+      title: "确认审核通过",
+      message: "是否确认审核通过并关闭该工单？关单后处理结果将正式生效。",
+      confirmText: "确认通过并关单",
+      onClose: () => setShowApproveConfirm(false),
+      onConfirm: () => { showToast('审核通过，工单已办结'); setShowApproveConfirm(false); }
+    }), showSubmitConfirm && /*#__PURE__*/_jsx(ActionConfirmModal, {
+      title: "确认提交审核",
+      message: "是否确认提交该工单的处理结果？提交后工单将进入待审核状态。",
+      confirmText: "确认提交",
+      onClose: () => setShowSubmitConfirm(false),
+      onConfirm: () => { showToast('已提交审核'); setShowSubmitConfirm(false); }
+    }), previewFile && /*#__PURE__*/_jsx(AttachmentPreviewModal, { file: previewFile, onClose: () => setPreviewFile(null) }), toast && /*#__PURE__*/_jsx("div", {
       className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
       children: toast
     })]
@@ -1878,9 +1960,21 @@ function NewCommunicationModal({ onClose, onSave }) {
   });
 }
 function TransferModal({ currentHandler, onClose, onSave, row }) {
-  const handlers = ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'];
+  const orgHandlers = {
+    '总行消保中心': ['王主管', '赵专员'],
+    '东港支行': ['张经理', '刘专员'],
+    '岚山支行': ['李经理', '陈专员'],
+    '莒县支行': ['周经理', '孙专员'],
+    '五莲支行': ['郑经理', '马专员'],
+    '开发区支行': ['高经理', '徐专员'],
+    '山海天支行': ['林经理', '于专员'],
+    '营业部': ['韩经理', '宋专员'],
+    '信用卡中心': ['吴主管', '许专员']
+  };
   const [selectedHandler, setSelectedHandler] = useState('');
   const [transferReason, setTransferReason] = useState('');
+  const currentOrg = row?.org || '东港支行';
+  const handlerOptions = (orgHandlers[currentOrg] || ['王主管', '赵专员', '张经理', '刘专员']).filter(h => h !== currentHandler);
   const canSave = selectedHandler && transferReason.trim();
   return /*#__PURE__*/_jsxs("div", {
     className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
@@ -1904,16 +1998,21 @@ function TransferModal({ currentHandler, onClose, onSave, row }) {
           value: currentHandler,
           disabled: true
         }), /*#__PURE__*/_jsx(Field, {
+          label: "所在机构",
+          value: currentOrg,
+          disabled: true
+        }), /*#__PURE__*/_jsx(Field, {
           label: "* 接收处理员",
           type: "select",
-          options: handlers.filter(h => h !== currentHandler),
+          options: handlerOptions,
           value: selectedHandler,
           setValue: setSelectedHandler
         }), /*#__PURE__*/_jsx(TextArea, {
           label: "* 转办原因",
-          placeholder: "请输入转办原因",
+          placeholder: "请输入转办原因，不超过200字",
           value: transferReason,
-          setValue: setTransferReason
+          setValue: setTransferReason,
+          maxLength: 200
         })]
       }), /*#__PURE__*/_jsx("div", {
         className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-4",
@@ -2153,29 +2252,29 @@ function EntryMethodList({
   const allRows = [{
     no: 'TS202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '东港支行', level: '普通', status: '草稿', time: '2026-07-02 09:24'
   }, {
-    no: 'TS202607020002', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', org: '信用卡中心', level: '重要', status: '已派发', time: '2026-07-02 10:18'
+    no: 'TS202607020002', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', org: '信用卡中心', level: '重要', status: '待处理', time: '2026-07-02 10:18'
   }, {
     no: 'TS202607020003', title: '账户服务咨询投诉', channel: '政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '草稿', time: '2026-07-02 11:05'
   }, {
     no: 'TS202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '莒县支行', level: '重要', status: '草稿', time: '2026-07-02 11:26'
   }, {
-    no: 'TS202607020005', title: '网点服务体验投诉', channel: '银行协会', customer: '陈女士', org: '五莲支行', level: '普通', status: '已派发', time: '2026-07-02 13:40'
+    no: 'TS202607020005', title: '网点服务体验投诉', channel: '银行协会', customer: '陈女士', org: '五莲支行', level: '普通', status: '处理中', time: '2026-07-02 13:40'
   }, {
-    no: 'TS202607020006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', org: '东港支行', level: '重要', status: '已派发', time: '2026-07-02 14:08'
+    no: 'TS202607020006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', org: '东港支行', level: '重要', status: '待审核', time: '2026-07-02 14:08'
   }, {
-    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '营业部', level: '普通', status: '已派发', time: '2026-07-02 14:35'
+    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '营业部', level: '普通', status: '已关单', time: '2026-07-02 14:35'
   }, {
-    no: 'TS202607020008', title: '征信异议处理', channel: '其它', customer: '刘先生', org: '信用卡中心', level: '重要', status: '已派发', time: '2026-07-02 15:12'
+    no: 'TS202607020008', title: '征信异议处理', channel: '其它', customer: '刘先生', org: '信用卡中心', level: '重要', status: '待处理', time: '2026-07-02 15:12'
   }, {
     no: 'TS202607020009', title: '贷款资料补充说明', channel: '国家局', customer: '孙女士', org: '山海天支行', level: '普通', status: '草稿', time: '2026-07-02 16:03'
   }, {
-    no: 'TS202607020010', title: '柜面业务办理时效', channel: '银行协会', customer: '马先生', org: '开发区支行', level: '普通', status: '已派发', time: '2026-07-02 16:48'
+    no: 'TS202607020010', title: '柜面业务办理时效', channel: '银行协会', customer: '马先生', org: '开发区支行', level: '普通', status: '处理中', time: '2026-07-02 16:48'
   }];
   const [viewRow, setViewRow] = useState(null);
   const [focusFlow, setFocusFlow] = useState(false);
   const [dispatchRow, setDispatchRow] = useState(null);
   const [listTab, setListTab] = useState('已派发工单');
-  const dispatchedRows = allRows.filter(r => r.status === '已派发');
+  const dispatchedRows = allRows.filter(r => r.status !== '草稿');
   const draftRows = allRows.filter(r => r.status === '草稿');
   const batchDraftRows = [{ no: 'DR202607080001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 09:24' }, { no: 'DR202607080002', title: '信用卡还款协商', channel: '12378', customer: '李女士', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 10:18' }, { no: 'DR202607080003', title: '账户服务咨询', channel: '政务热线', customer: '张女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 11:05' }, { no: 'DR202607080004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 11:26' }, { no: 'DR202607080005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 13:40' }, { no: 'DR202607080006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 14:08' }, { no: 'DR202607080007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 14:35' }, { no: 'DR202607080008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 15:12' }];
   const [draftTab, setDraftTab] = useState('单笔录入');
@@ -2236,7 +2335,7 @@ function EntryMethodList({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉来源", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['草稿', '已派发', '处理中', '已关单'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉来源", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -2279,10 +2378,8 @@ function EntryMethodList({
                 children: row.level
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
-                children: /*#__PURE__*/_jsx("button", {
-                  type: "button",
-                  onClick: () => openDetail(row, true),
-                  className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao transition hover:bg-line-light",
+                children: /*#__PURE__*/_jsx("span", {
+                  className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
                   children: row.status
                 })
               }), /*#__PURE__*/_jsx("td", {
@@ -2588,7 +2685,9 @@ function StandardComplaintForm({
   const [orderNo, setOrderNo] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [historyTab, setHistoryTab] = useState('自建单');
+  const [selectedHistory, setSelectedHistory] = useState(null);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
+  const [showDispatchConfirm, setShowDispatchConfirm] = useState(false);
   const [complainantName, setComplainantName] = useState('王先生');
   const [gender, setGender] = useState('');
   const [idNo, setIdNo] = useState('');
@@ -2603,6 +2702,7 @@ function StandardComplaintForm({
   const [cascaderHoverL1, setCascaderHoverL1] = useState(null);
   const [cascaderHoverL2, setCascaderHoverL2] = useState(null);
   const [attachments, setAttachments] = useState([]);
+  const [previewAttachment, setPreviewAttachment] = useState(null);
   const handleUpload = () => {
     if (attachments.length === 0) {
       setAttachments([
@@ -2732,6 +2832,8 @@ function StandardComplaintForm({
   };
   const historyRows = [{
     no: '1',
+    workNo: 'TS202606180001',
+    sourceType: '客服单',
     time: '2026-06-18 10:12',
     channel: '银行协会',
     org: '东港支行',
@@ -2747,6 +2849,8 @@ function StandardComplaintForm({
     remark: '同一客户历史来电'
   }, {
     no: '2',
+    workNo: 'TS202605270002',
+    sourceType: '自建单',
     time: '2026-05-27 14:35',
     channel: '国家局',
     org: '信用卡中心',
@@ -2762,6 +2866,8 @@ function StandardComplaintForm({
     remark: '已归档'
   }, {
     no: '3',
+    workNo: 'TS202604090003',
+    sourceType: '客服单',
     time: '2026-04-09 09:20',
     channel: '政务热线',
     org: '岚山支行',
@@ -2777,6 +2883,8 @@ function StandardComplaintForm({
     remark: '12345转办'
   }, {
     no: '4',
+    workNo: 'TS202603160004',
+    sourceType: '自建单',
     time: '2026-03-16 16:42',
     channel: '省监管局',
     org: '东港支行',
@@ -2791,6 +2899,25 @@ function StandardComplaintForm({
     loanType: '经营贷款',
     remark: '同机构历史投诉'
   }];
+  const selfBuiltCount = historyRows.filter(row => row.sourceType === '自建单').length;
+  const serviceCount = historyRows.filter(row => row.sourceType === '客服单').length;
+  const visibleHistoryRows = historyRows
+    .filter(row => historyTab === '自建单' ? row.sourceType === '自建单' : row.sourceType === '客服单')
+    .map(row => ({
+      ...row,
+      incomingDate: row.time.split(' ')[0],
+      incomingTime: row.time.split(' ')[1],
+      ticketLevel: row.no === '2' || row.no === '4' ? '重要' : '普通',
+      handlerName: row.no === '4' ? '李经理' : '张经理',
+      currentLocation: row.org,
+      currentStatus: row.no === '4' ? '处理中' : '已结案',
+      title: row.content,
+      regulatoryNo: `JG${row.workNo.slice(2)}`,
+      processingDeadline: '2026-07-16 18:00:00',
+      productTag: row.loanType || '个人贷款',
+      assignedOrg: row.org,
+      handlerUser: row.no === '4' ? '100024' : '100023'
+    }));
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
     children: [!hideHeader && /*#__PURE__*/_jsx("div", {
@@ -2924,30 +3051,33 @@ function StandardComplaintForm({
                   className: "font-black " + (historyTab === '客服来电' ? 'text-rizhao' : 'text-slate-500'),
                   children: "客服来电历史"
                 })]
-              }), /*#__PURE__*/_jsx("div", {
-                className: "text-sm font-bold text-slate-500",
-                children: "共 " + historyRows.length + " 条"
+              }), /*#__PURE__*/_jsxs("div", {
+                className: "flex flex-wrap items-center gap-2 text-sm font-bold text-slate-500",
+                children: [/*#__PURE__*/_jsx("span", { children: "渠道合计" }), /*#__PURE__*/_jsxs("span", { children: ["自建单 ", selfBuiltCount, " 次"] }), /*#__PURE__*/_jsxs("span", { children: ["客服单 ", serviceCount, " 次"] }), /*#__PURE__*/_jsxs("span", { className: "text-rizhao", children: ["共 ", historyRows.length, " 次"] })]
               })]
             }), /*#__PURE__*/_jsx("div", {
               className: "overflow-x-auto",
               children: /*#__PURE__*/_jsxs("table", {
-                className: "w-full min-w-[1500px] text-left text-sm",
+                className: "w-full min-w-[1420px] text-left text-sm",
                 children: [/*#__PURE__*/_jsx("thead", {
                   className: "bg-white text-slate-700",
                   children: /*#__PURE__*/_jsx("tr", {
-                    children: ['序号', '时间', '投诉渠道', '被诉单位', '来电人', '联系电话', '投诉内容', '业务类别', '诉点', '工单类别', '处理情况', '是否现场', '贷款种类', '备注1'].map(head => /*#__PURE__*/_jsx("th", {
+                    children: (historyTab === '客服来电' ? ['工单编号', '来电日期', '来电时间', '来电人姓名', '联系电话', '工单所属机构', '业务类型', '工单级别', '问题描述', '处理人', '当前位置', '当前状态'] : ['标题', '录入时间', '行内工单编号', '投诉反映渠道', '监管工单编号', '工单级别', '办理时限', '投诉人姓名', '被投诉机构', '投诉内容', '投诉产品标签', '所属机构', '处理人（工号）']).map(head => /*#__PURE__*/_jsx("th", {
                       className: "border-b border-slate-200 px-4 py-3 font-black whitespace-nowrap",
                       children: head
                     }, head))
                   })
                 }), /*#__PURE__*/_jsx("tbody", {
                   className: "divide-y divide-slate-100",
-                  children: historyRows.map(row => /*#__PURE__*/_jsxs("tr", {
+                  children: visibleHistoryRows.map(row => /*#__PURE__*/_jsxs("tr", {
                     className: "hover:bg-mist/50",
-                    children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.no }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-rizhao whitespace-nowrap", children: row.channel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.phone }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[240px]", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.business }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.point }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.type }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.result }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.onsite }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.loanType }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 min-w-[160px]", children: row.remark })]
+                    children: historyTab === '客服来电' ? [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setSelectedHistory(row), className: "font-black text-rizhao hover:underline", children: row.workNo }) }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.incomingDate }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.incomingTime }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.phone }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.business }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.ticketLevel }), /*#__PURE__*/_jsx("td", { className: "min-w-[240px] px-4 py-3", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.handlerName }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.currentLocation }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.currentStatus })] : [/*#__PURE__*/_jsx("td", { className: "min-w-[220px] px-4 py-3", children: row.title }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setSelectedHistory(row), className: "font-black text-rizhao hover:underline", children: row.workNo }) }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.channel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.regulatoryNo }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.ticketLevel }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.processingDeadline }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.caller }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.org }), /*#__PURE__*/_jsx("td", { className: "min-w-[240px] px-4 py-3", children: row.content }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.productTag }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.assignedOrg }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 whitespace-nowrap", children: row.handlerUser })]
                   }, row.no))
                 })]
               })
+            }), selectedHistory && /*#__PURE__*/_jsx(HistoryComplaintModal, {
+              row: selectedHistory,
+              onClose: () => setSelectedHistory(null)
             })]
           })]
         })
@@ -3215,7 +3345,7 @@ function StandardComplaintForm({
             children: [/*#__PURE__*/_jsx("thead", {
               className: "bg-mist text-slate-700",
               children: /*#__PURE__*/_jsx("tr", {
-                children: ['附件名称', '大小', '上传日期', '上传人员'].map(head => /*#__PURE__*/_jsx("th", {
+                children: ['附件名称', '大小', '上传日期', '上传人员', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                   className: "px-4 py-3 font-black",
                   children: head
                 }, head))
@@ -3224,7 +3354,7 @@ function StandardComplaintForm({
               children: attachments.length === 0 ? /*#__PURE__*/_jsx("tr", {
                 children: /*#__PURE__*/_jsx("td", {
                   className: "px-4 py-5 text-center text-slate-400",
-                  colSpan: "4",
+                  colSpan: "5",
                   children: "暂无附件"
                 })
               }) : attachments.map((att, i) => /*#__PURE__*/_jsxs("tr", {
@@ -3241,6 +3371,14 @@ function StandardComplaintForm({
                 }), /*#__PURE__*/_jsx("td", {
                   className: "px-4 py-3 text-slate-500",
                   children: att.uploader
+                }), /*#__PURE__*/_jsx("td", {
+                  className: "px-4 py-3",
+                  children: /*#__PURE__*/_jsx("button", {
+                    type: "button",
+                    onClick: () => setPreviewAttachment(att),
+                    className: "font-bold text-rizhao hover:underline",
+                    children: "在线预览"
+                  })
                 })]
               }, i))
             })]
@@ -3278,19 +3416,55 @@ function StandardComplaintForm({
           onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); showToast('工单已保存'); },
           children: "保存"
       }), /*#__PURE__*/_jsx("button", {
-          onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); if (footerMode === 'dispatch' && onDispatch) onDispatch(); showToast('工单已派发'); },
+          onClick: () => setShowDispatchConfirm(true),
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "派发"
         })]
       })]
+    }), previewAttachment && /*#__PURE__*/_jsx(AttachmentPreviewModal, {
+      file: previewAttachment,
+      onClose: () => setPreviewAttachment(null)
     }), showCustomerModal && /*#__PURE__*/_jsx(CustomerConfirmModal, {
       candidates: customerCandidates,
       onClose: () => setShowCustomerModal(false),
       onConfirm: confirmCustomer
+    }), showDispatchConfirm && /*#__PURE__*/_jsx(ActionConfirmModal, {
+      title: "确认派发",
+      message: "是否确认派发该工单？确认后工单将进入处理环节。",
+      confirmText: "确认派发",
+      onClose: () => setShowDispatchConfirm(false),
+      onConfirm: () => {
+        if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase());
+        if (footerMode === 'dispatch' && onDispatch) onDispatch();
+        showToast('工单已派发');
+        setShowDispatchConfirm(false);
+      }
     }), toast && /*#__PURE__*/_jsx("div", {
       className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
       children: toast
     })]
+  });
+}
+function AttachmentPreviewModal({ file, onClose }) {
+  const fileName = file?.name || '附件';
+  const isImage = /\.(png|jpe?g|gif|webp)$/i.test(fileName);
+  return /*#__PURE__*/_jsx("div", {
+    className: "fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/55 px-6 py-8",
+    onClick: onClose,
+    children: /*#__PURE__*/_jsxs("div", {
+      className: "flex max-h-[86vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl",
+      onClick: event => event.stopPropagation(),
+      children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "附件在线预览" }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-sm text-slate-500", children: [fileName, file?.size ? ` · ${file.size}` : ''] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onClose, className: "rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700", children: "关闭" })] }), /*#__PURE__*/_jsx("div", { className: "min-h-[430px] flex-1 overflow-auto bg-slate-100 p-6", children: isImage ? /*#__PURE__*/_jsxs("div", { className: "mx-auto flex min-h-[390px] max-w-2xl flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm", children: [/*#__PURE__*/_jsx("div", { className: "flex h-48 w-72 items-center justify-center rounded-xl bg-gradient-to-br from-orange-50 to-slate-100 text-6xl", children: "▧" }), /*#__PURE__*/_jsx("div", { className: "mt-5 text-sm font-bold text-slate-700", children: "图片材料预览" }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-xs text-slate-400", children: "原型环境使用示意内容展示附件预览效果" })] }) : /*#__PURE__*/_jsxs("div", { className: "mx-auto min-h-[520px] max-w-2xl rounded-xl bg-white px-14 py-12 shadow-sm", children: [/*#__PURE__*/_jsx("div", { className: "border-b border-slate-200 pb-5 text-center text-xl font-black text-ink", children: fileName }), /*#__PURE__*/_jsx("div", { className: "mt-8 text-sm leading-8 text-slate-600", children: "附件内容预览示例：该材料包含投诉事项说明、客户沟通记录、业务办理经过及相关证明信息。正式系统接入文件服务后，将在此区域展示 PDF、Word、Excel 等附件的实际内容。" }), /*#__PURE__*/_jsx("div", { className: "mt-8 rounded-xl bg-mist p-5 text-sm leading-7 text-slate-600", children: "预览说明：当前为原型模拟内容，附件无需下载即可在页面内查看。" })] }) })]
+    })
+  });
+}
+function ActionConfirmModal({ title, message, confirmText, onClose, onConfirm }) {
+  return /*#__PURE__*/_jsx("div", {
+    className: "fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/45 px-6 py-8",
+    children: /*#__PURE__*/_jsxs("div", {
+      className: "w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl",
+      children: [/*#__PURE__*/_jsx("div", { className: "border-b border-slate-200 px-6 py-5 text-xl font-black text-ink", children: title }), /*#__PURE__*/_jsx("div", { className: "px-6 py-7 text-sm leading-7 text-slate-600", children: message }), /*#__PURE__*/_jsxs("div", { className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-4", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: onClose, className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "取消" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onConfirm, className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-mid", children: confirmText })] })]
+    })
   });
 }
 function CustomerConfirmModal({
@@ -3439,6 +3613,48 @@ function SearchableSelectField({
     })]
   });
 }
+function HistoryComplaintModal({ row, onClose }) {
+  const fields = row.sourceType === '客服单' ? [
+    ['工单编号', row.workNo], ['来电号码', '13806331234'], ['来电日期', row.incomingDate],
+    ['来电时间', row.incomingTime], ['来电人姓名', row.caller], ['来电人称谓', '先生'],
+    ['联系电话', row.phone], ['来电Email', 'wangxx@example.com'], ['来电人邮编', '276800'],
+    ['联系地址', '山东省日照市东港区××路××号'], ['工单类型', row.type], ['工单子类型', '产品投诉'],
+    ['工单所属机构', row.org], ['业务类型', row.business], ['工单级别', row.ticketLevel],
+    ['来电业务类型', '个人业务'], ['处理方式', '协同处理'], ['处理时限', '48小时'],
+    ['进件渠道', row.channel], ['是否需要回访', '否'], ['处理人', row.handlerName],
+    ['剩余时间', row.currentStatus === '已结案' ? '0小时' : '12小时'], ['当前位置', row.currentLocation],
+    ['当前状态', row.currentStatus], ['催单人', '李四'], ['催单时间', '2026-07-09 15:30:00'],
+    ['催单描述', '客户再次来电询问处理进度，请尽快反馈。']
+  ] : [
+    ['标题', row.title], ['录入时间', row.time], ['行内工单编号', row.workNo],
+    ['工单类型', '投诉'], ['投诉反映渠道', row.channel], ['渠道细分', '人工客服'],
+    ['监管工单编号', row.regulatoryNo], ['工单级别', row.ticketLevel], ['办理时限', row.processingDeadline],
+    ['是否重办', '否'], ['是否现场', row.onsite], ['投诉人姓名', row.caller],
+    ['性别', '男'], ['身份证号码', '37************12'], ['联系电话', row.phone],
+    ['卡号', '6228********1234'], ['被投诉机构', row.org], ['投诉人诉求', '核实并说明'],
+    ['投诉产品标签', row.productTag], ['投诉原因标签', row.point], ['业务类别大类', row.business],
+    ['业务类别中类', row.loanType || '个人贷款'], ['业务类别小类', '贷款利息'], ['投诉原因大类', '费用与定价'],
+    ['投诉原因中类', '利息计收'], ['投诉原因小类', row.point], ['附件', 'ATT202607090001'],
+    ['所属机构', row.assignedOrg], ['处理人（工号）', row.handlerUser]
+  ];
+  return /*#__PURE__*/_jsx("div", {
+    className: "fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-5",
+    children: /*#__PURE__*/_jsxs("div", {
+      className: "max-h-[85vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white shadow-2xl",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex items-center justify-between border-b border-slate-200 px-6 py-5",
+        children: [/*#__PURE__*/_jsx("div", { className: "text-xl font-black text-ink", children: "历史投诉工单明细" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onClose, className: "rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold text-slate-600", children: "关闭" })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "space-y-5 p-6",
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "grid grid-cols-1 gap-4 md:grid-cols-2",
+          children: fields.map(([label, value]) => /*#__PURE__*/_jsxs("div", { className: "rounded-xl bg-mist px-4 py-3", children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: label }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm font-bold text-ink", children: value || '-' })] }, label))
+        }), /*#__PURE__*/_jsxs("div", { className: "rounded-xl bg-mist px-4 py-3", children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "投诉内容" }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm leading-7 text-ink", children: row.content })] })]
+      })]
+    })
+  });
+}
+
 function RegulatoryForm({
   content,
   setContent,
@@ -3449,6 +3665,9 @@ function RegulatoryForm({
   tagReady,
   handleTag
 }) {
+  const [regulatoryAttachments, setRegulatoryAttachments] = useState([]);
+  const [regulatoryPreview, setRegulatoryPreview] = useState(null);
+  const uploadRegulatoryAttachment = () => setRegulatoryAttachments([{ name: '监管来文.pdf', size: '1.8 MB' }]);
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
     children: [/*#__PURE__*/_jsx(Panel, {
@@ -3575,7 +3794,17 @@ function RegulatoryForm({
         }), /*#__PURE__*/_jsx("div", {
           className: "mt-2 text-sm text-slate-500",
           children: "支持图片、PDF、Word、Excel、音频转写文本等材料"
-        })]
+        }), regulatoryAttachments.length === 0 ? /*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: uploadRegulatoryAttachment,
+          className: "mt-4 rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white",
+          children: "上传附件"
+        }) : /*#__PURE__*/_jsx("div", {
+          className: "mx-auto mt-4 flex max-w-xl items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm",
+          children: /*#__PURE__*/_jsxs(React.Fragment, {
+            children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "font-bold text-ink", children: regulatoryAttachments[0].name }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs text-slate-500", children: regulatoryAttachments[0].size })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setRegulatoryPreview(regulatoryAttachments[0]), className: "font-bold text-rizhao hover:underline", children: "在线预览" })]
+          })
+        }), regulatoryPreview && /*#__PURE__*/_jsx(AttachmentPreviewModal, { file: regulatoryPreview, onClose: () => setRegulatoryPreview(null) })]
       })
     }), /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
@@ -3775,30 +4004,6 @@ function BatchImport({
           onClick: handleUpload,
           className: "mt-6 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "上传数据"
-        }), (uploadState === 'uploaded' || uploadState === 'parsing') && /*#__PURE__*/_jsxs("div", {
-          className: "mx-auto mt-6 max-w-xl",
-          children: [/*#__PURE__*/_jsxs("div", {
-            className: "mb-2 flex items-center justify-between text-sm font-bold text-slate-600",
-            children: [/*#__PURE__*/_jsx("span", { children: "解析中" }), /*#__PURE__*/_jsx("span", { children: "72%" })]
-          }), /*#__PURE__*/_jsx("div", {
-            className: "h-3 overflow-hidden rounded-full bg-white",
-            children: /*#__PURE__*/_jsx("div", { className: "h-full rounded-full bg-rizhao transition-all duration-700", style: { width: '72%' } })
-          }), /*#__PURE__*/_jsx("div", {
-            className: "mt-3 text-sm text-slate-500",
-            children: "正在校验字段、必填项和数据格式。"
-          })]
-        }), uploadState === 'parsed' && /*#__PURE__*/_jsxs("div", {
-          className: "mx-auto mt-6 max-w-xl",
-          children: [/*#__PURE__*/_jsxs("div", {
-            className: "mb-2 flex items-center justify-between text-sm font-bold text-slate-600",
-            children: [/*#__PURE__*/_jsx("span", { children: "解析完成" }), /*#__PURE__*/_jsx("span", { children: "100%" })]
-          }), /*#__PURE__*/_jsx("div", {
-            className: "h-3 overflow-hidden rounded-full bg-white",
-            children: /*#__PURE__*/_jsx("div", { className: "h-full rounded-full bg-rizhao", style: { width: '100%' } })
-          }), /*#__PURE__*/_jsx("div", {
-            className: "mt-3 text-sm text-slate-500",
-            children: "本次共解析出 15 条有效数据"
-          })]
         }), parseError && /*#__PURE__*/_jsx("div", {
           className: "mt-4 text-sm font-bold text-red-500",
           children: parseError
@@ -4512,17 +4717,22 @@ function TextArea({
   label,
   placeholder,
   value,
-  setValue
+  setValue,
+  maxLength
 }) {
   return /*#__PURE__*/_jsxs("label", {
     className: "block",
     children: [/*#__PURE__*/_jsx("div", {
       className: "field-label mb-2",
       children: label
+    }), maxLength && /*#__PURE__*/_jsx("div", {
+      className: "mb-2 text-right text-xs text-slate-400",
+      children: `${(value || '').length}/${maxLength}`
     }), /*#__PURE__*/_jsx("div", {
       className: "field-box min-h-[118px] items-start py-3",
       children: /*#__PURE__*/_jsx("textarea", {
         rows: "4",
+        maxLength: maxLength,
         value: value,
         onChange: setValue ? e => setValue(e.target.value) : undefined,
         placeholder: placeholder
@@ -4611,6 +4821,59 @@ const rolesData = [
 ];
 
 function RolePermissionManager() {
+  const [configRole, setConfigRole] = useState(null);
+  const [roleList, setRoleList] = useState([{
+    name: '消保办管理员', code: 'CONSUMER_ADMIN', status: '启用', users: 6,
+    positioning: '负责全行投诉统筹、工单审核及权限管理', orgLevel: ['总行', '总行部室'],
+    dataScope: '全行', builtIn: '是'
+  }, {
+    name: '机构管理员', code: 'ORG_ADMIN', status: '启用', users: 18,
+    positioning: '负责本机构及下辖机构工单分配与管理', orgLevel: ['分支机构', '支行'],
+    dataScope: '本行及下辖', builtIn: '是'
+  }, {
+    name: '投诉处理员', code: 'COMPLAINT_HANDLER', status: '启用', users: 280,
+    positioning: '负责投诉工单办理、客户联系及结果反馈', orgLevel: ['总行部室', '分支机构', '支行', '网点'],
+    dataScope: '本机构', builtIn: '是'
+  }, {
+    name: '超级管理员', code: 'SUPER_ADMIN', status: '启用', users: 2,
+    positioning: '系统初始化、基础配置及全量权限维护', orgLevel: ['总行'],
+    dataScope: '全行', builtIn: '是'
+  }]);
+  const toggleRoleStatus = code => setRoleList(prev => prev.map(item => item.code === code ? { ...item, status: item.status === '启用' ? '停用' : '启用' } : item));
+  const updateRoleField = (code, field, value) => setRoleList(prev => prev.map(item => item.code === code ? { ...item, [field]: value } : item));
+  const deleteRole = roleItem => {
+    if (roleItem.builtIn === '是') { window.alert('系统内置角色不允许删除。'); return; }
+    if (window.confirm(`是否确认删除角色“${roleItem.name}”？`)) setRoleList(prev => prev.filter(item => item.code !== roleItem.code));
+  };
+  if (configRole) return /*#__PURE__*/_jsx(RolePermissionConfig, { role: configRole, onBack: () => setConfigRole(null) });
+  return /*#__PURE__*/_jsxs("section", {
+    className: "rounded-2xl border border-slate-200 bg-white",
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: "flex items-center justify-between border-b border-slate-200 px-5 py-4",
+      children: [/*#__PURE__*/_jsxs("div", {
+        children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "角色列表" }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm text-slate-500", children: "查看系统角色并进入功能权限配置" })]
+      }), /*#__PURE__*/_jsxs("div", { className: "text-sm text-slate-500", children: ["共 ", roleList.length, " 个角色"] })]
+    }), /*#__PURE__*/_jsx("div", {
+      className: "w-full",
+      children: /*#__PURE__*/_jsxs("table", {
+        className: "role-list-table w-full table-fixed text-left text-xs",
+        children: [/*#__PURE__*/_jsx("colgroup", {
+          children: [9, 10, 7, 6, 15, 14, 10, 9, 20].map((width, index) => /*#__PURE__*/_jsx("col", { style: { width: `${width}%` } }, index))
+        }), /*#__PURE__*/_jsx("thead", {
+          className: "bg-slate-100 text-slate-600",
+          children: /*#__PURE__*/_jsx("tr", {
+            children: ['角色名称', '角色编码', '角色状态', '关联用户数', '角色定位', '使用机构层级', '默认数据范围', '是否系统内置', '操作'].map(head => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-2 py-3 font-black leading-5", children: head }, head))
+          })
+        }), /*#__PURE__*/_jsx("tbody", {
+          className: "divide-y divide-slate-100",
+          children: roleList.map(roleItem => /*#__PURE__*/_jsxs("tr", {
+            className: "hover:bg-mist/40",
+            children: [/*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold leading-5 text-ink", children: roleItem.name }), /*#__PURE__*/_jsx("td", { className: "break-all px-2 py-3 font-mono leading-5 text-slate-600", children: roleItem.code }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => toggleRoleStatus(roleItem.code), className: "flex items-center gap-1.5", children: [/*#__PURE__*/_jsx("span", { className: `relative inline-flex h-5 w-9 rounded-full transition ${roleItem.status === '启用' ? 'bg-green-500' : 'bg-slate-300'}`, children: /*#__PURE__*/_jsx("span", { className: `absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition ${roleItem.status === '启用' ? 'left-[18px]' : 'left-0.5'}` }) }), /*#__PURE__*/_jsx("span", { className: `font-bold ${roleItem.status === '启用' ? 'text-green-600' : 'text-slate-500'}`, children: roleItem.status })] }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold text-ink", children: roleItem.users }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 leading-5 text-slate-600", children: roleItem.positioning }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsx(RoleOrgLevelControl, { value: roleItem.orgLevel, onChange: value => updateRoleField(roleItem.code, 'orgLevel', value) }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsx("div", { className: "field-box role-select-box", children: /*#__PURE__*/_jsx("select", { value: roleItem.dataScope, onChange: event => updateRoleField(roleItem.code, 'dataScope', event.target.value), children: ['全行', '本行及下辖', '本机构'].map(option => /*#__PURE__*/_jsx("option", { children: option }, option)) }) }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsx("span", { className: `rounded-full px-2 py-1 font-bold ${roleItem.builtIn === '是' ? 'bg-blue-50 text-blue-700' : 'bg-slate-100 text-slate-600'}`, children: roleItem.builtIn }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-3 whitespace-nowrap", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => setConfigRole(roleItem), className: "font-bold text-rizhao", children: "权限分配" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => window.alert(`角色“${roleItem.name}”已保存。`), className: "font-bold text-rizhao", children: "保存" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => toggleRoleStatus(roleItem.code), className: "font-bold text-rizhao", children: roleItem.status === '启用' ? '停用' : '启用' }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => deleteRole(roleItem), className: `font-bold ${roleItem.builtIn === '是' ? 'text-slate-400' : 'text-red-500'}`, children: "删除角色" })] }) })]
+          }, roleItem.code))
+        })]
+      })
+    }), /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-t border-slate-100 px-5 py-4 text-sm text-slate-500", children: [/*#__PURE__*/_jsxs("span", { children: ["共 ", roleList.length, " 条"] }), /*#__PURE__*/_jsx("span", { children: "第 1 / 1 页" })] })]
+  });
   const [selectedRoleIdx, setSelectedRoleIdx] = useState(0);
   const [permTab, setPermTab] = useState('菜单权限');
   const [dirty, setDirty] = useState(false);
@@ -4746,6 +5009,105 @@ function RolePermissionManager() {
   });
 }
 
+function RoleOrgLevelControl({ value, onChange }) {
+  const options = ['总行', '总行部室', '分支机构', '分支机构部室', '支行', '网点', '营业部'];
+  const [open, setOpen] = useState(false);
+  const toggle = option => {
+    const next = value.includes(option) ? value.filter(item => item !== option) : [...value, option];
+    if (next.length > 0) onChange(next);
+  };
+  return /*#__PURE__*/_jsxs("div", {
+    className: "relative",
+    tabIndex: -1,
+    onBlur: event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); },
+    children: [/*#__PURE__*/_jsxs("button", { type: "button", onClick: () => setOpen(!open), className: `field-box role-select-box flex w-full cursor-pointer items-center justify-between text-left ${open ? 'border-rizhao shadow-low' : ''}`, children: [/*#__PURE__*/_jsx("span", { className: "truncate text-slate-700", children: value.length === 1 ? value[0] : `${value[0]}等 ${value.length} 项` }), /*#__PURE__*/_jsx("span", { className: `ml-2 text-[10px] text-slate-400 transition ${open ? 'rotate-180' : ''}`, children: "▼" })] }), open && /*#__PURE__*/_jsxs("div", {
+      className: "absolute left-0 top-full z-[80] mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl",
+      children: [/*#__PURE__*/_jsx("div", { className: "border-b border-slate-100 px-3 py-2 text-xs font-bold text-slate-500", children: "选择适用机构层级" }), /*#__PURE__*/_jsx("div", { className: "max-h-64 overflow-y-auto p-1.5", children: options.map(option => {
+        const checked = value.includes(option);
+        return /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => toggle(option), className: `flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-xs transition ${checked ? 'bg-orange-50 text-rizhao' : 'text-slate-700 hover:bg-slate-50'}`, children: [/*#__PURE__*/_jsx("span", { className: "whitespace-nowrap font-bold", children: option }), /*#__PURE__*/_jsx("span", { className: `ml-4 flex h-4 w-4 shrink-0 items-center justify-center rounded border text-[10px] font-black ${checked ? 'border-rizhao bg-rizhao text-white' : 'border-slate-300 bg-white text-transparent'}`, children: "✓" })] }, option);
+      }) }), /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-t border-slate-100 px-3 py-2 text-xs", children: [/*#__PURE__*/_jsxs("span", { className: "text-slate-400", children: ["已选 ", value.length, " 项"] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setOpen(false), className: "font-bold text-rizhao", children: "完成" })] })]
+    })]
+  });
+}
+function RolePermissionTree({ tree, selected, setSelected }) {
+  const collectKeys = node => node.key ? [node.key] : (node.children || []).flatMap(collectKeys);
+  const toggleNode = node => {
+    const keys = collectKeys(node);
+    const allSelected = keys.every(key => selected.includes(key));
+    setSelected(prev => allSelected ? prev.filter(key => !keys.includes(key)) : Array.from(new Set([...prev, ...keys])));
+  };
+  const renderNodes = (nodes, level = 0) => /*#__PURE__*/_jsx("div", {
+    className: level === 0 ? "space-y-3" : "ml-6 mt-2 space-y-2 border-l border-slate-200 pl-5",
+    children: nodes.map(node => {
+      const keys = collectKeys(node);
+      const checkedCount = keys.filter(key => selected.includes(key)).length;
+      const checked = checkedCount === keys.length;
+      const partial = checkedCount > 0 && !checked;
+      return /*#__PURE__*/_jsxs("div", {
+        children: [/*#__PURE__*/_jsxs("button", {
+          type: "button",
+          onClick: () => toggleNode(node),
+          className: `flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition ${checked || partial ? 'border-line-divider bg-mist/60' : 'border-slate-200 bg-white hover:border-line-divider'}`,
+          children: [/*#__PURE__*/_jsx("span", { className: `flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs font-black ${checked ? 'border-rizhao bg-rizhao text-white' : partial ? 'border-rizhao bg-orange-100 text-rizhao' : 'border-slate-300 bg-white text-transparent'}`, children: checked ? '✓' : partial ? '−' : '✓' }), /*#__PURE__*/_jsx("span", { className: `${level === 0 ? 'text-sm font-black' : 'text-sm font-bold'} text-ink`, children: node.name }), node.children && /*#__PURE__*/_jsxs("span", { className: "ml-auto text-xs text-slate-400", children: [checkedCount, "/", keys.length] })]
+        }), node.children && renderNodes(node.children, level + 1)]
+      }, node.key || node.name);
+    })
+  });
+  return /*#__PURE__*/_jsx("div", { className: "rounded-2xl bg-slate-50 p-4", children: renderNodes(tree) });
+}
+function RolePermissionConfig({ role, onBack }) {
+  const permissionItems = [
+    { key: 'entry', name: '工单录入权限', desc: '允许进入工单录入页面并新建投诉工单' },
+    { key: 'view', name: '工单查看权限', desc: '允许查看数据范围内的工单及详情' },
+    { key: 'process', name: '工单处理权限', desc: '允许填写处理结果、联系记录和处理附件' },
+    { key: 'closeAudit', name: '关单审核权限', desc: '允许审核处理结果并执行关单' },
+    { key: 'ledgerQuery', name: '台账查询权限', desc: '允许查询投诉工单台账' },
+    { key: 'ledgerExport', name: '台账导出权限', desc: '允许导出台账并记录导出日志' },
+    { key: 'backend', name: '后台配置管理权限', desc: '允许维护用户、角色、机构和短信模板' }
+  ];
+  const permissionTree = [{
+    name: '投诉管理',
+    children: [
+      { key: 'entry', name: '工单录入权限' },
+      { key: 'view', name: '工单查看权限' },
+      { key: 'process', name: '工单处理权限' },
+      { key: 'closeAudit', name: '关单审核权限' },
+      { name: '台账管理', children: [
+        { key: 'ledgerQuery', name: '台账查询权限' },
+        { key: 'ledgerExport', name: '台账导出权限' }
+      ] }
+    ]
+  }, {
+    name: '后台管理',
+    children: [{ key: 'backend', name: '后台配置管理权限' }]
+  }];
+  const defaultPermissions = role.code === 'SUPER_ADMIN' || role.code === 'CONSUMER_ADMIN'
+    ? permissionItems.map(item => item.key)
+    : role.code === 'ORG_ADMIN'
+      ? ['view', 'process', 'closeAudit', 'ledgerQuery', 'ledgerExport']
+      : ['entry', 'view', 'process', 'ledgerQuery'];
+  const [selected, setSelected] = useState(defaultPermissions);
+  const [dataScope, setDataScope] = useState(role.dataScope);
+  const [saved, setSaved] = useState(false);
+  const togglePermission = key => setSelected(prev => prev.includes(key) ? prev.filter(item => item !== key) : [...prev, key]);
+  const savePermissions = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  return /*#__PURE__*/_jsxs("div", {
+    className: "space-y-4",
+    children: [/*#__PURE__*/_jsxs("div", {
+      className: "flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4",
+      children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "权限分配" }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-sm text-slate-500", children: [role.name, " · ", role.code] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onBack, className: "rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700", children: "返回角色列表" })]
+    }), /*#__PURE__*/_jsxs("section", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsxs("div", { className: "mb-4 flex items-center justify-between", children: [/*#__PURE__*/_jsx("div", { className: "font-black text-ink", children: "功能权限" }), /*#__PURE__*/_jsxs("div", { className: "text-sm text-slate-500", children: ["已选择 ", selected.length, " / ", permissionItems.length, " 项"] })] }), /*#__PURE__*/_jsx(RolePermissionTree, { tree: permissionTree, selected: selected, setSelected: setSelected })]
+    }), /*#__PURE__*/_jsxs("section", {
+      className: "rounded-2xl border border-slate-200 bg-white p-5",
+      children: [/*#__PURE__*/_jsx("div", { className: "mb-3 font-black text-ink", children: "数据范围" }), /*#__PURE__*/_jsx(Field, { label: "默认数据范围", type: "select", options: ['全行', '本行及下辖', '本机构'], value: dataScope, setValue: setDataScope })]
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "flex items-center justify-end gap-3",
+      children: [saved && /*#__PURE__*/_jsx("span", { className: "text-sm font-bold text-green-600", children: "权限配置已保存" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onBack, className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "取消" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: savePermissions, disabled: selected.length === 0, className: "rounded-xl bg-rizhao px-6 py-2.5 text-sm font-black text-white shadow-mid disabled:cursor-not-allowed disabled:bg-slate-300", children: "保存权限配置" })]
+    })]
+  });
+}
 function MenuPermPanel({ perms, onChange }) {
   const [expanded, setExpanded] = useState(true);
   const keys = Object.keys(perms);
