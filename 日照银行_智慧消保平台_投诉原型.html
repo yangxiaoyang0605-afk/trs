@@ -542,8 +542,8 @@ const menus = [{
   active: false,
   desc: '管理角色 / 权限'
 }];
-const channels = ['国家局', '山东省监管局', '12378监管热线'];
-const govChannels = ['日照市12345政务热线', '省级政务热线转办'];
+const channels = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'];
+const govChannels = ['政务热线'];
 function App() {
   const [mainTab, setMainTab] = useState('录入工单');
   const [entryTab, setEntryTab] = useState('列表');
@@ -821,7 +821,7 @@ function ProcessingWorkspace({
   const myRows = [{
     no: 'TS202607020002',
     title: '信用卡还款协商',
-    channel: '12378监管热线',
+    channel: '市监管局',
     customer: '李女士',
     org: '信用卡中心',
     level: '重要',
@@ -843,7 +843,7 @@ function ProcessingWorkspace({
   }, {
     no: 'TS202607020010',
     title: '柜面业务办理时效',
-    channel: '客服中心',
+    channel: '银行协会',
     customer: '马先生',
     org: '开发区支行',
     level: '普通',
@@ -857,7 +857,7 @@ function ProcessingWorkspace({
   }, (_, index) => ({
     no: `TS20260703${String(index + 1).padStart(4, '0')}`,
     title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉'][index % 5],
-    channel: ['省监管局', '12378监管热线', '12345政务热线', '客服中心'][index % 4],
+    channel: ['省监管局', '市监管局', '政务热线', '银行协会'][index % 4],
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士'][index % 5],
     org: '信用卡中心',
     level: index % 3 === 0 ? '重要' : '普通',
@@ -871,7 +871,7 @@ function ProcessingWorkspace({
   }, (_, index) => ({
     no: `TS20260704${String(index + 1).padStart(4, '0')}`,
     title: ['经营贷办理进度反馈', '账户服务咨询投诉', '还款提醒争议', '网点服务态度反馈', '贷款资料补充说明'][index % 5],
-    channel: ['国家局', '省监管局', '12378监管热线', '12345政务热线'][index % 4],
+    channel: ['国家局', '省监管局', '市监管局', '政务热线'][index % 4],
     customer: ['赵先生', '张女士', '李女士', '孙女士', '马先生'][index % 5],
     org: ['东港支行', '岚山支行', '莒县支行', '五莲支行', '开发区支行'][index % 5],
     level: index % 4 === 0 ? '重要' : '普通',
@@ -883,17 +883,17 @@ function ProcessingWorkspace({
   const myPendingAssignRows = [{
     no: 'TS202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '东港支行', level: '重要', status: '待分配', remain: '剩余 4 天', handler: '', content: '客户反映经营贷办理进度问题，需分配处理员。'
   }, {
-    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '12345政务热线', customer: '吴女士', org: '东港支行', level: '普通', status: '待分配', remain: '剩余 3 天', handler: '', content: '客户咨询银行卡交易限额，需分配处理员。'
+    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '东港支行', level: '普通', status: '待分配', remain: '剩余 3 天', handler: '', content: '客户咨询银行卡交易限额，需分配处理员。'
   }];
   const adminMyRows = [{
-    no: 'TS202607020003', title: '账户服务咨询投诉', channel: '12345政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '待审核', remain: '剩余 2 天', handler: '李经理', content: '客户反映账户服务问题，已处理待审核。'
+    no: 'TS202607020003', title: '账户服务咨询投诉', channel: '政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '待审核', remain: '剩余 2 天', handler: '李经理', content: '客户反映账户服务问题，已处理待审核。'
   }, {
-    no: 'TS202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '信用卡中心', level: '重要', status: '审核中', remain: '已超期', handler: '王主管', content: '客户反映征信异议，审核中。'
+    no: 'TS202607020008', title: '征信异议处理', channel: '其它', customer: '刘先生', org: '信用卡中心', level: '重要', status: '审核中', remain: '已超期', handler: '王主管', content: '客户反映征信异议，审核中。'
   }];
   const adminSameOrgRows = Array.from({ length: 6 }, (_, index) => ({
     no: `TS20260710${String(index + 1).padStart(3, '0')}`,
     title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉', '柜面业务办理时效'][index % 6],
-    channel: ['省监管局', '12378监管热线', '12345政务热线', '客服中心'][index % 4],
+    channel: ['省监管局', '市监管局', '政务热线', '银行协会'][index % 4],
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '马先生'][index % 6],
     org: '东港支行',
     level: index % 3 === 0 ? '重要' : '普通',
@@ -905,7 +905,7 @@ function ProcessingWorkspace({
   const adminChildOrgRows = Array.from({ length: 6 }, (_, index) => ({
     no: `TS20260711${String(index + 1).padStart(3, '0')}`,
     title: ['经营贷办理进度反馈', '账户服务咨询投诉', '还款提醒争议', '网点服务态度反馈', '贷款资料补充说明', '提前还款费用争议'][index % 6],
-    channel: ['国家局', '省监管局', '12378监管热线', '12345政务热线'][index % 4],
+    channel: ['国家局', '省监管局', '市监管局', '政务热线'][index % 4],
     customer: ['赵先生', '张女士', '李女士', '孙女士', '马先生', '周先生'][index % 6],
     org: ['岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心', '山海天支行'][index % 6],
     level: index % 4 === 0 ? '重要' : '普通',
@@ -917,7 +917,7 @@ function ProcessingWorkspace({
   const orgSameOrgRows = Array.from({ length: 6 }, (_, index) => ({
     no: `TS20260712${String(index + 1).padStart(3, '0')}`,
     title: ['贷款利息争议处理', '网点服务体验投诉', '银行卡交易限额咨询', '征信异议处理', '账户服务咨询投诉', '柜面业务办理时效'][index % 6],
-    channel: ['省监管局', '12378监管热线', '12345政务热线', '客服中心'][index % 4],
+    channel: ['省监管局', '市监管局', '政务热线', '银行协会'][index % 4],
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '马先生'][index % 6],
     org: '东港支行',
     level: index % 3 === 0 ? '重要' : '普通',
@@ -929,7 +929,7 @@ function ProcessingWorkspace({
   const orgChildOrgRows = Array.from({ length: 6 }, (_, index) => ({
     no: `TS20260713${String(index + 1).padStart(3, '0')}`,
     title: ['经营贷办理进度反馈', '账户服务咨询投诉', '还款提醒争议', '网点服务态度反馈', '贷款资料补充说明', '提前还款费用争议'][index % 6],
-    channel: ['国家局', '省监管局', '12378监管热线', '12345政务热线'][index % 4],
+    channel: ['国家局', '省监管局', '市监管局', '政务热线'][index % 4],
     customer: ['赵先生', '张女士', '李女士', '孙女士', '马先生', '周先生'][index % 6],
     org: ['岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心', '山海天支行'][index % 6],
     level: index % 4 === 0 ? '重要' : '普通',
@@ -1020,7 +1020,7 @@ function ProcessingWorkspace({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "标题", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '12378监管热线', '12345政务热线', '客服中心'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "标题", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-4 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -2121,7 +2121,10 @@ function EntryMethodList({
   const draftRows = allRows.filter(r => r.status === '草稿');
   const batchDraftRows = [{ no: 'DR202607080001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 09:24' }, { no: 'DR202607080002', title: '信用卡还款协商', channel: '12378', customer: '李女士', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 10:18' }, { no: 'DR202607080003', title: '账户服务咨询', channel: '政务热线', customer: '张女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 11:05' }, { no: 'DR202607080004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 11:26' }, { no: 'DR202607080005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 13:40' }, { no: 'DR202607080006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 14:08' }, { no: 'DR202607080007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 14:35' }, { no: 'DR202607080008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 15:12' }];
   const [draftTab, setDraftTab] = useState('单笔录入');
-  const currentRows = listTab === '已派发工单' ? dispatchedRows : draftTab === '单笔录入' ? draftRows : batchDraftRows;
+  const currentRows = (listTab === '已派发工单' ? dispatchedRows : draftTab === '单笔录入' ? draftRows : batchDraftRows).map(row => ({
+    ...row,
+    channel: ({ '12378': '市监管局', '12378监管热线': '市监管局', '12345政务热线': '政务热线', '客服中心': '银行协会' })[row.channel] || row.channel
+  }));
   const openDetail = (row, shouldFocusFlow = false) => {
     setFocusFlow(shouldFocusFlow);
     setViewRow(row);
@@ -2672,7 +2675,7 @@ function StandardComplaintForm({
   const historyRows = [{
     no: '1',
     time: '2026-06-18 10:12',
-    channel: '96588客服',
+    channel: '银行协会',
     org: '东港支行',
     caller: '王先生',
     phone: '138****0919',
@@ -3610,20 +3613,20 @@ function BatchImport({
 
   const initialRows = [
     { no: 'DR202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020002', title: '信用卡还款协商', channel: '12378', customer: '李女士', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020003', title: '账户服务咨询投诉', channel: '12345政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020002', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020003', title: '账户服务咨询投诉', channel: '政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
     { no: 'DR202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020005', title: '网点服务体验投诉', channel: '银行协会', customer: '陈女士', status: '待确认', checked: false, errors: null },
     { no: 'DR202607020006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020007', title: '银行卡交易限额咨询', channel: '12345政务热线', customer: '吴女士', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020008', title: '征信异议处理', channel: '其它', customer: '刘先生', status: '待确认', checked: false, errors: null },
     { no: 'DR202607020009', title: '贷款资料补充说明', channel: '国家局', customer: '孙女士', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020010', title: '柜面业务办理时效', channel: '客服中心', customer: '马先生', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020011', title: '理财收益争议', channel: '12378', customer: '郑女士', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020010', title: '柜面业务办理时效', channel: '银行协会', customer: '马先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020011', title: '理财收益争议', channel: '市监管局', customer: '郑女士', status: '待确认', checked: false, errors: null },
     { no: 'DR202607020012', title: '社保卡激活投诉', channel: '省监管局', customer: '宋先生', status: '待确认', checked: false, errors: null },
     { no: 'DR202607020013', title: '信用卡盗刷处理', channel: '国家局', customer: '唐女士', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020014', title: '外汇汇款延迟', channel: '客服中心', customer: '秦先生', status: '待确认', checked: false, errors: null },
-    { no: 'DR202607020015', title: '对公开户咨询', channel: '12345政务热线', customer: '许女士', status: '待确认', checked: false, errors: null }
+    { no: 'DR202607020014', title: '外汇汇款延迟', channel: '银行协会', customer: '秦先生', status: '待确认', checked: false, errors: null },
+    { no: 'DR202607020015', title: '对公开户咨询', channel: '政务热线', customer: '许女士', status: '待确认', checked: false, errors: null }
   ];
 
   function handleDownload() { showToast('标准模板下载成功。'); }
@@ -3891,7 +3894,7 @@ function LedgerExportWorkspace() {
     no: `TS20260705${String(index + 1).padStart(4, '0')}`,
     superviseNo: `JG20260705${String(index + 1).padStart(4, '0')}`,
     title: ['贷款利息争议处理', '信用卡还款协商', '账户服务咨询投诉', '网点服务体验投诉', '征信异议处理'][index % 5],
-    channel: ['国家局', '省监管局', '12378监管热线', '12345政务热线', '客服中心'][index % 5],
+    channel: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'][index % 6],
     customer: ['王先生', '李女士', '张女士', '陈女士', '刘先生'][index % 5],
     phone: ['138****0919', '156****2816', '139****7735', '187****6620', '135****0821'][index % 5],
     org: ['东港支行', '信用卡中心', '岚山支行', '五莲支行', '营业部'][index % 5],
@@ -3955,7 +3958,7 @@ function LedgerExportWorkspace() {
         }), /*#__PURE__*/_jsx(Field, {
           label: "投诉来源",
           type: "select",
-          options: ['国家局', '省监管局', '12378监管热线', '12345政务热线', '客服中心']
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它']
         }), /*#__PURE__*/_jsx(Field, {
           label: "工单状态",
           type: "select",
