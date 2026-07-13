@@ -783,7 +783,15 @@ function EntryWorkspace(props) {
         handleTag: handleTag,
         setEntryTab: setEntryTab
       })]
-    }) : /*#__PURE__*/_jsx(StandardComplaintForm, {
+    }) : /*#__PURE__*/_jsxs(_Fragment, {
+      children: [/*#__PURE__*/_jsx("div", {
+        className: "mb-5",
+        children: /*#__PURE__*/_jsx("button", {
+          onClick: () => setEntryTab('列表'),
+          className: "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700",
+          children: "返回工单列表"
+        })
+      }), /*#__PURE__*/_jsx(StandardComplaintForm, {
         content: content,
         setContent: setContent,
         productTag: productTag,
@@ -793,6 +801,7 @@ function EntryWorkspace(props) {
         tagReady: tagReady,
         handleTag: handleTag,
         hideHeader: true
+      })]
     })
   });
 }
