@@ -455,15 +455,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .rz-shell { background: #F6F6F6; }
     .rz-frame {
       box-sizing: border-box;
-      display: flex;
+      position: relative;
+      display: grid;
+      grid-template-columns: 210px 10px minmax(0, 1200px);
+      grid-template-rows: 76px 8px minmax(0, 1fr);
       width: 100%;
-      max-width: none;
+      max-width: 1440px;
       min-height: 100vh;
-      margin: 0;
+      margin: 0 auto;
+      padding: 0 10px;
     }
-    .rz-content { flex: 1 1 auto; min-width: 0; }
-    .rz-page-pad { padding: 24px; }
+    .rz-content { display: contents; }
+    .rz-topbar { grid-column: 1 / -1; grid-row: 1; }
+    .rz-page-pad { grid-column: 3; grid-row: 3; min-width: 0; padding: 0 0 24px; }
     .rz-main-card {
+      min-height: 100%;
       overflow: hidden;
       border: 1px solid #EDEDED;
       border-radius: 16px;
@@ -471,15 +477,32 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
     }
     .rz-section-title { font-size: 20px; line-height: 1.5; letter-spacing: 0; }
-    @media (max-width: 1279px) {
+    @media (max-width: 900px) {
       .rz-frame {
-        display: flex;
-        padding: 0;
-        max-width: none;
+        grid-template-columns: 210px 10px minmax(900px, 1fr);
       }
-      .rz-content { flex: 1 1 auto; }
     }
-    .rz-sidebar { width: 292px !important; }
+    .rz-sidebar { grid-column: 1; grid-row: 3; width: 210px !important; min-width: 210px; margin-bottom: 24px; border-radius: 16px; overflow: visible; }
+    .rz-sidebar > div { border-radius: 16px; }
+    .rz-sidebar-brand {
+      position: absolute;
+      top: 0;
+      left: 10px;
+      z-index: 20;
+      display: block;
+      box-sizing: border-box;
+      width: 210px;
+      height: 76px;
+      padding: 8px 12px !important;
+      border: 0 !important;
+      background: #FFFFFF;
+      color: #202020;
+    }
+    .rz-sidebar-brand > div { grid-template-columns: 52px minmax(0, 1fr) !important; gap: 10px !important; }
+    .rz-sidebar-brand > div > div:first-child { width: 52px !important; height: 52px !important; border-radius: 12px !important; box-shadow: none !important; }
+    .rz-sidebar-brand .text-\[25px\] { font-size: 18px !important; }
+    .rz-sidebar-brand .text-\[18px\] { margin-top: 6px !important; font-size: 13px !important; }
+    .rz-topbar-title { display: none !important; }
     .rounded-3xl, .rounded-2xl { border-radius: 16px !important; }
     .rounded-xl { border-radius: 12px !important; }
     .rounded-lg { border-radius: 12px !important; }
@@ -524,23 +547,29 @@ const {
   useState
 } = React;
 
-// 菜单：一期核心模块，按用户指定的四个模块展示。
+// 左侧一级菜单。
 const menus = [{
-  name: '投诉处理',
+  name: '投诉管理',
   active: true,
-  desc: '录入 / 处理 / 台账'
+  desc: '投诉业务全流程'
 }, {
-  name: '报表管理',
+  name: '消保审查',
   active: false,
-  desc: '监管报表 / 行内报表'
-}, {
-  name: '统计分析',
-  active: false,
-  desc: '看板 / 指标分析'
+  desc: ''
 }, {
   name: '后台管理',
   active: false,
-  desc: '管理角色 / 权限'
+  desc: ''
+}, {
+  name: '消保评价',
+  active: false,
+  desc: ''
+}, {
+  name: '知识园地', active: false, desc: ''
+}, {
+  name: '金教宣传', active: false, desc: ''
+}, {
+  name: '智能预警', active: false, desc: ''
 }];
 const channels = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'];
 const govChannels = ['政务热线'];
@@ -645,12 +674,15 @@ function Sidebar({
     setMainTab(name);
     if (name === '录入工单') setEntryTab('列表');
   };
+  const isPrimaryActive = name => name === '投诉管理'
+    ? ['录入工单', '处理工单', '台账导出', '报表管理', '统计分析'].includes(mainTab)
+    : name === '后台管理' ? mainTab === '后台管理' : mainTab === name;
   return /*#__PURE__*/_jsx("aside", {
     className: "rz-sidebar shrink-0 bg-ink text-white",
     children: /*#__PURE__*/_jsxs("div", {
       className: "flex h-full flex-col",
       children: [/*#__PURE__*/_jsx("div", {
-        className: "border-b border-white/10 px-6 py-6",
+        className: "rz-sidebar-brand border-b border-white/10 px-6 py-6",
         children: /*#__PURE__*/_jsxs("div", {
           className: "grid grid-cols-[76px_1fr] items-center gap-4",
           children: [/*#__PURE__*/_jsx("div", {
@@ -672,32 +704,47 @@ function Sidebar({
           })]
         })
       }), /*#__PURE__*/_jsx("nav", {
-        className: "flex-1 space-y-2 px-4 py-5",
+        className: "flex-1 space-y-2 overflow-y-auto px-4 py-5",
         children: visibleMenus.map((item, index) => /*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("button", {
-            className: `group w-full rounded-xl px-4 py-4 text-left transition ${item.active ? 'bg-white text-ink shadow-lg' : 'text-white/76 hover:bg-white/8 hover:text-white'}`,
+            onClick: () => item.name === '投诉管理' ? openSubMenu('录入工单') : item.name === '后台管理' ? setMainTab('后台管理') : setMainTab(item.name),
+            className: `group w-full rounded-xl px-4 py-3 text-left transition ${isPrimaryActive(item.name) ? 'bg-white text-ink shadow-lg' : 'text-white/76 hover:bg-white/8 hover:text-white'}`,
             children: /*#__PURE__*/_jsxs("div", {
               className: "flex items-center gap-3",
               children: [/*#__PURE__*/_jsx("span", {
-                className: `flex h-8 w-8 items-center justify-center rounded-lg text-sm font-black ${item.active ? 'bg-rizhao text-white' : 'bg-white/10 text-white/80'}`,
+                className: `flex h-8 w-8 items-center justify-center rounded-lg text-sm font-black ${isPrimaryActive(item.name) ? 'bg-rizhao text-white' : 'bg-white/10 text-white/80'}`,
                 children: index + 1
               }), /*#__PURE__*/_jsxs("div", {
                 children: [/*#__PURE__*/_jsx("div", {
                   className: "font-bold",
                   children: item.name
                 }), /*#__PURE__*/_jsx("div", {
-                  className: `mt-0.5 text-xs ${item.active ? 'text-slate-500' : 'text-white/42'}`,
+                    className: `mt-0.5 text-xs ${isPrimaryActive(item.name) ? 'text-slate-500' : 'text-white/42'}`,
                   children: item.desc
                 })]
               })]
             })
-          }), item.name === '投诉处理' && /*#__PURE__*/_jsx("div", {
-            className: "ml-5 mt-2 space-y-1 border-l border-white/14 pl-4",
-            children: subMenus.map(name => /*#__PURE__*/_jsx("button", {
-              onClick: () => openSubMenu(name),
-              className: `block w-full rounded-lg px-3 py-2.5 text-left text-sm font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
-              children: name
-            }, name))
+          }), item.name === '投诉管理' && /*#__PURE__*/_jsxs("div", {
+            className: "ml-4 mt-2 space-y-1 border-l border-white/14 pl-3",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "rounded-lg px-3 py-2 text-sm font-bold text-white",
+              children: "投诉处理"
+            }), /*#__PURE__*/_jsx("div", {
+              className: "ml-2 space-y-1 border-l border-white/14 pl-2",
+              children: subMenus.map(name => /*#__PURE__*/_jsx("button", {
+                onClick: () => openSubMenu(name),
+                className: `block w-full rounded-lg px-3 py-2 text-left text-xs font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+                children: name
+              }, name))
+            }), /*#__PURE__*/_jsx("button", {
+              onClick: () => setMainTab('报表管理'),
+              className: `block w-full rounded-lg px-3 py-2 text-left text-sm font-bold transition ${mainTab === '报表管理' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              children: "报表管理"
+            }), /*#__PURE__*/_jsx("button", {
+              onClick: () => setMainTab('统计分析'),
+              className: `block w-full rounded-lg px-3 py-2 text-left text-sm font-bold transition ${mainTab === '统计分析' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              children: "统计分析"
+            })]
           }), item.name === '后台管理' && /*#__PURE__*/_jsx("div", {
             className: "ml-5 mt-2 space-y-1 border-l border-white/14 pl-4",
             children: adminSubMenus.map(name => /*#__PURE__*/_jsx("button", {
@@ -718,10 +765,20 @@ const roleLabels = { complaint_handler: '投诉处理员', admin_office: '消保
 function Topbar({ mainTab, role, setRole }) {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   return /*#__PURE__*/_jsx("header", {
-    className: "sticky top-0 z-10 border-b border-white/70 bg-white/78 backdrop-blur",
+    className: "rz-topbar sticky top-0 z-10 rounded-b-2xl border-b border-white/70 bg-white/78 backdrop-blur",
     children: /*#__PURE__*/_jsx("div", {
-      className: "flex h-[76px] items-center justify-end px-8",
-      children: /*#__PURE__*/_jsxs("div", {
+      className: "flex h-[76px] items-center justify-end px-6",
+      children: /*#__PURE__*/_jsxs(_Fragment, {
+        children: [/*#__PURE__*/_jsxs("div", {
+          className: "rz-topbar-title flex items-baseline gap-3",
+          children: [/*#__PURE__*/_jsx("span", {
+            className: "text-[24px] font-black tracking-wide text-ink",
+            children: "日照银行"
+          }), /*#__PURE__*/_jsx("span", {
+            className: "text-[20px] font-black text-rizhao",
+            children: "消保平台"
+          })]
+        }), /*#__PURE__*/_jsxs("div", {
         className: "flex items-center gap-3",
         children: [mainTab === '处理工单' && /*#__PURE__*/_jsxs("div", {
           className: "relative",
@@ -744,6 +801,7 @@ function Topbar({ mainTab, role, setRole }) {
           className: "rounded-full bg-ink px-4 py-2 text-sm font-bold text-white",
           children: "个人信息"
         })]
+      })]
       })
     })
   });
