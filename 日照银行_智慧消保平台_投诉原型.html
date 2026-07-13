@@ -1325,7 +1325,14 @@ function ProcessingDetail({
   const [processResult, setProcessResult] = useState('');
   const [processConclusion, setProcessConclusion] = useState('');
   const [contactResult, setContactResult] = useState('');
-  const [commRecords, setCommRecords] = useState([]);
+  const [commRecords, setCommRecords] = useState(isReadOnly ? [{
+    type: 'outbound',
+    time: '2026-07-02 10:30',
+    handler: row.handler || '张经理',
+    callStatus: '已接通',
+    contactResult: '已向客户说明处理进度并确认后续反馈方式',
+    duration: '03:18'
+  }] : []);
   const [showOutboundCall, setShowOutboundCall] = useState(false);
   const [showSendSms, setShowSendSms] = useState(false);
   const [showNewComm, setShowNewComm] = useState(false);
@@ -1339,7 +1346,7 @@ function ProcessingDetail({
   const [previewFile, setPreviewFile] = useState(null);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
 
-  const addCommRecord = record => setCommRecords(prev => [record, ...prev]);
+  const addCommRecord = record => setCommRecords(prev => [{ handler: row.handler || '当前处理人', ...record }, ...prev]);
 
   const detailFields = [{
     label: '行内工单编号',
@@ -1476,7 +1483,7 @@ function ProcessingDetail({
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowNewComm(true),
           className: "rounded-lg border border-rizhao bg-white px-5 py-2.5 text-sm font-black text-rizhao",
-          children: "新增联系人与沟通记录"
+          children: "新增联系与沟通记录"
         })]
       })
     }), /*#__PURE__*/_jsx(StandardSection, {
@@ -1485,78 +1492,31 @@ function ProcessingDetail({
         className: "py-6 text-center text-sm text-slate-400",
         children: "暂无联系与沟通记录"
       }) : /*#__PURE__*/_jsx("div", {
-        className: "space-y-4",
-        children: commRecords.map((rec, idx) => /*#__PURE__*/_jsxs("div", {
-          className: "flex gap-4",
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "flex flex-col items-center",
-            children: [/*#__PURE__*/_jsx("div", {
-              className: `flex h-8 w-8 items-center justify-center rounded-full text-xs font-black text-white ${rec.type === 'outbound' ? 'bg-rizhao' : rec.type === 'sms' ? 'bg-blue-600' : 'bg-green-600'}`,
-              children: rec.type === 'outbound' ? '呼' : rec.type === 'sms' ? '信' : '记'
-            }), idx < commRecords.length - 1 && /*#__PURE__*/_jsx("div", {
-              className: "mt-1 w-px flex-1 bg-slate-200"
-            })]
-          }), /*#__PURE__*/_jsxs("div", {
-            className: "flex-1 rounded-xl border border-slate-200 bg-slate-50 p-4",
-            children: [/*#__PURE__*/_jsx("div", {
-              className: "text-xs text-slate-500",
-              children: rec.time
-            }), /*#__PURE__*/_jsx("div", {
-              className: "mt-1 text-sm font-bold text-ink",
-              children: rec.type === 'outbound' ? '外呼' : rec.type === 'sms' ? '短信' : '手动沟通记录'
-            }), rec.type === 'outbound' ? /*#__PURE__*/_jsxs("div", {
-              className: "mt-2 space-y-1 text-sm text-slate-700",
-              children: [/*#__PURE__*/_jsxs("div", {
-                children: ["通话状态：", /*#__PURE__*/_jsx("span", {
-                  className: "font-bold",
-                  children: rec.callStatus
-                })]
-              }), /*#__PURE__*/_jsxs("div", {
-                children: ["联系结果：", /*#__PURE__*/_jsx("span", {
-                  className: "font-bold",
-                  children: rec.contactResult
-                })]
-              }), /*#__PURE__*/_jsxs("div", {
-                children: ["通话时长：", rec.duration]
-              })]
-            }) : rec.type === 'sms' ? /*#__PURE__*/_jsxs("div", {
-              className: "mt-2 space-y-1 text-sm text-slate-700",
-              children: [/*#__PURE__*/_jsxs("div", {
-                children: ["发送状态：", /*#__PURE__*/_jsx("span", {
-                  className: `font-bold ${rec.sendStatus === '成功' ? 'text-green-600' : 'text-red-500'}`,
-                  children: rec.sendStatus
-                })]
-              }), rec.sendStatus === '失败' && /*#__PURE__*/_jsx("div", {
-                className: "mt-1",
-                children: /*#__PURE__*/_jsx("button", {
-                  onClick: () => {
-                    const updated = [...commRecords];
-                    updated[idx] = { ...updated[idx], sendStatus: '已重试' };
-                    setCommRecords(updated);
-                  },
-                  className: "rounded-lg border border-rizhao px-3 py-1 text-xs font-bold text-rizhao",
-                  children: "重试"
-                })
-              }), rec.content && /*#__PURE__*/_jsxs("div", {
-                children: ["内容：", rec.content]
-              }), rec.sender && /*#__PURE__*/_jsxs("div", {
-                children: ["发送人：", rec.sender]
-              })]
-            }) : /*#__PURE__*/_jsxs("div", {
-              className: "mt-2 space-y-1 text-sm text-slate-700",
-              children: [rec.contactMethod && /*#__PURE__*/_jsxs("div", {
-                children: ["联系方式：", rec.contactMethod]
-              }), rec.content && /*#__PURE__*/_jsxs("div", {
-                children: ["沟通内容：", rec.content]
-              }), rec.attachments && rec.attachments.length > 0 && /*#__PURE__*/_jsxs("div", {
-                children: ["证明材料：", rec.attachments.map((a, i) => /*#__PURE__*/_jsx("button", {
-                  className: "text-sm font-bold text-rizhao underline",
-                  children: "查看"
-                }, i))]
-              })]
-            })]
+        className: "overflow-hidden rounded-xl border border-slate-200",
+        children: /*#__PURE__*/_jsxs("table", {
+          className: "w-full table-fixed text-left text-sm",
+          children: [/*#__PURE__*/_jsx("thead", {
+            className: "bg-slate-50 text-slate-600",
+            children: /*#__PURE__*/_jsx("tr", {
+              children: ['时间', '处理人', '方式', '内容'].map((head, index) => /*#__PURE__*/_jsx("th", {
+                className: `px-4 py-3 font-bold ${index === 0 ? 'w-[170px]' : index === 1 ? 'w-[130px]' : index === 2 ? 'w-[100px]' : ''}`,
+                children: head
+              }, head))
+            })
+          }), /*#__PURE__*/_jsx("tbody", {
+            className: "divide-y divide-slate-100",
+            children: commRecords.map((rec, idx) => {
+              const method = rec.method || (rec.type === 'outbound' ? '外呼' : rec.type === 'sms' ? '短信' : '其他');
+              const recordContent = rec.type === 'outbound'
+                ? [rec.contactResult, rec.callStatus && `通话状态：${rec.callStatus}`, rec.duration && `通话时长：${rec.duration}`].filter(Boolean).join('；')
+                : [rec.content, rec.sendStatus && `发送状态：${rec.sendStatus}`].filter(Boolean).join('；');
+              return /*#__PURE__*/_jsxs("tr", {
+                className: "align-top",
+                children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: rec.time }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: rec.handler || '当前处理人' }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: method }), /*#__PURE__*/_jsx("td", { className: "break-words px-4 py-3 leading-6 text-slate-700", children: recordContent || '-' })]
+              }, idx);
+            })
           })]
-        }, idx))
+        })
       })
     }), /*#__PURE__*/_jsxs(StandardSection, {
       title: "处理结果",
@@ -1895,11 +1855,11 @@ function SendSmsModal({ customerPhone, onClose, onSave }) {
   });
 }
 function NewCommunicationModal({ onClose, onSave }) {
-  const [contactMethod, setContactMethod] = useState('');
+  const [communicationMethod, setCommunicationMethod] = useState('');
   const [commContent, setCommContent] = useState('');
-  const [attachments, setAttachments] = useState([]);
   const handleSave = () => {
-    onSave({ contactMethod, content: commContent, attachments });
+    if (!communicationMethod || !commContent.trim()) return;
+    onSave({ method: communicationMethod, content: commContent });
   };
   return /*#__PURE__*/_jsxs("div", {
     className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
@@ -1909,7 +1869,7 @@ function NewCommunicationModal({ onClose, onSave }) {
         className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
         children: [/*#__PURE__*/_jsx("div", {
           className: "text-xl font-black text-ink",
-          children: "新增联系人与沟通记录"
+          children: "新增联系与沟通记录"
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
@@ -1919,30 +1879,16 @@ function NewCommunicationModal({ onClose, onSave }) {
       }), /*#__PURE__*/_jsxs("div", {
         className: "space-y-4 px-6 py-5",
         children: [/*#__PURE__*/_jsx(Field, {
-          label: "联系方式",
-          placeholder: "请输入联系方式",
-          value: contactMethod,
-          setValue: setContactMethod
+          label: "* 方式",
+          type: "select",
+          options: ['短信', '外呼', '其他'],
+          value: communicationMethod,
+          setValue: setCommunicationMethod
         }), /*#__PURE__*/_jsx(TextArea, {
-          label: "沟通内容",
+          label: "* 内容",
           placeholder: "请输入沟通内容",
           value: commContent,
           setValue: setCommContent
-        }), /*#__PURE__*/_jsxs("div", {
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "field-label mb-2",
-            children: "沟通证明材料上传"
-          }), /*#__PURE__*/_jsx("button", {
-            onClick: () => setAttachments(prev => [...prev, '证明材料_' + (prev.length + 1)]),
-            className: "rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700",
-            children: "选择文件"
-          }), attachments.length > 0 && /*#__PURE__*/_jsx("div", {
-            className: "mt-2 space-y-1",
-            children: attachments.map((a, i) => /*#__PURE__*/_jsx("div", {
-              className: "text-sm text-slate-600",
-              children: a
-            }, i))
-          })]
         })]
       }), /*#__PURE__*/_jsx("div", {
         className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-4",
@@ -1951,8 +1897,8 @@ function NewCommunicationModal({ onClose, onSave }) {
           className: "rounded-xl border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700",
           children: "取消"
         }), /*#__PURE__*/_jsx("button", {
-          onClick: handleSave,
-          className: "rounded-xl bg-rizhao px-5 py-2 text-sm font-black text-white shadow-mid",
+          onClick: communicationMethod && commContent.trim() ? handleSave : undefined,
+          className: `rounded-xl px-5 py-2 text-sm font-black text-white shadow-mid ${communicationMethod && commContent.trim() ? 'bg-rizhao' : 'cursor-not-allowed bg-slate-300'}`,
           children: "保存"
         })]
       })]
@@ -2335,7 +2281,7 @@ function EntryMethodList({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉来源", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -2349,7 +2295,7 @@ function EntryMethodList({
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-mist/60 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-                children: ['行内工单编号', '标题', '反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+                children: ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-5 py-4 font-bold",
                 children: head
               }, head))
