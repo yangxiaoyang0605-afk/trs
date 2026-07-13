@@ -607,6 +607,20 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       min-width: 160px !important;
       max-width: 160px !important;
     }
+    .rz-processing-info-body > section {
+      padding: 20px 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    .rz-processing-info-body > section + section {
+      border-top: 1px solid #E4E4E4 !important;
+    }
+    .rz-processing-info-body > section > div:first-child {
+      margin-bottom: 16px !important;
+      padding-bottom: 10px !important;
+      border-bottom: 0 !important;
+    }
   </style>
 </head>
 <body>
@@ -984,8 +998,8 @@ function ProcessingWorkspace({
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士'][index % 5],
     org: '信用卡中心',
     level: index % 3 === 0 ? '重要' : '普通',
-    status: ['待处理', '处理中', '待审核'][index % 3],
-    remain: `剩余 ${index % 4 + 1} 天`,
+    status: index === 4 ? '已办结' : ['待处理', '处理中', '待审核'][index % 3],
+    remain: index === 4 ? '已办结' : `剩余 ${index % 4 + 1} 天`,
     handler: ['张经理', '李经理', '王主管'][index % 3],
     content: '客户反映相关业务办理问题，要求银行核实后反馈处理结果。'
   }));
@@ -1021,7 +1035,7 @@ function ProcessingWorkspace({
     org: '东港支行',
     level: index % 3 === 0 ? '重要' : '普通',
     status: ['已办结', '待审核', '审核中', '待分配', '待处理', '处理中'][index % 6],
-    remain: index % 3 === 0 ? '已超期' : `剩余 ${index % 3 + 1} 天`,
+    remain: index % 6 === 0 ? '已办结' : index % 3 === 0 ? '已超期' : `剩余 ${index % 3 + 1} 天`,
     handler: ['张经理', '李经理', '王主管'][index % 3],
     content: '本机构工单内容。'
   }));
@@ -1033,7 +1047,7 @@ function ProcessingWorkspace({
     org: ['岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心', '山海天支行'][index % 6],
     level: index % 4 === 0 ? '重要' : '普通',
     status: ['已办结', '待审核', '审核中', '待分配', '待处理', '处理中'][index % 6],
-    remain: `剩余 ${index % 4 + 1} 天`,
+    remain: index % 6 === 0 ? '已办结' : `剩余 ${index % 4 + 1} 天`,
     handler: ['赵专员', '陈专员', '刘专员'][index % 3],
     content: '下辖机构工单内容。'
   }));
@@ -1044,8 +1058,8 @@ function ProcessingWorkspace({
     customer: ['王先生', '陈女士', '吴女士', '刘先生', '张女士', '马先生'][index % 6],
     org: '东港支行',
     level: index % 3 === 0 ? '重要' : '普通',
-    status: ['待分配', '待处理', '处理中', '待审核', '审核中', '已办结'][index % 6],
-    remain: index % 3 === 0 ? '已超期' : `剩余 ${index % 3 + 1} 天`,
+    status: ['待分配', '待处理', '处理中', '待审核', '已办结', '审核中'][index % 6],
+    remain: index % 6 === 4 ? '已办结' : index % 3 === 0 ? '已超期' : `剩余 ${index % 3 + 1} 天`,
     handler: ['张经理', '李经理', '王主管'][index % 3],
     content: '本机构工单。'
   }));
@@ -1057,7 +1071,7 @@ function ProcessingWorkspace({
     org: ['岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心', '山海天支行'][index % 6],
     level: index % 4 === 0 ? '重要' : '普通',
     status: ['待分配', '待处理', '处理中', '待审核', '审核中', '已办结'][index % 6],
-    remain: `剩余 ${index % 4 + 1} 天`,
+    remain: index % 6 === 5 ? '已办结' : `剩余 ${index % 4 + 1} 天`,
     handler: ['赵专员', '陈专员', '刘专员'][index % 3],
     content: '下辖机构工单。'
   }));
@@ -1109,7 +1123,9 @@ function ProcessingWorkspace({
         onClick: () => setDetailRow(null),
         className: "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700",
         children: "返回处理列表"
-      }), /*#__PURE__*/_jsx(ProcessingDetail, {
+      }), detailMode === 'returnVisit' ? /*#__PURE__*/_jsx(ReturnVisitPage, {
+        row: detailRow
+      }) : /*#__PURE__*/_jsx(ProcessingDetail, {
         role: role,
         row: detailRow,
         mode: detailMode,
@@ -1185,7 +1201,7 @@ function ProcessingWorkspace({
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: visibleRows.map(row => /*#__PURE__*/_jsxs("tr", {
-              className: `hover:bg-mist/50 ${row.remain?.includes('已超期') ? 'rz-overdue-row' : ''}`,
+              className: `hover:bg-mist/50 ${row.status !== '已办结' && row.remain?.includes('已超期') ? 'rz-overdue-row' : ''}`,
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
@@ -1211,11 +1227,22 @@ function ProcessingWorkspace({
                   children: row.status
                 })
               }), /*#__PURE__*/_jsx("td", {
-                className: `px-5 py-4 ${row.remain?.includes('已超期') ? 'text-red-500 font-bold' : row.remain?.includes('即将超期') ? 'text-orange-500 font-bold' : 'text-slate-500'}`,
-                children: row.remain
+                className: `px-5 py-4 ${row.status !== '已办结' && row.remain?.includes('已超期') ? 'text-red-500 font-bold' : row.status !== '已办结' && row.remain?.includes('即将超期') ? 'text-orange-500 font-bold' : 'text-slate-500'}`,
+                children: row.status === '已办结' ? '已办结' : row.remain
               }), /*#__PURE__*/_jsx("td", {
                 className: "rz-operation-cell whitespace-nowrap px-3 py-4",
-                children: role === 'admin_office' ? /*#__PURE__*/_jsxs("div", {
+                children: row.status === '已办结' ? /*#__PURE__*/_jsxs("div", {
+                  className: "flex items-center gap-3 whitespace-nowrap",
+                  children: [/*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('view'); setDetailRow(row); },
+                    className: "font-bold text-rizhao",
+                    children: "查看"
+                  }), /*#__PURE__*/_jsx("button", {
+                    onClick: () => { setDetailMode('returnVisit'); setDetailRow(row); },
+                    className: "font-bold text-rizhao",
+                    children: "回访"
+                  })]
+                }) : role === 'admin_office' ? /*#__PURE__*/_jsxs("div", {
                   className: "flex items-center gap-3 whitespace-nowrap",
                   children: [/*#__PURE__*/_jsx("button", {
                     onClick: () => { setDetailMode('view'); setDetailRow(row); },
@@ -1368,7 +1395,7 @@ function ProcessingDetail({
     value: row.status
   }, {
     label: '剩余处理时间',
-    value: row.remain
+    value: row.status === '已办结' ? '已办结' : row.remain
   }, {
     label: '是否重办',
     value: '否'
@@ -1468,7 +1495,19 @@ function ProcessingDetail({
           })]
         })
       })
-    }), !isReadOnly && /*#__PURE__*/_jsx(StandardSection, {
+    }), /*#__PURE__*/_jsxs("section", {
+      className: "rz-processing-info-group rounded-2xl border border-slate-200 bg-white px-6 pb-1 pt-6",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex items-center gap-3 border-b border-slate-200 pb-4",
+        children: [/*#__PURE__*/_jsx("span", {
+          className: "h-8 w-1.5 rounded-full bg-rizhao"
+        }), /*#__PURE__*/_jsx("h3", {
+          className: "text-lg font-black text-ink",
+          children: "工单处理信息"
+        })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "rz-processing-info-body",
+        children: [!isReadOnly && /*#__PURE__*/_jsx(StandardSection, {
       title: "联系处理",
       children: /*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap gap-3",
@@ -1555,6 +1594,8 @@ function ProcessingDetail({
           className: "text-sm text-slate-500",
           children: "可上传沟通记录、证明材料等"
         })]
+      })]
+    })]
       })]
     }), /*#__PURE__*/_jsx(FlowRecordSection, {
       records: [{
@@ -4261,7 +4302,7 @@ function LedgerExportWorkspace() {
                 className: "px-5 py-4 whitespace-nowrap",
                 children: /*#__PURE__*/_jsxs("div", {
                   className: "flex gap-3 whitespace-nowrap",
-                  children: ['查看', '回访', '修改'].map(action => /*#__PURE__*/_jsx("button", {
+                  children: ['查看', ...(row.status === '已关单' ? ['回访'] : []), '修改'].map(action => /*#__PURE__*/_jsx("button", {
                     type: "button",
                     onClick: () => setActiveAction({
                       type: action,
@@ -4316,28 +4357,52 @@ function ReturnVisitPage({
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
     children: [/*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "工单信息",
+      title: "工单详情",
       fields: [{
         label: '行内工单编号',
         value: row.no
       }, {
         label: '监管工单编号',
-        value: row.superviseNo
+        value: row.superviseNo || `JG${row.no?.slice(2) || ''}`
       }, {
         label: '工单标题',
         value: row.title
+      }, {
+        label: '投诉反映渠道',
+        value: row.channel
       }, {
         label: '投诉人',
         value: row.customer
       }, {
         label: '联系电话',
-        value: row.phone
+        value: row.phone || '156****2816'
       }, {
         label: '被投诉机构',
         value: row.org
       }, {
+        label: '工单级别',
+        value: row.level || '普通'
+      }, {
         label: '工单状态',
         value: row.status
+      }, {
+        label: '录入时间',
+        value: row.time || '2026-07-02 09:24'
+      }, {
+        label: '投诉内容',
+        value: row.content || '客户反映相关业务办理问题，要求银行核实处理情况并反馈最终结果。'
+      }]
+    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+      title: "处理结果",
+      fields: [{
+        label: '处理结论',
+        value: '投诉事项已核实处理'
+      }, {
+        label: '处理意见',
+        value: '已与客户完成沟通并反馈核实结果，相关问题已按流程处理完毕。'
+      }, {
+        label: '办结时间',
+        value: '2026-07-03 16:30'
       }]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "当前处理人",
@@ -4422,9 +4487,17 @@ function ReturnVisitPage({
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
+          onClick: () => alert('回访信息已保存。'),
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
           children: "保存回访"
         }), /*#__PURE__*/_jsx("button", {
+          onClick: () => {
+            if (!visitWay || !visitResult) {
+              alert('请选择回访方式和回访结果。');
+              return;
+            }
+            alert('回访已提交。');
+          },
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "提交"
         })]
