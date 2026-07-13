@@ -584,7 +584,7 @@ function App() {
           children: /*#__PURE__*/_jsxs("section", {
             className: "rz-main-card",
             children: [/*#__PURE__*/_jsx("div", {
-              className: "border-b border-slate-200 px-6 py-5",
+              className: `${mainTab === '录入工单' ? 'hidden' : ''} border-b border-slate-200 px-6 py-5`,
               children: /*#__PURE__*/_jsx("div", {
                 className: "flex flex-wrap items-center justify-between gap-4",
                 children: /*#__PURE__*/_jsxs("div", {
@@ -783,15 +783,7 @@ function EntryWorkspace(props) {
         handleTag: handleTag,
         setEntryTab: setEntryTab
       })]
-    }) : /*#__PURE__*/_jsxs(_Fragment, {
-      children: [/*#__PURE__*/_jsxs("div", {
-        className: "mb-5 flex flex-wrap items-center justify-between gap-3",
-        children: /*#__PURE__*/_jsx("button", {
-          onClick: () => setEntryTab('列表'),
-          className: "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700",
-          children: "返回工单列表"
-        })
-      }), /*#__PURE__*/_jsx(StandardComplaintForm, {
+    }) : /*#__PURE__*/_jsx(StandardComplaintForm, {
         content: content,
         setContent: setContent,
         productTag: productTag,
@@ -799,8 +791,8 @@ function EntryWorkspace(props) {
         reasonTag: reasonTag,
         setReasonTag: setReasonTag,
         tagReady: tagReady,
-        handleTag: handleTag
-      })]
+        handleTag: handleTag,
+        hideHeader: true
     })
   });
 }
@@ -2094,23 +2086,23 @@ function EntryMethodList({
   const allRows = [{
     no: 'TS202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '东港支行', level: '普通', status: '草稿', time: '2026-07-02 09:24'
   }, {
-    no: 'TS202607020002', title: '信用卡还款协商', channel: '12378', customer: '李女士', org: '信用卡中心', level: '重要', status: '已派发', time: '2026-07-02 10:18'
+    no: 'TS202607020002', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', org: '信用卡中心', level: '重要', status: '已派发', time: '2026-07-02 10:18'
   }, {
-    no: 'TS202607020003', title: '账户服务咨询投诉', channel: '12345政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '草稿', time: '2026-07-02 11:05'
+    no: 'TS202607020003', title: '账户服务咨询投诉', channel: '政务热线', customer: '张女士', org: '岚山支行', level: '普通', status: '草稿', time: '2026-07-02 11:05'
   }, {
     no: 'TS202607020004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '莒县支行', level: '重要', status: '草稿', time: '2026-07-02 11:26'
   }, {
-    no: 'TS202607020005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', org: '五莲支行', level: '普通', status: '已派发', time: '2026-07-02 13:40'
+    no: 'TS202607020005', title: '网点服务体验投诉', channel: '银行协会', customer: '陈女士', org: '五莲支行', level: '普通', status: '已派发', time: '2026-07-02 13:40'
   }, {
     no: 'TS202607020006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', org: '东港支行', level: '重要', status: '已派发', time: '2026-07-02 14:08'
   }, {
-    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '12345政务热线', customer: '吴女士', org: '营业部', level: '普通', status: '已派发', time: '2026-07-02 14:35'
+    no: 'TS202607020007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '营业部', level: '普通', status: '已派发', time: '2026-07-02 14:35'
   }, {
-    no: 'TS202607020008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '信用卡中心', level: '重要', status: '已派发', time: '2026-07-02 15:12'
+    no: 'TS202607020008', title: '征信异议处理', channel: '其它', customer: '刘先生', org: '信用卡中心', level: '重要', status: '已派发', time: '2026-07-02 15:12'
   }, {
     no: 'TS202607020009', title: '贷款资料补充说明', channel: '国家局', customer: '孙女士', org: '山海天支行', level: '普通', status: '草稿', time: '2026-07-02 16:03'
   }, {
-    no: 'TS202607020010', title: '柜面业务办理时效', channel: '客服中心', customer: '马先生', org: '开发区支行', level: '普通', status: '已派发', time: '2026-07-02 16:48'
+    no: 'TS202607020010', title: '柜面业务办理时效', channel: '银行协会', customer: '马先生', org: '开发区支行', level: '普通', status: '已派发', time: '2026-07-02 16:48'
   }];
   const [viewRow, setViewRow] = useState(null);
   const [focusFlow, setFocusFlow] = useState(false);
@@ -2143,14 +2135,6 @@ function EntryMethodList({
     children: [/*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap items-center justify-between gap-3",
       children: [/*#__PURE__*/_jsxs("div", {
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "text-lg font-black",
-          children: "工单录入"
-        }), /*#__PURE__*/_jsx("div", {
-          className: "mt-1 text-sm text-slate-500",
-          children: "新增工单后在此查看和管理已派发及草稿工单"
-        })]
-      }), /*#__PURE__*/_jsxs("div", {
         className: "flex gap-3",
         children: [/*#__PURE__*/_jsx("button", {
           onClick: () => setEntryTab('单笔录入'),
@@ -2182,7 +2166,7 @@ function EntryMethodList({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉来源", type: "select", options: ['国家局', '山东省监管局', '12378监管热线', '日照市12345'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['草稿', '已派发', '处理中', '已关单'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉来源", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['草稿', '已派发', '处理中', '已关单'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -2779,7 +2763,7 @@ function StandardComplaintForm({
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单类型",
             type: "select",
-            options: ['投诉', '举报', '抱怨', '咨询', '建议', '求助']
+            options: ['投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访']
           }), /*#__PURE__*/_jsx(Field, {
           label: "* 投诉反映渠道",
           type: "select",
