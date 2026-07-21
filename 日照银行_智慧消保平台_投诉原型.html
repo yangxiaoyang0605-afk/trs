@@ -2318,6 +2318,7 @@ const roleLabels = { complaint_handler: '投诉处理员', org_admin: '工单派
 function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder }) {
   const [showMessages, setShowMessages] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [departments, setDepartments] = useState([
     { id: 'org-main', orgName: '总行消保中心', type: '所属机构', isDefault: true, roleKey: 'org_admin', complaintRole: '机构管理员', reviewRole: '消保办管理员' },
@@ -2331,7 +2332,10 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
   }, []);
   const switchDepartment = dept => {
     setCurrentDeptId(dept.id);
-    setRole(dept.roleKey);
+  };
+  const switchRole = nextRole => {
+    setRole(nextRole);
+    setShowRoleSwitcher(false);
   };
   const setDefaultDepartment = id => {
     setDepartments(list => list.map(item => ({ ...item, isDefault: item.id === id })));
@@ -2367,8 +2371,21 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
         }), /*#__PURE__*/_jsxs("div", {
         className: "flex items-center gap-3",
         children: [/*#__PURE__*/_jsxs("div", {
-          className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700",
-          children: [currentDept.orgName, /*#__PURE__*/_jsx("span", { className: "mx-2 text-slate-300", children: "|" }), roleLabels[role] || role]
+          className: "relative",
+          children: [/*#__PURE__*/_jsxs("button", {
+            type: "button",
+            onClick: () => setShowRoleSwitcher(!showRoleSwitcher),
+            className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition hover:border-rizhao hover:text-rizhao",
+            children: [currentDept.orgName, /*#__PURE__*/_jsx("span", { className: "mx-2 text-slate-300", children: "|" }), roleLabels[role] || role, /*#__PURE__*/_jsx("span", { className: "ml-2 text-xs text-slate-400", children: "切换" })]
+          }), showRoleSwitcher && /*#__PURE__*/_jsx("div", {
+            className: "absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-high",
+            children: Object.entries(roleLabels).map(([roleKey, roleName]) => /*#__PURE__*/_jsxs("button", {
+              type: "button",
+              onClick: () => switchRole(roleKey),
+              className: `mb-1 flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-bold transition ${role === roleKey ? 'bg-orange-50 text-rizhao' : 'text-slate-600 hover:bg-slate-50'}`,
+              children: [/*#__PURE__*/_jsx("span", { children: roleName }), role === roleKey && /*#__PURE__*/_jsx("span", { className: "rounded-full bg-rizhao px-2 py-0.5 text-[11px] font-black text-white", children: "当前" })]
+            }, roleKey))
+          })]
         }), /*#__PURE__*/_jsxs("div", {
           className: "relative",
           children: [/*#__PURE__*/_jsxs("button", {
