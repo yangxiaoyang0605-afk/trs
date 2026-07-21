@@ -3080,7 +3080,7 @@ function ProcessingDetail({
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
             children: [['客户身份证复印件.jpg', '2.3 MB'], ['投诉录音转写.docx', '156 KB']].map(file => /*#__PURE__*/_jsxs("tr", {
-              children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: file[0] }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: file[1] }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: "2026-07-09" }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: "张经理" }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsx("button", { onClick: () => setPreviewFile({ name: file[0], size: file[1] }), className: "font-bold text-rizhao", children: "在线预览" }) })]
+              children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: file[0] }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: file[1] }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: "2026-07-09" }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: "张经理" }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsx("button", { onClick: () => previewAttachmentFile({ name: file[0], size: file[1] }, setPreviewFile), className: "font-bold text-rizhao", children: "在线预览" }) })]
             }, file[0]))
           })]
         })
@@ -5149,7 +5149,7 @@ function StandardComplaintForm({
                   className: "px-4 py-3",
                   children: /*#__PURE__*/_jsx("button", {
                     type: "button",
-                    onClick: () => setPreviewAttachment(att),
+                    onClick: () => previewAttachmentFile(att, setPreviewAttachment),
                     className: "font-bold text-rizhao hover:underline",
                     children: "在线预览"
                   })
@@ -5231,6 +5231,29 @@ function AttachmentPreviewModal({ file, onClose }) {
       children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "附件在线预览" }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-sm text-slate-500", children: [fileName, file?.size ? ` · ${file.size}` : ''] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onClose, className: "rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700", children: "关闭" })] }), /*#__PURE__*/_jsx("div", { className: "min-h-[430px] flex-1 overflow-auto bg-slate-100 p-6", children: isImage ? /*#__PURE__*/_jsxs("div", { className: "mx-auto flex min-h-[390px] max-w-2xl flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 shadow-sm", children: [/*#__PURE__*/_jsx("div", { className: "flex h-48 w-72 items-center justify-center rounded-xl bg-gradient-to-br from-orange-50 to-slate-100 text-6xl", children: "▧" }), /*#__PURE__*/_jsx("div", { className: "mt-5 text-sm font-bold text-slate-700", children: "图片材料预览" }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-xs text-slate-400", children: "原型环境使用示意内容展示附件预览效果" })] }) : /*#__PURE__*/_jsxs("div", { className: "mx-auto min-h-[520px] max-w-2xl rounded-xl bg-white px-14 py-12 shadow-sm", children: [/*#__PURE__*/_jsx("div", { className: "border-b border-slate-200 pb-5 text-center text-xl font-black text-ink", children: fileName }), /*#__PURE__*/_jsx("div", { className: "mt-8 text-sm leading-8 text-slate-600", children: "附件内容预览示例：该材料包含投诉事项说明、客户沟通记录、业务办理经过及相关证明信息。正式系统接入文件服务后，将在此区域展示 PDF、Word、Excel 等附件的实际内容。" }), /*#__PURE__*/_jsx("div", { className: "mt-8 rounded-xl bg-mist p-5 text-sm leading-7 text-slate-600", children: "预览说明：当前为原型模拟内容，附件无需下载即可在页面内查看。" })] }) })]
     })
   });
+}
+function isImageAttachment(file) {
+  return /\.(png|jpe?g|gif|webp)$/i.test(file?.name || '');
+}
+function openAttachmentInNewTab(file) {
+  const fileName = file?.name || '附件';
+  const fileSize = file?.size ? ` · ${file.size}` : '';
+  const confirmed = window.confirm(`即将打开新页签预览：${fileName}`);
+  if (!confirmed) return;
+  const previewWindow = window.open('', '_blank');
+  if (!previewWindow) {
+    window.alert('浏览器已拦截新页签，请允许弹出窗口后重试。');
+    return;
+  }
+  previewWindow.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileName} - 在线预览</title><style>body{margin:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#101828}.top{height:64px;background:#EE7800;color:#fff;display:flex;align-items:center;padding:0 28px;font-weight:800;font-size:18px}.wrap{padding:32px}.paper{max-width:920px;min-height:640px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 36px rgba(15,23,42,.08);padding:44px 56px}.meta{color:#667085;font-size:13px;margin-top:8px}.title{font-size:26px;font-weight:900;border-bottom:1px solid #e5e7eb;padding-bottom:20px}.content{margin-top:28px;line-height:2;color:#475467;font-size:15px}.hint{margin-top:28px;border-radius:10px;background:#fff7ed;color:#9a3412;padding:16px 18px;font-size:14px;line-height:1.8}</style></head><body><div class="top">附件在线预览</div><div class="wrap"><div class="paper"><div class="title">${fileName}</div><div class="meta">文件信息${fileSize}</div><div class="content">附件内容预览示例：该材料包含投诉事项说明、客户沟通记录、业务办理经过及相关证明信息。正式系统接入文件服务后，将在此新页签中展示 PDF、Word、Excel 等附件的实际内容。</div><div class="hint">当前为原型预览效果，不产生下载动作；图片类附件仍在原页面弹窗中查看。</div></div></div></body></html>`);
+  previewWindow.document.close();
+}
+function previewAttachmentFile(file, setImagePreview) {
+  if (isImageAttachment(file)) {
+    setImagePreview(file);
+  } else {
+    openAttachmentInNewTab(file);
+  }
 }
 function ActionConfirmModal({ title, message, confirmText, onClose, onConfirm }) {
   return /*#__PURE__*/_jsx("div", {
@@ -5590,7 +5613,7 @@ function RegulatoryForm({
         }) : /*#__PURE__*/_jsx("div", {
           className: "mx-auto mt-4 flex max-w-xl items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm",
           children: /*#__PURE__*/_jsxs(React.Fragment, {
-            children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "font-bold text-ink", children: regulatoryAttachments[0].name }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs text-slate-500", children: regulatoryAttachments[0].size })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setRegulatoryPreview(regulatoryAttachments[0]), className: "font-bold text-rizhao hover:underline", children: "在线预览" })]
+            children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "font-bold text-ink", children: regulatoryAttachments[0].name }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs text-slate-500", children: regulatoryAttachments[0].size })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => previewAttachmentFile(regulatoryAttachments[0], setRegulatoryPreview), className: "font-bold text-rizhao hover:underline", children: "在线预览" })]
           })
         }), regulatoryPreview && /*#__PURE__*/_jsx(AttachmentPreviewModal, { file: regulatoryPreview, onClose: () => setRegulatoryPreview(null) })]
       })
@@ -6280,7 +6303,7 @@ function ReturnVisitPage({
                 className: "px-4 py-3",
                 children: /*#__PURE__*/_jsx("button", {
                   type: "button",
-                  onClick: () => setPreviewFile({ name: file[0], size: file[1] }),
+                  onClick: () => previewAttachmentFile({ name: file[0], size: file[1] }, setPreviewFile),
                   className: "font-bold text-rizhao",
                   children: "在线预览"
                 })
