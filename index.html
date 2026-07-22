@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -7071,7 +7071,7 @@ function ParameterizedConfigManager() {
 
 // ─── 角色权限管理 ───────────────────────────────────────────
 const rolesData = [
-  { name: '工单派发员', code: 'ORG_ADMIN', count: 18, scope: '本机构', status: true,
+  { name: '工单派发员', code: 'ORG_ADMIN', count: 18, scope: '本行及下辖', status: true,
     perms: {
       menus: {
         工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': true, '转办': true, '查看工单详情': true, '关单审核': true },
@@ -7082,10 +7082,10 @@ const rolesData = [
         后台管理: { '用户管理权限': false, '角色权限管理权限': false, '机构管理权限': false, '参数化配置权限': false }
       },
       buttons: {},
-      dataScope: '本机构'
+      dataScope: '本行及下辖'
     }
   },
-  { name: '投诉处理员', code: 'HANDLER', count: 280, scope: '本机构', status: true,
+  { name: '投诉处理员', code: 'HANDLER', count: 280, scope: '本行及下辖', status: true,
     perms: {
       menus: {
         工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': false, '转办': true, '查看工单详情': true, '关单审核': false },
@@ -7096,7 +7096,7 @@ const rolesData = [
         后台管理: { '用户管理权限': false, '角色权限管理权限': false, '机构管理权限': false, '参数化配置权限': false }
       },
       buttons: {},
-      dataScope: '本机构'
+      dataScope: '本行及下辖'
     }
   },
   { name: '超级管理员', code: 'SUPER_ADMIN', count: 2, scope: '全行', status: true,
@@ -7188,35 +7188,54 @@ function RolePermissionManager() {
   const [roleList, setRoleList] = useState([{
     name: '工单派发员', code: 'ORG_ADMIN', status: '启用', users: 18,
     positioning: '负责工单录入、派发和审核',
-    dataScope: '本机构', builtIn: '是'
+    dataScope: '本行及下辖', builtIn: '是'
   }, {
     name: '投诉处理员', code: 'COMPLAINT_HANDLER', status: '启用', users: 280,
     positioning: '负责投诉工单办理、客户联系及结果反馈',
-    dataScope: '本机构', builtIn: '是'
+    dataScope: '本行及下辖', builtIn: '是'
   }, {
     name: '超级管理员', code: 'SUPER_ADMIN', status: '启用', users: 2,
     positioning: '系统初始化、基础配置及全量权限维护',
     dataScope: '全行', builtIn: '是'
   }]);
+  const [reviewRoleList, setReviewRoleList] = useState([{
+    name: '超级管理员', code: 'REVIEW_SUPER_ADMIN', status: '启用', users: 2,
+    positioning: '负责消保审查模块权限维护及全量数据查看',
+    dataScope: '全行', builtIn: '是'
+  }, {
+    name: '普通员工', code: 'REVIEW_STAFF', status: '启用', users: 126,
+    positioning: '负责消保审查相关待办处理和本人数据查看',
+    dataScope: '本行及下辖', builtIn: '是'
+  }]);
+  const [roleModuleTab, setRoleModuleTab] = useState('投诉');
+  const currentRoleList = roleModuleTab === '投诉' ? roleList : reviewRoleList;
+  const setCurrentRoleList = updater => roleModuleTab === '投诉' ? setRoleList(updater) : setReviewRoleList(updater);
   const [newRole, setNewRole] = useState(null);
-  const openNewRole = () => setNewRole({ name: '', code: '', positioning: '', dataScope: '本机构', status: '启用' });
+  const openNewRole = () => setNewRole({ module: roleModuleTab, name: '', code: '', positioning: '', dataScope: '本行及下辖', status: '启用' });
   const saveNewRole = () => {
     const name = newRole.name.trim();
     const code = newRole.code.trim().toUpperCase();
+    const module = newRole.module || roleModuleTab;
+    const targetList = module === '投诉' ? roleList : reviewRoleList;
     if (!name || !code) { window.alert('请填写角色名称和角色编码。'); return; }
-    if (roleList.some(item => item.code === code)) { window.alert('角色编码已存在，请重新填写。'); return; }
-    setRoleList(list => [...list, { ...newRole, name, code, users: 0, builtIn: '否' }]);
+    if (targetList.some(item => item.code === code)) { window.alert('角色编码已存在，请重新填写。'); return; }
+    const saveItem = { ...newRole, name, code, users: 0, builtIn: '否' };
+    delete saveItem.module;
+    if (module === '投诉') setRoleList(list => [...list, saveItem]);
+    else setReviewRoleList(list => [...list, saveItem]);
+    setRoleModuleTab(module);
+    setPage(1);
     setNewRole(null);
   };
-  const toggleRoleStatus = code => setRoleList(prev => prev.map(item => item.code === code ? { ...item, status: item.status === '启用' ? '停用' : '启用' } : item));
+  const toggleRoleStatus = code => setCurrentRoleList(prev => prev.map(item => item.code === code ? { ...item, status: item.status === '启用' ? '停用' : '启用' } : item));
   const toggleBuiltIn = code => {
-    if (code === 'SUPER_ADMIN') return;
-    setRoleList(prev => prev.map(item => item.code === code ? { ...item, builtIn: item.builtIn === '是' ? '否' : '是' } : item));
+    if (code === 'SUPER_ADMIN' || code === 'REVIEW_SUPER_ADMIN') return;
+    setCurrentRoleList(prev => prev.map(item => item.code === code ? { ...item, builtIn: item.builtIn === '是' ? '否' : '是' } : item));
   };
-  const updateRoleField = (code, field, value) => setRoleList(prev => prev.map(item => item.code === code ? { ...item, [field]: value } : item));
+  const updateRoleField = (code, field, value) => setCurrentRoleList(prev => prev.map(item => item.code === code ? { ...item, [field]: value } : item));
   const deleteRole = roleItem => {
     if (roleItem.builtIn === '是') { window.alert('系统内置角色不允许删除。'); return; }
-    if (window.confirm(`是否确认删除角色“${roleItem.name}”？`)) setRoleList(prev => prev.filter(item => item.code !== roleItem.code));
+    if (window.confirm(`是否确认删除角色“${roleItem.name}”？`)) setCurrentRoleList(prev => prev.filter(item => item.code !== roleItem.code));
   };
   if (configRole) return /*#__PURE__*/_jsx(RolePermissionConfig, { role: configRole, onBack: () => setConfigRole(null), onSaveScope: scope => { updateRoleField(configRole.code, 'dataScope', scope); setConfigRole(role => ({ ...role, dataScope: scope })); } });
   return /*#__PURE__*/_jsxs("section", {
@@ -7225,7 +7244,7 @@ function RolePermissionManager() {
       className: "flex items-center justify-between border-b border-slate-200 px-5 py-4",
       children: [/*#__PURE__*/_jsxs("div", {
         children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "角色列表" }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm text-slate-500", children: "查看系统角色并进入功能权限配置" })]
-      }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-4", children: [/*#__PURE__*/_jsxs("span", { className: "text-sm text-slate-500", children: ["共 ", roleList.length, " 个角色"] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: openNewRole, className: "rounded-lg bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low hover:bg-[#D86D00]", children: "+ 新增角色" })] })]
+      }), /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-center justify-end gap-3", children: [/*#__PURE__*/_jsx("div", { className: "rounded-xl bg-slate-100 p-1", children: ['投诉', '审查'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setRoleModuleTab(tab); setPage(1); }, className: `rounded-lg px-4 py-2 text-sm font-black transition ${roleModuleTab === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) }), /*#__PURE__*/_jsxs("span", { className: "text-sm text-slate-500", children: ["共 ", currentRoleList.length, " 个角色"] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: openNewRole, className: "rounded-lg bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low hover:bg-[#D86D00]", children: "+ 新增角色" })] })]
     }), /*#__PURE__*/_jsx("div", {
       className: "w-full",
       children: /*#__PURE__*/_jsxs("table", {
@@ -7239,13 +7258,13 @@ function RolePermissionManager() {
           })
         }), /*#__PURE__*/_jsx("tbody", {
           className: "divide-y divide-slate-100",
-          children: roleList.slice((page - 1) * pageSize, page * pageSize).map(roleItem => /*#__PURE__*/_jsxs("tr", {
+          children: currentRoleList.slice((page - 1) * pageSize, page * pageSize).map(roleItem => /*#__PURE__*/_jsxs("tr", {
             className: "hover:bg-mist/40",
-            children: [/*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold leading-5 text-ink", children: roleItem.name }), /*#__PURE__*/_jsx("td", { className: "break-all px-2 py-3 font-mono leading-5 text-slate-600", children: roleItem.code }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsx("span", { className: `inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${roleItem.status === '启用' ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`, children: roleItem.status }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold text-ink", children: roleItem.users }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 leading-5 text-slate-600", children: roleItem.positioning }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold text-slate-600", children: roleItem.dataScope }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsxs("button", { type: "button", disabled: roleItem.code === 'SUPER_ADMIN', onClick: () => toggleBuiltIn(roleItem.code), className: `flex items-center gap-1.5 ${roleItem.code === 'SUPER_ADMIN' ? 'cursor-not-allowed opacity-70' : ''}`, children: [/*#__PURE__*/_jsx("span", { className: `relative inline-flex h-5 w-9 rounded-full transition ${roleItem.code === 'SUPER_ADMIN' ? 'bg-slate-300' : roleItem.builtIn === '是' ? 'bg-green-500' : 'bg-slate-300'}`, children: /*#__PURE__*/_jsx("span", { className: `absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition ${roleItem.builtIn === '是' ? 'left-[18px]' : 'left-0.5'}` }) }), /*#__PURE__*/_jsx("span", { className: `font-bold ${roleItem.code === 'SUPER_ADMIN' ? 'text-slate-400' : roleItem.builtIn === '是' ? 'text-green-600' : 'text-slate-500'}`, children: roleItem.builtIn })] }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-3 whitespace-nowrap", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => setConfigRole(roleItem), className: "font-bold text-rizhao", children: "权限分配" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => window.alert(`角色“${roleItem.name}”已保存。`), className: "font-bold text-rizhao", children: "保存" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => toggleRoleStatus(roleItem.code), className: `font-bold ${roleItem.status === '启用' ? 'text-orange-600' : 'text-green-600'}`, children: roleItem.status === '启用' ? '停用' : '启用' }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => deleteRole(roleItem), className: `font-bold ${roleItem.builtIn === '是' ? 'text-slate-400' : 'text-red-500'}`, children: "删除角色" })] }) })]
+            children: [/*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold leading-5 text-ink", children: roleItem.name }), /*#__PURE__*/_jsx("td", { className: "break-all px-2 py-3 font-mono leading-5 text-slate-600", children: roleItem.code }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsx("span", { className: `inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${roleItem.status === '启用' ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}`, children: roleItem.status }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold text-ink", children: roleItem.users }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 leading-5 text-slate-600", children: roleItem.positioning }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3 font-bold text-slate-600", children: roleItem.dataScope }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsxs("button", { type: "button", disabled: roleItem.code === 'SUPER_ADMIN' || roleItem.code === 'REVIEW_SUPER_ADMIN', onClick: () => toggleBuiltIn(roleItem.code), className: `flex items-center gap-1.5 ${roleItem.code === 'SUPER_ADMIN' || roleItem.code === 'REVIEW_SUPER_ADMIN' ? 'cursor-not-allowed opacity-70' : ''}`, children: [/*#__PURE__*/_jsx("span", { className: `relative inline-flex h-5 w-9 rounded-full transition ${roleItem.code === 'SUPER_ADMIN' || roleItem.code === 'REVIEW_SUPER_ADMIN' ? 'bg-slate-300' : roleItem.builtIn === '是' ? 'bg-green-500' : 'bg-slate-300'}`, children: /*#__PURE__*/_jsx("span", { className: `absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition ${roleItem.builtIn === '是' ? 'left-[18px]' : 'left-0.5'}` }) }), /*#__PURE__*/_jsx("span", { className: `font-bold ${roleItem.code === 'SUPER_ADMIN' || roleItem.code === 'REVIEW_SUPER_ADMIN' ? 'text-slate-400' : roleItem.builtIn === '是' ? 'text-green-600' : 'text-slate-500'}`, children: roleItem.builtIn })] }) }), /*#__PURE__*/_jsx("td", { className: "px-2 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-3 whitespace-nowrap", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => setConfigRole(roleItem), className: "font-bold text-rizhao", children: "权限分配" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => window.alert(`角色“${roleItem.name}”已保存。`), className: "font-bold text-rizhao", children: "保存" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => toggleRoleStatus(roleItem.code), className: `font-bold ${roleItem.status === '启用' ? 'text-orange-600' : 'text-green-600'}`, children: roleItem.status === '启用' ? '停用' : '启用' }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => deleteRole(roleItem), className: `font-bold ${roleItem.builtIn === '是' ? 'text-slate-400' : 'text-red-500'}`, children: "删除角色" })] }) })]
           }, roleItem.code))
         })]
       })
-    }), /*#__PURE__*/_jsx(ListPagination, { total: roleList.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } }), newRole && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[680px] max-w-full rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsxs("div", { className: "flex items-start justify-between", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black text-ink", children: "新增角色" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: "创建后请进入权限分配，配置功能权限和默认数据范围。" })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setNewRole(null), className: "text-sm font-bold text-slate-400 hover:text-ink", children: "关闭" })] }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "* 角色名称", value: newRole.name, setValue: value => setNewRole(data => ({ ...data, name: value })), placeholder: "请输入角色名称" }), /*#__PURE__*/_jsx(Field, { label: "* 角色编码", value: newRole.code, setValue: value => setNewRole(data => ({ ...data, code: value })), placeholder: "例如：BRANCH_REVIEWER" }), /*#__PURE__*/_jsx(Field, { label: "初始状态", type: "select", options: ['启用', '停用'], value: newRole.status, setValue: value => setNewRole(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "角色定位", value: newRole.positioning, setValue: value => setNewRole(data => ({ ...data, positioning: value })), placeholder: "简要说明该角色的职责和使用范围", maxLength: 100 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => setNewRole(null), className: "rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-500", children: "取消" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: saveNewRole, className: "rounded-lg bg-rizhao px-6 py-2.5 text-sm font-black text-white", children: "保存角色" })] })] }) })]
+    }), /*#__PURE__*/_jsx(ListPagination, { total: currentRoleList.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } }), newRole && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[680px] max-w-full rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsxs("div", { className: "flex items-start justify-between", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black text-ink", children: "新增角色" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-sm text-slate-500", children: ["创建后请进入权限分配，配置", newRole.module || roleModuleTab, "模块权限和默认数据范围。"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setNewRole(null), className: "text-sm font-bold text-slate-400 hover:text-ink", children: "关闭" })] }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "* 角色标识", type: "select", options: ['投诉', '审查'], value: newRole.module, setValue: value => setNewRole(data => ({ ...data, module: value })) }), /*#__PURE__*/_jsx(Field, { label: "* 角色名称", value: newRole.name, setValue: value => setNewRole(data => ({ ...data, name: value })), placeholder: "请输入角色名称" }), /*#__PURE__*/_jsx(Field, { label: "* 角色编码", value: newRole.code, setValue: value => setNewRole(data => ({ ...data, code: value })), placeholder: "例如：BRANCH_REVIEWER" }), /*#__PURE__*/_jsx(Field, { label: "初始状态", type: "select", options: ['启用', '停用'], value: newRole.status, setValue: value => setNewRole(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "角色定位", value: newRole.positioning, setValue: value => setNewRole(data => ({ ...data, positioning: value })), placeholder: "简要说明该角色的职责和使用范围", maxLength: 100 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => setNewRole(null), className: "rounded-lg border border-slate-200 px-5 py-2.5 text-sm font-bold text-slate-500", children: "取消" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: saveNewRole, className: "rounded-lg bg-rizhao px-6 py-2.5 text-sm font-black text-white", children: "保存角色" })] })] }) })]
   });
   const [selectedRoleIdx, setSelectedRoleIdx] = useState(0);
   const [permTab, setPermTab] = useState('菜单权限');
@@ -7462,7 +7481,7 @@ function RolePermissionConfig({ role, onBack, onSaveScope }) {
       children: [/*#__PURE__*/_jsxs("div", { className: "mb-4 flex items-center justify-between", children: [/*#__PURE__*/_jsx("div", { className: "font-black text-ink", children: "功能权限" }), /*#__PURE__*/_jsxs("div", { className: "text-sm text-slate-500", children: ["已选择 ", selected.length, " / ", permissionItems.length, " 项"] })] }), /*#__PURE__*/_jsx(RolePermissionTree, { tree: permissionTree, selected: selected, setSelected: setSelected })]
     }), /*#__PURE__*/_jsxs("section", {
       className: "rounded-2xl border border-slate-200 bg-white p-5",
-      children: [/*#__PURE__*/_jsx("div", { className: "mb-3 font-black text-ink", children: "数据范围" }), /*#__PURE__*/_jsx(Field, { label: "默认数据范围", type: "select", options: ['全行', '本行及下辖', '本机构'], value: dataScope, setValue: setDataScope })]
+      children: [/*#__PURE__*/_jsx("div", { className: "mb-3 font-black text-ink", children: "数据范围" }), /*#__PURE__*/_jsx(Field, { label: "默认数据范围", type: "select", options: ['全行', '本行及下辖'], value: dataScope, setValue: setDataScope })]
     }), /*#__PURE__*/_jsxs("div", {
       className: "flex items-center justify-end gap-3",
       children: [saved && /*#__PURE__*/_jsx("span", { className: "text-sm font-bold text-green-600", children: "权限配置已保存" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onBack, className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "取消" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: savePermissions, disabled: selected.length === 0, className: "rounded-xl bg-rizhao px-6 py-2.5 text-sm font-black text-white shadow-mid disabled:cursor-not-allowed disabled:bg-slate-300", children: "保存权限配置" })]
@@ -7621,7 +7640,7 @@ function ButtonPermPanel({ perms, onChange }) {
 }
 
 function DataScopePanel({ scope, onChange }) {
-  const options = ['全行', '本行及下辖', '本部室', '本支行/网点'];
+  const options = ['全行', '本行及下辖'];
   return /*#__PURE__*/_jsx("div", {
     className: "space-y-3",
     children: options.map(opt => /*#__PURE__*/_jsx("label", {
