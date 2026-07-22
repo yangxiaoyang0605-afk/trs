@@ -1445,7 +1445,16 @@ function RzQuadrantChart({ title, note, data }) {
 function RzOverviewPage({ applied }) {
   const statusMax = Math.max(...rzOverviewStatusData.map(item => item.value), 1);
   const sourceMax = Math.max(...rzOverviewSourceData.map(item => item.value), 1);
+  const overviewProductTop5 = rzOverviewDistribution['产品'].slice(0, 5);
+  const overviewReasonTop5 = rzOverviewDistribution['原因'].slice(0, 5);
   const statusTone = item => item.tone === 'red' ? 'bg-rose-500' : item.tone === 'green' ? 'bg-emerald-500' : item.tone === 'blue' ? 'bg-blue-500' : item.tone === 'purple' ? 'bg-violet-500' : item.tone === 'orange' ? 'bg-rizhao' : 'bg-slate-400';
+  const renderOverviewRankCard = (title, note, data) => {
+    const max = Math.max(...data.map(item => item.value), 1);
+    return /*#__PURE__*/_jsxs("div", { className: "rounded-lg border border-slate-200 bg-white shadow-low", children: [
+      /*#__PURE__*/_jsxs("div", { className: "border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: note })] }),
+      /*#__PURE__*/_jsx("div", { className: "space-y-3 p-5", children: data.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[30px_116px_1fr_94px] items-center gap-3 text-xs", children: [/*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded font-black ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-700", children: item.name }), /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded bg-rizhao", style: { width: `${item.value / max * 100}%` } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-500", children: [item.value.toLocaleString(), "件 · ", item.rate] })] }, item.name)) })
+    ] });
+  };
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
     /*#__PURE__*/_jsx("section", { className: "grid grid-cols-5 gap-4", children: rzOverviewMetrics.map(card => /*#__PURE__*/_jsx(RzOverviewMetricCard, { card: card }, card.title)) }),
     /*#__PURE__*/_jsx(RzOverviewTrend, { applied: applied }),
@@ -1458,6 +1467,10 @@ function RzOverviewPage({ applied }) {
         /*#__PURE__*/_jsxs("div", { className: "border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "投诉来源分布" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: "展示不同来源进入系统的工单占比" })] }),
         /*#__PURE__*/_jsx("div", { className: "space-y-3 p-5", children: rzOverviewSourceData.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[30px_116px_1fr_86px] items-center gap-3 text-xs", children: [/*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded font-black ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-700", children: item.name }), /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded bg-rizhao", style: { width: `${item.value / sourceMax * 100}%` } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-500", children: [item.value, "件 · ", item.rate] })] }, item.name)) })
       ] })
+    ] }),
+    /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-[1fr_1fr] gap-5", children: [
+      renderOverviewRankCard("投诉产品排行 Top5", "展示当前范围内投诉集中的产品标签", overviewProductTop5),
+      renderOverviewRankCard("投诉原因排行 Top5", "展示当前范围内投诉集中的原因标签", overviewReasonTop5)
     ] })
   ] });
 }
