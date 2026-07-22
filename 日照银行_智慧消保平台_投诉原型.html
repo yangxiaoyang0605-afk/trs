@@ -2338,7 +2338,7 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [departments, setDepartments] = useState([
-    { id: 'org-main', orgName: '总行消保中心', type: '所属机构', isDefault: true, roleKey: 'org_admin', complaintRole: '机构管理员', reviewRole: '消保办管理员' },
+    { id: 'org-main', orgName: '总行消保中心', type: '所属机构', isDefault: true, roleKey: 'org_admin', complaintRole: '工单派发员', reviewRole: '' },
     { id: 'org-dg', orgName: '东港支行', type: '所属机构', isDefault: false, roleKey: 'complaint_handler', complaintRole: '投诉处理员', reviewRole: '' },
     { id: 'org-risk', orgName: '风险管理部', type: '借调机构', isDefault: false, roleKey: 'org_admin', complaintRole: '', reviewRole: '消保审查员' }
   ]);
@@ -7071,7 +7071,7 @@ function ParameterizedConfigManager() {
 
 // ─── 角色权限管理 ───────────────────────────────────────────
 const rolesData = [
-  { name: '机构管理员', code: 'ORG_ADMIN', count: 18, scope: '本机构及下辖机构', status: true,
+  { name: '工单派发员', code: 'ORG_ADMIN', count: 18, scope: '本机构', status: true,
     perms: {
       menus: {
         工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': true, '转办': true, '查看工单详情': true, '关单审核': true },
@@ -7082,10 +7082,10 @@ const rolesData = [
         后台管理: { '用户管理权限': false, '角色权限管理权限': false, '机构管理权限': false, '参数化配置权限': false }
       },
       buttons: {},
-      dataScope: '本行及下辖'
+      dataScope: '本机构'
     }
   },
-  { name: '投诉处理员', code: 'HANDLER', count: 280, scope: '按机构授权', status: true,
+  { name: '投诉处理员', code: 'HANDLER', count: 280, scope: '本机构', status: true,
     perms: {
       menus: {
         工单处理: { '查看本机构/下辖工单': true, '工单详情办理': true, '退回/转派': false, '转办': true, '查看工单详情': true, '关单审核': false },
@@ -7096,7 +7096,7 @@ const rolesData = [
         后台管理: { '用户管理权限': false, '角色权限管理权限': false, '机构管理权限': false, '参数化配置权限': false }
       },
       buttons: {},
-      dataScope: '本支行/网点'
+      dataScope: '本机构'
     }
   },
   { name: '超级管理员', code: 'SUPER_ADMIN', count: 2, scope: '全行', status: true,
@@ -7117,11 +7117,11 @@ const rolesData = [
 
 function UserRoleAssignmentManager() {
   const orgOptions = ['总行消保中心', '东港支行', '岚山支行', '五莲支行', '信用卡中心'];
-  const complaintRoles = ['投诉处理员', '机构管理员', '消保办管理员'];
-  const reviewRoles = ['消保审查员', '消保办管理员'];
+  const complaintRoles = ['投诉处理员', '工单派发员'];
+  const reviewRoles = ['消保审查员'];
   const [rows, setRows] = useState([
     { id: 1, name: '张经理', workNo: '100023', org: '东港支行', complaintRole: '投诉处理员', reviewRole: '' },
-    { id: 2, name: '王主管', workNo: '100086', org: '总行消保中心', complaintRole: '消保办管理员', reviewRole: '消保办管理员' },
+    { id: 2, name: '王主管', workNo: '100086', org: '总行消保中心', complaintRole: '工单派发员', reviewRole: '' },
     { id: 3, name: '李审核', workNo: '100117', org: '信用卡中心', complaintRole: '', reviewRole: '消保审查员' }
   ]);
   const [page, setPage] = useState(1);
@@ -7186,13 +7186,9 @@ function RolePermissionManager() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
   const [roleList, setRoleList] = useState([{
-    name: '消保办管理员', code: 'CONSUMER_ADMIN', status: '启用', users: 6,
-    positioning: '负责全行投诉统筹、工单审核及权限管理',
-    dataScope: '全行', builtIn: '是'
-  }, {
-    name: '机构管理员', code: 'ORG_ADMIN', status: '启用', users: 18,
-    positioning: '负责本机构及下辖机构工单分配与管理',
-    dataScope: '本行及下辖', builtIn: '是'
+    name: '工单派发员', code: 'ORG_ADMIN', status: '启用', users: 18,
+    positioning: '负责工单录入、派发和审核',
+    dataScope: '本机构', builtIn: '是'
   }, {
     name: '投诉处理员', code: 'COMPLAINT_HANDLER', status: '启用', users: 280,
     positioning: '负责投诉工单办理、客户联系及结果反馈',
@@ -7446,10 +7442,10 @@ function RolePermissionConfig({ role, onBack, onSaveScope }) {
       { key: 'paramConfig', name: '参数化配置权限' }
     ]
   }];
-  const defaultPermissions = role.code === 'SUPER_ADMIN' || role.code === 'CONSUMER_ADMIN'
+  const defaultPermissions = role.code === 'SUPER_ADMIN'
     ? permissionItems.map(item => item.key)
     : role.code === 'ORG_ADMIN'
-      ? ['view', 'process', 'closeAudit', 'ledgerQuery', 'ledgerExport', 'orgManage']
+      ? ['entry', 'view', 'process', 'closeAudit', 'ledgerQuery', 'ledgerExport']
       : ['entry', 'view', 'process', 'ledgerQuery'];
   const [selected, setSelected] = useState(defaultPermissions);
   const [dataScope, setDataScope] = useState(role.dataScope);
@@ -7646,19 +7642,19 @@ function DataScopePanel({ scope, onChange }) {
 
 // ─── 用户管理 ─────────────────────────────────────────────
 const userListData = [
-  { empId: '100001', name: '赵一明', gender: '男', phone: '13800001001', idType: '居民身份证', idNumber: '110101********1234', personType: '正式员工', personStatus: '在职', position: '消保主管', orgCode: ['ZBXB001'], orgName: ['总行消保中心'], deptCode: [], deptName: [], roles: ['机构管理员', '超级管理员'], workStatus: '在岗' },
+  { empId: '100001', name: '赵一明', gender: '男', phone: '13800001001', idType: '居民身份证', idNumber: '110101********1234', personType: '正式员工', personStatus: '在职', position: '消保主管', orgCode: ['ZBXB001'], orgName: ['总行消保中心'], deptCode: [], deptName: [], roles: ['工单派发员', '超级管理员'], workStatus: '在岗' },
   { empId: '100002', name: '钱立新', gender: '男', phone: '13800001002', idType: '居民身份证', idNumber: '110101********1235', personType: '正式员工', personStatus: '在职', position: '消保专员', orgCode: ['YH001'], orgName: ['银河中支'], deptCode: [], deptName: [], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100003', name: '孙海燕', gender: '女', phone: '13800001003', idType: '居民身份证', idNumber: '110101********1236', personType: '正式员工', personStatus: '在职', position: '消保专员', orgCode: ['SHT001'], orgName: ['山海天支行'], deptCode: [], deptName: [], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100004', name: '李国华', gender: '男', phone: '13800001004', idType: '居民身份证', idNumber: '110101********1237', personType: '正式员工', personStatus: '在职', position: '消保专员', orgCode: ['KFQ001'], orgName: ['开发区中支'], deptCode: [], deptName: [], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100005', name: '周晓东', gender: '男', phone: '13800001005', idType: '居民身份证', idNumber: '110101********1238', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['RL001'], deptName: ['人力资源部'], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100006', name: '吴晓婷', gender: '女', phone: '13800001006', idType: '居民身份证', idNumber: '110101********1239', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['FG001'], deptName: ['发展规划部'], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100007', name: '郑文博', gender: '男', phone: '13800001007', idType: '居民身份证', idNumber: '110101********1240', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['LS001'], deptName: ['零售金融部'], roles: ['投诉处理员'], workStatus: '在岗' },
-  { empId: '100008', name: '王丽萍', gender: '女', phone: '13800001008', idType: '居民身份证', idNumber: '110101********1241', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['GS001'], deptName: ['银河中支公司部'], roles: ['投诉处理员', '机构管理员'], workStatus: '在岗' },
+  { empId: '100008', name: '王丽萍', gender: '女', phone: '13800001008', idType: '居民身份证', idNumber: '110101********1241', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['GS001'], deptName: ['银河中支公司部'], roles: ['投诉处理员', '工单派发员'], workStatus: '在岗' },
   { empId: '100009', name: '冯志强', gender: '男', phone: '13800001009', idType: '居民身份证', idNumber: '110101********1242', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['FX001'], deptName: ['银河中支风险部'], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100010', name: '陈嘉欣', gender: '女', phone: '13800001010', idType: '居民身份证', idNumber: '110101********1243', personType: '派遣员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['GK001'], deptName: ['日照港口支行'], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100011', name: '褚卫东', gender: '男', phone: '13800001011', idType: '居民身份证', idNumber: '110101********1244', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001', 'QD001'], orgName: ['日照银行', '青岛分行'], deptCode: ['YY001'], deptName: ['银河中支营业部'], roles: ['投诉处理员', '超级管理员'], workStatus: '在岗' },
   { empId: '100012', name: '卫兰', gender: '女', phone: '13800001012', idType: '居民身份证', idNumber: '110101********1245', personType: '派遣员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['HH001'], deptName: ['黄海一路网点'], roles: ['投诉处理员'], workStatus: '在岗' },
-  { empId: '100013', name: '蒋明辉', gender: '男', phone: '13800001013', idType: '居民身份证', idNumber: '110101********1246', personType: '正式员工', personStatus: '在职', position: '机构管理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['QD001'], deptName: ['青岛分行'], roles: ['机构管理员'], workStatus: '在岗' },
+  { empId: '100013', name: '蒋明辉', gender: '男', phone: '13800001013', idType: '居民身份证', idNumber: '110101********1246', personType: '正式员工', personStatus: '在职', position: '工单派发员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['QD001'], deptName: ['青岛分行'], roles: ['工单派发员'], workStatus: '在岗' },
   { empId: '100014', name: '沈雅琴', gender: '女', phone: '13800001014', idType: '居民身份证', idNumber: '110101********1247', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['KJ001'], deptName: ['总行科技部'], roles: ['投诉处理员'], workStatus: '暂停接单' },
   { empId: '100015', name: '韩磊', gender: '男', phone: '13800001015', idType: '居民身份证', idNumber: '110101********1248', personType: '正式员工', personStatus: '停用', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['DG001'], deptName: ['东港支行'], roles: ['投诉处理员'], workStatus: '暂停接单' }
 ];
@@ -7667,19 +7663,18 @@ function UserManager() {
   var $ = React.createElement;
   var orgOptions = ['日照银行', '总行消保中心', '银河中支', '山海天支行', '开发区中支', '东港支行', '岚山支行', '五莲支行', '开发区支行', '青岛分行', '信用卡中心', '风险管理部'];
   var orgCodeMap = { '日照银行': 'RZ001', '总行消保中心': 'ZBXB001', '银河中支': 'YH001', '山海天支行': 'SHT001', '开发区中支': 'KFQ001', '东港支行': 'DG001', '岚山支行': 'LS001', '五莲支行': 'WL001', '开发区支行': 'KFQ002', '青岛分行': 'QD001', '信用卡中心': 'XYK001', '风险管理部': 'FK001' };
-  var complaintRoleOptions = ['投诉处理员', '机构管理员', '消保办管理员'];
-  var reviewRoleOptions = ['消保审查员', '消保办管理员'];
+  var complaintRoleOptions = ['投诉处理员', '工单派发员'];
+  var reviewRoleOptions = ['消保审查员'];
   var orgQueryOptions = orgOptions.map(function(name) { return { id: orgCodeMap[name], name: name }; });
   var roleQueryOptions = [
     { id: 'COMPLAINT_HANDLER', name: '投诉处理员' },
-    { id: 'ORG_ADMIN', name: '机构管理员' },
-    { id: 'CONSUMER_ADMIN', name: '消保办管理员' },
+    { id: 'ORG_ADMIN', name: '工单派发员' },
     { id: 'SUPER_ADMIN', name: '超级管理员' },
     { id: 'REVIEWER', name: '消保审查员' }
   ];
   var roleQueryMap = roleQueryOptions.reduce(function(map, item) { map[item.id] = item.name; return map; }, {});
   function getComplaintRole(u) {
-    return (u.complaintRole !== undefined ? u.complaintRole : (u.roles || []).find(function(r) { return ['投诉处理员', '机构管理员', '消保办管理员'].indexOf(r) >= 0; }) || '');
+    return (u.complaintRole !== undefined ? u.complaintRole : (u.roles || []).find(function(r) { return ['投诉处理员', '工单派发员'].indexOf(r) >= 0; }) || '');
   }
   function getReviewRole(u) {
     return (u.reviewRole !== undefined ? u.reviewRole : (u.roles || []).find(function(r) { return r === '消保审查员'; }) || '');
