@@ -7813,7 +7813,7 @@ function UserManager() {
     ]}),
     $("div", { className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white", children: [
       $("table", { className: "w-full text-left text-sm", children: [
-        $("thead", { children: $("tr", { className: "border-b border-slate-200 bg-mist/60", children: ['员工号','姓名','性别','手机号','证件类型','证件号','人员类型','人员状态','职务','机构编号','机构名称','投诉系统角色','状态','操作'].map(function(h) { return $("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }); }) })}),
+        $("thead", { children: $("tr", { className: "border-b border-slate-200 bg-mist/60", children: ['员工号','姓名','性别','手机号','证件类型','证件号','人员类型','人员状态','职务','机构编号','机构名称','投诉系统角色','操作'].map(function(h) { return $("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }); }) })}),
         $("tbody", { children: visibleUsers.map(function(u, i) {
           return $("tr", { key: i, className: "border-b border-slate-100 hover:bg-mist/40", children: [
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: u.empId }),
@@ -7828,7 +7828,6 @@ function UserManager() {
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: $("div", { className: "flex flex-wrap gap-1", children: u.orgCode.map(function(c, j) { return $("span", { key: j, className: "rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700", children: c }); }) }) }),
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: $("div", { className: "flex flex-wrap gap-1", children: u.orgName.map(function(n, j) { return $("span", { key: j, className: "text-sm text-slate-700", children: n }); }) }) }),
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: $("div", { className: "flex flex-wrap gap-1", children: u.roles.map(function(r, j) { return $("span", { key: j, className: "rounded-full bg-mist px-2 py-0.5 text-xs font-bold text-rizhao", children: r }); }) }) }),
-            $("td", { className: "px-4 py-3 whitespace-nowrap", children: badge(u.workStatus === '在岗' ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-600', u.workStatus) }),
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: $("button", { type: "button", className: "font-black text-rizhao", onClick: function() { setEditUser({ ...u, deptAssignments: buildAssignments(u).map(function(item) { return { ...item }; }) }); }, children: "编辑" }) })
             ]});
           }) })
