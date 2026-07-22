@@ -1888,7 +1888,7 @@ function RzProductRectification({ selectedProduct }) {
   ] });
 }
 
-const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '原因标签报表', '产品标签报表', '工单处理统计报表', '未办结工单报表'];
+const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '原因标签报表', '产品标签报表', '满意情况报表', '工单处理统计报表', '未办结工单报表'];
 const workOrderReportRows = [
   { institution: '东港支行', customers: '12.8万', outlets: 18, previous: 79, total: 86, accepted: 92, valid: 86, invalid: 6, regulatory: 11, repeat: 5, pending: 2, processing: 5, supplement: 1, completed: 78, returned: 5, completionRate: '90.7%', avgDuration: '1.6天', timely: 74, overdue: 4, timelyRate: '94.9%', longest: '4.2天', topProduct: '个人贷款 28件', topReason: '收费争议 19件', abnormal: 2, evaluated: 72, satisfied: 61, basic: 8, dissatisfied: 3, satisfactionRate: '95.8%', agreementRate: '93.0%', due24h: 2, avgAge: '1.4天' },
   { institution: '信用卡中心', customers: '9.6万', outlets: 1, previous: 68, total: 74, accepted: 81, valid: 74, invalid: 7, regulatory: 13, repeat: 8, pending: 2, processing: 3, supplement: 0, completed: 69, returned: 4, completionRate: '93.2%', avgDuration: '1.4天', timely: 65, overdue: 4, timelyRate: '94.2%', longest: '3.8天', topProduct: '信用卡 74件', topReason: '规则告知 22件', abnormal: 3, evaluated: 65, satisfied: 56, basic: 7, dissatisfied: 2, satisfactionRate: '96.9%', agreementRate: '94.6%', due24h: 1, avgAge: '1.1天' },
@@ -1902,6 +1902,7 @@ const workOrderReportConfigs = {
   '处理时效明细表': { columns: [['institution','机构名称'],['completed','办结工单量'],['avgDuration','平均处理时长'],['timely','按时办结量'],['overdue','超时办结量'],['timelyRate','按时办结率'],['longest','最长处理时长']] },
   '原因标签报表': { columns: [['institution','机构名称'],['topReason','高频原因标签'],['total','标签工单量'],['pending','待处理'],['processing','处理中'],['overdue','逾期工单量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
   '产品标签报表': { columns: [['institution','机构名称'],['topProduct','高频产品标签'],['total','标签工单量'],['pending','待处理'],['processing','处理中'],['overdue','逾期工单量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
+  '满意情况报表': { columns: [['institution','机构名称'],['evaluated','已评价量'],['satisfied','满意'],['basic','基本满意'],['dissatisfied','不满意'],['satisfactionRate','满意率'],['agreementRate','达成一致率']] },
   '工单处理统计报表': { columns: [['institution','机构名称'],['customers','客户数'],['outlets','网点数'],['accepted','受理投诉量'],['valid','有效投诉量'],['invalid','无效投诉量'],['regulatory','监管投诉量'],['repeat','重复投诉量'],['completionRate','办结率']] },
   '未办结工单报表': { columns: [['institution','机构名称'],['pending','待处理'],['processing','处理中'],['supplement','待补充'],['overdue','已逾期'],['due24h','24小时内到期'],['avgAge','未办结工单平均耗时']] }
 };
@@ -1918,6 +1919,7 @@ const processingDetailConfigs = {
   '处理时效明细表': [['id','工单编号'],['source','投诉来源'],['accepted','受理时间'],['created','工单创建时间'],['limit','处理时限'],['status','工单状态'],['branch','所在分行'],['institution','被投诉机构']],
   '原因标签报表': [['id','工单编号'],['source','投诉来源'],['accepted','受理时间'],['created','工单创建时间'],['reason','投诉原因标签'],['product','产品标签'],['status','工单状态'],['institution','被投诉机构']],
   '产品标签报表': [['id','工单编号'],['source','投诉来源'],['accepted','受理时间'],['created','工单创建时间'],['product','产品标签'],['reason','投诉原因标签'],['status','工单状态'],['institution','被投诉机构']],
+  '满意情况报表': [['id','工单编号'],['institution','被投诉机构'],['source','投诉来源'],['handlerOrg','处理机构'],['dueDate','回访日期'],['satisfaction','满意情况'],['status','工单状态']],
   '工单处理统计报表': [['id','工单编号'],['source','投诉来源'],['created','工单创建时间'],['branch','所在分行'],['department','涉及部门'],['institution','被投诉机构'],['status','工单状态']],
   '未办结工单报表': [['id','工单编号'],['created','工单创建时间'],['dueDate','应回复日期'],['source','受理来源'],['type','工单类型'],['handlerOrg','当前处理人机构'],['institution','被投诉机构']]
 };
@@ -1937,7 +1939,7 @@ function ListPagination({ total, page, pageSize, onPageChange, onPageSizeChange,
 }
 
 function WorkOrderProcessingReport() {
-  const initialFilter = { org: '全部机构', start: '2026-07-01', end: '2026-07-15', source: '全部来源', product: '全部产品', reason: '全部原因', workOrderNo: '' };
+  const initialFilter = { org: '全部机构', start: '2026-07-01', end: '2026-07-15', source: '全部来源', product: '全部产品', reason: '全部原因', workOrderNo: '', satisfaction: '全部评价' };
   const [activeReport, setActiveReport] = useState(workOrderReportTabs[0]);
   const [statisticType, setStatisticType] = useState(workOrderStatisticTypes[0]);
   const [draft, setDraft] = useState(initialFilter);
@@ -1951,6 +1953,7 @@ function WorkOrderProcessingReport() {
     (!['处理状态明细表','产品标签报表'].includes(activeReport) || applied.product === '全部产品' || row.product === applied.product) &&
     (activeReport !== '原因标签报表' || applied.reason === '全部原因' || row.reason === applied.reason) &&
     (!applied.workOrderNo || row.id.includes(applied.workOrderNo)) &&
+    (activeReport !== '满意情况报表' || applied.satisfaction === '全部评价' || row.satisfaction === applied.satisfaction) &&
     (activeReport !== '未办结工单报表' || !['已办结','已关单'].includes(row.status))
   );
   const totalComplaints = rows.reduce((sum, row) => sum + row.total, 0);
@@ -1970,6 +1973,7 @@ function WorkOrderProcessingReport() {
         ['处理状态明细表','工单处理统计报表'].includes(activeReport) && /*#__PURE__*/_jsxs("label", { className: "w-[180px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "投诉来源" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.source, onChange: e => setDraft({ ...draft, source: e.target.value }), children: ['全部来源','网点现场投诉','监管转办投诉','客服热线投诉'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
         ['处理状态明细表','产品标签报表'].includes(activeReport) && /*#__PURE__*/_jsxs("label", { className: "w-[170px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "产品标签" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.product, onChange: e => setDraft({ ...draft, product: e.target.value }), children: ['全部产品','个人贷款','信用卡','支付结算','理财产品','借记卡'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
         activeReport === '原因标签报表' && /*#__PURE__*/_jsxs("label", { className: "w-[190px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "原因标签" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.reason, onChange: e => setDraft({ ...draft, reason: e.target.value }), children: ['全部原因','提前还款争议','年费告知争议','到账时效争议','风险揭示不足','服务态度'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
+        activeReport === '满意情况报表' && /*#__PURE__*/_jsxs("label", { className: "w-[170px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "满意情况" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.satisfaction, onChange: e => setDraft({ ...draft, satisfaction: e.target.value }), children: ['全部评价','满意','基本满意','不满意','待评价','待回访'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
         /*#__PURE__*/_jsxs("div", { className: "flex gap-2", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setDraft(initialFilter); setApplied(initialFilter); }, className: "h-11 rounded-lg border border-slate-200 px-4 text-xs font-black text-slate-500 hover:bg-slate-50", children: "重置" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setApplied(draft), className: "h-11 rounded-lg bg-rizhao px-5 text-xs font-black text-white hover:bg-[#D86D00]", children: "查询" })] })
       ] }),
       /*#__PURE__*/_jsxs("div", { className: "mt-3 flex justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: [/*#__PURE__*/_jsxs("span", { children: ["统计范围：", applied.org, "｜", applied.start, " 至 ", applied.end, "；上方为机构统计，下方为关联工单"] }), /*#__PURE__*/_jsx("span", { children: "数据更新时间：2026-07-15 12:00" })] })
@@ -2631,30 +2635,40 @@ function ProcessingWorkspace({
     handler: ['赵专员', '陈专员', '刘专员'][index % 3],
     content: '下辖机构工单。'
   }));
-  const dispatcherTodoRows = myPendingAssignRows.concat(adminMyRows);
-  const dispatcherSameOrgRows = orgSameOrgRows.concat(adminSameOrgRows).slice(0, 10);
-  const dispatcherChildOrgRows = orgChildOrgRows.concat(adminChildOrgRows).slice(0, 10);
+  const markRows = (rows, marker) => rows.map((row, index) => ({ ...row, ...marker(row, index) }));
+  const currentOperator = role === 'org_admin' ? '王主管' : '张经理';
+  const myTodoRows = role === 'org_admin'
+    ? markRows(myPendingAssignRows.concat(adminMyRows), () => ({ owner: true, handler: currentOperator }))
+    : markRows(myRows, () => ({ owner: true, handler: currentOperator }));
+  const allWorkRows = role === 'org_admin'
+    ? markRows(
+        myPendingAssignRows.concat(adminMyRows, orgSameOrgRows, orgChildOrgRows, adminSameOrgRows, adminChildOrgRows),
+        (row, index) => ({
+          owner: row.status === '待分配' ? index % 2 === 0 : row.handler === currentOperator || row.no === 'TS202607020003' || row.no === 'TS202607020008',
+          handler: row.status === '待分配' ? (index % 2 === 0 ? currentOperator : '李主管') : row.handler
+        })
+      )
+    : markRows(
+        myRows.concat(sameOrgRows, childOrgRows),
+        row => ({ owner: row.handler === currentOperator, handler: row.handler || currentOperator })
+      );
+  const dispatcherTodoRows = myTodoRows;
+  const dispatcherSameOrgRows = allWorkRows;
+  const dispatcherChildOrgRows = [];
   const groups = role === 'org_admin' ? [{
-    name: '我的待办', count: dispatcherTodoRows.length, note: '派发 / 审核 / 收回', rows: dispatcherTodoRows
+    name: '我的待办', count: dispatcherTodoRows.length, note: '本人负责待处理', rows: dispatcherTodoRows
   }, {
-    name: '本机构工单', count: dispatcherSameOrgRows.length, note: '本机构全部工单', rows: dispatcherSameOrgRows
-  }, {
-    name: '下辖机构工单', count: dispatcherChildOrgRows.length, note: '下辖机构工单', rows: dispatcherChildOrgRows
+    name: '全部工单', count: dispatcherSameOrgRows.length, note: '可查看全部，仅本人负责可操作', rows: dispatcherSameOrgRows
   }] : [{
     name: '我的待办',
-    count: 3,
+    count: myTodoRows.length,
     note: '需本人处理',
-    rows: myRows
+    rows: myTodoRows
   }, {
-    name: '本机构工单',
-    count: 10,
-    note: '本机构全部处理中工单',
-    rows: sameOrgRows
-  }, {
-    name: '下辖机构工单',
-    count: 10,
-    note: '下辖机构处理中工单',
-    rows: childOrgRows
+    name: '全部工单',
+    count: allWorkRows.length,
+    note: '可查看全部，仅本人负责可操作',
+    rows: allWorkRows
   }];
   const effectiveGroups = groups.map(item => item.name === '我的待办' ? {
     ...item,
@@ -2688,6 +2702,7 @@ function ProcessingWorkspace({
       setPendingMessageWorkOrder && setPendingMessageWorkOrder(null);
     }
   }, [pendingMessageWorkOrder]);
+  const canOperateRow = row => row.owner || row.handler === currentOperator;
   if (detailRow) {
     return /*#__PURE__*/_jsxs("div", {
       className: "space-y-5",
@@ -2709,7 +2724,7 @@ function ProcessingWorkspace({
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
     children: [/*#__PURE__*/_jsx("div", {
-      className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
+      className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
       children: effectiveGroups.map(item => /*#__PURE__*/_jsxs("button", {
         type: "button",
         onClick: () => switchScope(item.name),
@@ -2772,7 +2787,9 @@ function ProcessingWorkspace({
             })
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
-            children: visibleRows.map(row => /*#__PURE__*/_jsxs("tr", {
+            children: visibleRows.map(row => {
+              const canOperate = canOperateRow(row);
+              return /*#__PURE__*/_jsxs("tr", {
               className: `hover:bg-mist/50 ${row.status !== '已办结' && row.remain?.includes('已超期') ? 'rz-overdue-row' : ''}`,
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
@@ -2820,15 +2837,15 @@ function ProcessingWorkspace({
                     onClick: () => { setDetailMode('view'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "查看"
-                  }), row.status === '待分配' ? /*#__PURE__*/_jsx("button", {
+                  }), canOperate && row.status === '待分配' ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setDispatchRow(row),
                     className: "font-bold text-rizhao",
                     children: "派发"
-                  }) : (row.status === '待审核' || row.status === '审核中') ? /*#__PURE__*/_jsx("button", {
+                  }) : canOperate && (row.status === '待审核' || row.status === '审核中') ? /*#__PURE__*/_jsx("button", {
                     onClick: () => { setDetailMode('process'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "审核"
-                  }) : /*#__PURE__*/_jsx("span", {}), scope === '下辖机构工单' ? /*#__PURE__*/_jsx("button", {
+                  }) : /*#__PURE__*/_jsx("span", {}), canOperate && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
                     onClick: () => setRecallRow(row),
                     className: "font-bold text-orange-500",
                     children: "收回"
@@ -2839,14 +2856,19 @@ function ProcessingWorkspace({
                     onClick: () => { setDetailMode('view'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "查看"
-                  }), (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
+                  }), canOperate && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
                     onClick: () => { setDetailMode('process'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "处理"
-                  }) : /*#__PURE__*/_jsx("span", {}), /*#__PURE__*/_jsx("span", {})]
+                  }) : /*#__PURE__*/_jsx("span", {}), canOperate && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
+                    onClick: () => setRecallRow(row),
+                    className: "font-bold text-orange-500",
+                    children: "申请收回"
+                  }) : /*#__PURE__*/_jsx("span", {})]
                 })
               })]
-            }, row.no))
+            }, row.no);
+            })
           })]
         })
       }), /*#__PURE__*/_jsxs("div", {
@@ -2958,6 +2980,7 @@ function ProcessingDetail({
   const isAdminOffice = role === 'admin_office';
   const isOrgAdmin = role === 'org_admin';
   const isComplaintHandler = role === 'complaint_handler';
+  const isViewMode = mode === 'view';
   const isReadOnly = mode === 'view' || isAdminOffice || isOrgAdmin;
   const [processResult, setProcessResult] = useState('');
   const [processConclusion, setProcessConclusion] = useState('');
@@ -3222,7 +3245,7 @@ function ProcessingDetail({
       })]
     }), /*#__PURE__*/_jsx(FlowRecordSection, {
       records: buildExampleFlowRecords(row)
-    }), (isAdminOffice || isOrgAdmin) && (row.status === '待审核' || row.status === '审核中') ? /*#__PURE__*/_jsxs("div", {
+    }), !isViewMode && (isAdminOffice || isOrgAdmin) && (row.status === '待审核' || row.status === '审核中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap justify-end gap-3",
       children: [/*#__PURE__*/_jsx("button", {
         onClick: () => setShowRejectModal(true),
@@ -3233,21 +3256,21 @@ function ProcessingDetail({
         className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
         children: "审核通过并关单"
       })]
-    }) : isOrgAdmin && row.status === '待分配' ? /*#__PURE__*/_jsxs("div", {
+    }) : !isViewMode && isOrgAdmin && row.status === '待分配' ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap justify-end gap-3",
       children: [/*#__PURE__*/_jsx("button", {
         onClick: () => setShowOrgAssignModal(true),
         className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
         children: "派发"
       })]
-    }) : isOrgAdmin && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
+    }) : !isViewMode && isOrgAdmin && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap justify-end gap-3",
       children: [row.status === '待处理' ? /*#__PURE__*/_jsx("button", {
         onClick: () => setShowOrgRecallModal(true),
         className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
         children: "收回"
       }) : null]
-    }) : isComplaintHandler && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
+    }) : !isViewMode && isComplaintHandler && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap items-center justify-end gap-3",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap gap-3",
@@ -3765,10 +3788,9 @@ function TransferModal({ currentHandler, onClose, onSave, row }) {
 function DispatchModal({ row, onClose, onSave }) {
   const orgs = ['东港支行', '岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心'];
   const handlers = ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'];
-  const [targetType, setTargetType] = useState('');
   const [targetOrg, setTargetOrg] = useState('');
   const [targetHandler, setTargetHandler] = useState('');
-  const canSave = targetType && (targetType === '本机构人员' ? targetHandler : targetOrg);
+  const canSave = targetOrg && targetHandler;
   return /*#__PURE__*/_jsxs("div", {
     className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
     children: [/*#__PURE__*/_jsxs("div", {
@@ -3799,25 +3821,13 @@ function DispatchModal({ row, onClose, onSave }) {
           value: row.org,
           disabled: true
         }), /*#__PURE__*/_jsx(Field, {
-          label: "* 派发对象类型",
+          label: "* 派发机构",
           type: "select",
-          options: ['本机构人员', '下辖机构', '下辖机构人员'],
-          value: targetType,
-          setValue: v => { setTargetType(v); setTargetOrg(''); setTargetHandler(''); }
-        }), targetType === '本机构人员' && /*#__PURE__*/_jsx(Field, {
-          label: "* 选择处理员",
-          type: "select",
-          options: handlers,
-          value: targetHandler,
-          setValue: setTargetHandler
-        }), (targetType === '下辖机构' || targetType === '下辖机构人员') && /*#__PURE__*/_jsx(Field, {
-          label: "* 选择下辖机构",
-          type: "select",
-          options: orgs.filter(o => o !== row.org),
+          options: orgs,
           value: targetOrg,
           setValue: setTargetOrg
-        }), targetType === '下辖机构人员' && targetOrg && /*#__PURE__*/_jsx(Field, {
-          label: "* 选择处理员",
+        }), /*#__PURE__*/_jsx(Field, {
+          label: "* 负责人",
           type: "select",
           options: handlers,
           value: targetHandler,
