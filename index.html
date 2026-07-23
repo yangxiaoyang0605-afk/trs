@@ -898,7 +898,7 @@ const rzAnalyticsOrgOptions = ['全行', '总行消保中心', '东港支行', '
 const rzAnalyticsMetricSets = {
   '投诉总览': [
     { label: '工单总量', value: 168, unit: '件', sub: '按工单编号去重', tone: 'orange' },
-    { label: '未办结工单', value: 23, unit: '件', sub: '待处理/处理中/待审核', tone: 'blue' },
+    { label: '未办结工单', value: 23, unit: '件', sub: '待处理/处理中/待审核/审核中', tone: 'blue' },
     { label: '逾期或即将到期', value: 7, unit: '件', sub: '逾期 3 件，24小时内到期 4 件', tone: 'red' },
     { label: '已办结工单', value: 98, unit: '件', sub: '办结率 78.0%', tone: 'green' }
   ],
@@ -1064,7 +1064,7 @@ const rzReasonDetailRows = [
 ];
 const rzOverviewMetrics = [
   { title: '工单总量', note: '按工单编号去重', value: '168', unit: '件', icon: '□', tone: 'orange', items: [{ label: '客服工单', value: '72 件' }, { label: '自建工单', value: '96 件' }] },
-  { title: '未办结工单', note: '当前仍在流程中', value: '23', unit: '件', icon: '…', tone: 'blue', items: [{ label: '处理中', value: '11 件' }, { label: '待审核', value: '6 件' }] },
+  { title: '未办结工单', note: '当前仍在流程中', value: '23', unit: '件', icon: '…', tone: 'blue', items: [{ label: '处理中', value: '11 件' }, { label: '待审核/审核中', value: '6 件' }] },
   { title: '逾期或即将到期', note: '处理时限预警', value: '7', unit: '件', icon: '!', tone: 'red', items: [{ label: '已逾期', value: '3 件' }, { label: '24小时内到期', value: '4 件' }] },
   { title: '已办结工单', note: '完成处理闭环', value: '98', unit: '件', icon: '✓', tone: 'green', items: [{ label: '办结率', value: '78.0%' }, { label: '按时办结', value: '91 件' }] },
   { title: '满意情况', note: '回访评价结果', value: '94.6', unit: '%', icon: '★', tone: 'green', items: [{ label: '满意/基本满意', value: '88 件' }, { label: '不满意', value: '5 件' }] }
@@ -1082,7 +1082,8 @@ const rzOverviewTrendSets = {
 const rzOverviewStatusData = [
   { name: '待处理', value: 8, rate: '4.8%', tone: 'orange' },
   { name: '处理中', value: 11, rate: '6.5%', tone: 'blue' },
-  { name: '待审核', value: 10, rate: '6.0%', tone: 'purple' },
+  { name: '待审核', value: 6, rate: '3.6%', tone: 'purple' },
+  { name: '审核中', value: 4, rate: '2.4%', tone: 'blue' },
   { name: '已办结', value: 139, rate: '82.7%', tone: 'green' }
 ];
 const rzOverviewSourceData = [
@@ -1888,12 +1889,12 @@ function RzProductRectification({ selectedProduct }) {
 
 const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '原因标签报表', '产品标签报表', '满意情况报表', '工单处理统计报表'];
 const workOrderReportRows = [
-  { institution: '东港支行', customers: '12.8万', outlets: 18, previous: 79, total: 86, accepted: 92, valid: 86, invalid: 6, regulatory: 11, repeat: 5, pending: 2, processing: 5, supplement: 1, completed: 78, returned: 5, completionRate: '90.7%', avgDuration: '1.6天', timely: 74, overdue: 4, timelyRate: '94.9%', longest: '4.2天', topProduct: '个人贷款 28件', topReason: '收费争议 19件', abnormal: 2, evaluated: 72, satisfied: 61, basic: 8, dissatisfied: 3, satisfactionRate: '95.8%', agreementRate: '93.0%', due24h: 2, avgAge: '1.4天' },
-  { institution: '信用卡中心', customers: '9.6万', outlets: 1, previous: 68, total: 74, accepted: 81, valid: 74, invalid: 7, regulatory: 13, repeat: 8, pending: 2, processing: 3, supplement: 0, completed: 69, returned: 4, completionRate: '93.2%', avgDuration: '1.4天', timely: 65, overdue: 4, timelyRate: '94.2%', longest: '3.8天', topProduct: '信用卡 74件', topReason: '规则告知 22件', abnormal: 3, evaluated: 65, satisfied: 56, basic: 7, dissatisfied: 2, satisfactionRate: '96.9%', agreementRate: '94.6%', due24h: 1, avgAge: '1.1天' },
-  { institution: '青岛分行', customers: '8.9万', outlets: 12, previous: 62, total: 68, accepted: 73, valid: 68, invalid: 5, regulatory: 8, repeat: 4, pending: 4, processing: 3, supplement: 0, completed: 61, returned: 3, completionRate: '89.7%', avgDuration: '1.8天', timely: 56, overdue: 5, timelyRate: '91.8%', longest: '5.1天', topProduct: '支付结算 21件', topReason: '办理时效 17件', abnormal: 1, evaluated: 57, satisfied: 46, basic: 8, dissatisfied: 3, satisfactionRate: '94.7%', agreementRate: '91.2%', due24h: 2, avgAge: '1.7天' },
-  { institution: '岚山支行', customers: '7.4万', outlets: 9, previous: 63, total: 59, accepted: 65, valid: 59, invalid: 6, regulatory: 5, repeat: 3, pending: 5, processing: 4, supplement: 2, completed: 48, returned: 6, completionRate: '81.4%', avgDuration: '2.3天', timely: 40, overdue: 8, timelyRate: '83.3%', longest: '6.4天', topProduct: '理财产品 18件', topReason: '风险揭示 14件', abnormal: 2, evaluated: 43, satisfied: 32, basic: 7, dissatisfied: 4, satisfactionRate: '90.7%', agreementRate: '86.4%', due24h: 4, avgAge: '2.2天' },
-  { institution: '开发区支行', customers: '6.8万', outlets: 8, previous: 48, total: 52, accepted: 58, valid: 52, invalid: 6, regulatory: 6, repeat: 4, pending: 3, processing: 5, supplement: 1, completed: 43, returned: 4, completionRate: '82.7%', avgDuration: '2.1天', timely: 37, overdue: 6, timelyRate: '86.0%', longest: '5.8天', topProduct: '借记卡 16件', topReason: '服务态度 13件', abnormal: 1, evaluated: 39, satisfied: 30, basic: 6, dissatisfied: 3, satisfactionRate: '92.3%', agreementRate: '88.5%', due24h: 3, avgAge: '2.0天' },
-  { institution: '运营管理部', customers: '5.2万', outlets: 6, previous: 44, total: 46, accepted: 49, valid: 46, invalid: 3, regulatory: 4, repeat: 2, pending: 1, processing: 1, supplement: 0, completed: 44, returned: 2, completionRate: '95.7%', avgDuration: '1.2天', timely: 43, overdue: 1, timelyRate: '97.7%', longest: '3.1天', topProduct: '存款业务 15件', topReason: '规则告知 12件', abnormal: 0, evaluated: 42, satisfied: 37, basic: 4, dissatisfied: 1, satisfactionRate: '97.6%', agreementRate: '95.7%', due24h: 0, avgAge: '0.8天' }
+  { institution: '东港支行', customers: '12.8万', outlets: 18, previous: 79, total: 86, accepted: 92, valid: 86, invalid: 6, regulatory: 11, repeat: 5, pending: 2, processing: 5, supplement: 1, completed: 78, returned: 5, completionRate: '90.7%', avgDuration: '1.6天', timely: 74, overdue: 4, timelyRate: '94.9%', longest: '4.2天', topProduct: '个人贷款 28件', productShare: '32.6%', topReason: '收费争议 19件', reasonShare: '22.1%', abnormal: 2, evaluated: 72, satisfied: 61, basic: 8, dissatisfied: 3, satisfactionRate: '95.8%', agreementRate: '93.0%', due24h: 2, avgAge: '1.4天' },
+  { institution: '信用卡中心', customers: '9.6万', outlets: 1, previous: 68, total: 74, accepted: 81, valid: 74, invalid: 7, regulatory: 13, repeat: 8, pending: 2, processing: 3, supplement: 0, completed: 69, returned: 4, completionRate: '93.2%', avgDuration: '1.4天', timely: 65, overdue: 4, timelyRate: '94.2%', longest: '3.8天', topProduct: '信用卡 74件', productShare: '100.0%', topReason: '规则告知 22件', reasonShare: '29.7%', abnormal: 3, evaluated: 65, satisfied: 56, basic: 7, dissatisfied: 2, satisfactionRate: '96.9%', agreementRate: '94.6%', due24h: 1, avgAge: '1.1天' },
+  { institution: '青岛分行', customers: '8.9万', outlets: 12, previous: 62, total: 68, accepted: 73, valid: 68, invalid: 5, regulatory: 8, repeat: 4, pending: 4, processing: 3, supplement: 0, completed: 61, returned: 3, completionRate: '89.7%', avgDuration: '1.8天', timely: 56, overdue: 5, timelyRate: '91.8%', longest: '5.1天', topProduct: '支付结算 21件', productShare: '30.9%', topReason: '办理时效 17件', reasonShare: '25.0%', abnormal: 1, evaluated: 57, satisfied: 46, basic: 8, dissatisfied: 3, satisfactionRate: '94.7%', agreementRate: '91.2%', due24h: 2, avgAge: '1.7天' },
+  { institution: '岚山支行', customers: '7.4万', outlets: 9, previous: 63, total: 59, accepted: 65, valid: 59, invalid: 6, regulatory: 5, repeat: 3, pending: 5, processing: 4, supplement: 2, completed: 48, returned: 6, completionRate: '81.4%', avgDuration: '2.3天', timely: 40, overdue: 8, timelyRate: '83.3%', longest: '6.4天', topProduct: '理财产品 18件', productShare: '30.5%', topReason: '风险揭示 14件', reasonShare: '23.7%', abnormal: 2, evaluated: 43, satisfied: 32, basic: 7, dissatisfied: 4, satisfactionRate: '90.7%', agreementRate: '86.4%', due24h: 4, avgAge: '2.2天' },
+  { institution: '开发区支行', customers: '6.8万', outlets: 8, previous: 48, total: 52, accepted: 58, valid: 52, invalid: 6, regulatory: 6, repeat: 4, pending: 3, processing: 5, supplement: 1, completed: 43, returned: 4, completionRate: '82.7%', avgDuration: '2.1天', timely: 37, overdue: 6, timelyRate: '86.0%', longest: '5.8天', topProduct: '借记卡 16件', productShare: '30.8%', topReason: '服务态度 13件', reasonShare: '25.0%', abnormal: 1, evaluated: 39, satisfied: 30, basic: 6, dissatisfied: 3, satisfactionRate: '92.3%', agreementRate: '88.5%', due24h: 3, avgAge: '2.0天' },
+  { institution: '运营管理部', customers: '5.2万', outlets: 6, previous: 44, total: 46, accepted: 49, valid: 46, invalid: 3, regulatory: 4, repeat: 2, pending: 1, processing: 1, supplement: 0, completed: 44, returned: 2, completionRate: '95.7%', avgDuration: '1.2天', timely: 43, overdue: 1, timelyRate: '97.7%', longest: '3.1天', topProduct: '存款业务 15件', productShare: '32.6%', topReason: '规则告知 12件', reasonShare: '26.1%', abnormal: 0, evaluated: 42, satisfied: 37, basic: 4, dissatisfied: 1, satisfactionRate: '97.6%', agreementRate: '95.7%', due24h: 0, avgAge: '0.8天' }
 ];
 const reportFormulaTips = {
   '办结率': '办结率 = 已办结工单量 / 工单总量 × 100%。',
@@ -1901,14 +1902,28 @@ const reportFormulaTips = {
   '满意率': '满意率 =（满意 + 基本满意）/ 已评价量 × 100%。',
   '达成一致率': '达成一致率 = 达成一致工单量 / 已回访工单量 × 100%。',
   '平均处理时长': '平均处理时长 = 已办结工单从创建到办结的处理耗时平均值。',
-  '标签命中工单量': '标签命中工单量 = 当前机构内命中该高频产品或原因标签的工单去重数量。',
+  '标签占比': '标签占比 = 当前高频产品或原因标签命中工单量 / 当前机构总工单量 × 100%。',
   '超时办结量': '超时办结量 = 已办结工单中实际办结时间超过规定处理时限的工单数量。'
 };
+function ReportHeaderLabel({ label }) {
+  const tip = reportFormulaTips[label];
+  if (!tip) return label;
+  return /*#__PURE__*/_jsxs("span", {
+    className: "group relative inline-flex items-center gap-1 align-middle",
+    children: [label, /*#__PURE__*/_jsx("span", {
+      className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-300 bg-white text-[10px] font-black text-slate-400",
+      children: "?"
+    }), /*#__PURE__*/_jsx("span", {
+      className: "pointer-events-none absolute left-0 top-6 z-30 hidden w-64 whitespace-normal rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-[11px] font-bold leading-5 text-slate-600 shadow-high group-hover:block",
+      children: tip
+    })]
+  });
+}
 const workOrderReportConfigs = {
   '处理状态明细表': { columns: [['institution','机构名称'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['review','待审核'],['completed','已办结'],['completionRate','办结率']] },
   '处理时效明细表': { columns: [['institution','机构名称'],['completed','办结工单量'],['avgDuration','平均处理时长'],['timely','按时办结量'],['overdue','超时办结量'],['timelyRate','按时办结率']] },
-  '原因标签报表': { columns: [['institution','机构名称'],['topReason','高频原因标签'],['total','标签命中工单量'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
-  '产品标签报表': { columns: [['institution','机构名称'],['topProduct','高频产品标签'],['total','标签命中工单量'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
+  '原因标签报表': { columns: [['institution','机构名称'],['topReason','高频原因标签'],['reasonShare','标签占比'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
+  '产品标签报表': { columns: [['institution','机构名称'],['topProduct','高频产品标签'],['productShare','标签占比'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
   '满意情况报表': { columns: [['institution','机构名称'],['evaluated','已评价量'],['satisfied','满意'],['basic','基本满意'],['dissatisfied','不满意'],['satisfactionRate','满意率'],['agreementRate','达成一致率']] },
   '工单处理统计报表': { columns: [['institution','机构名称'],['outlets','网点数'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['review','待审核'],['completed','已办结'],['overdue','超时办结量'],['completionRate','办结率'],['avgDuration','平均处理时长']] }
 };
@@ -1990,7 +2005,7 @@ function WorkOrderProcessingReport() {
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeReport, "｜共 ", rows.length, " 个机构统计结果"] })] }), /*#__PURE__*/_jsx("button", { type: "button", className: "rounded-lg border border-rizhao px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
-      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[1080px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: config.columns.map(([,label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: reportFormulaTips[label] ? /*#__PURE__*/_jsxs("span", { className: "inline-flex items-center gap-1", children: [label, /*#__PURE__*/_jsx("span", { title: reportFormulaTips[label], className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-300 text-[10px] font-black text-slate-400", children: "?" })] }) : label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map((row,index) => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: config.columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeReport}-${row.institution}-${index}`)) })] }) }),
+      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[1080px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: config.columns.map(([,label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: /*#__PURE__*/_jsx(ReportHeaderLabel, { label: label }) }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map((row,index) => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: config.columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeReport}-${row.institution}-${index}`)) })] }) }),
       rows.length === 0 && /*#__PURE__*/_jsx("div", { className: "py-16 text-center text-sm text-slate-400", children: "当前条件下暂无报表数据" })
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
@@ -2070,7 +2085,7 @@ function SimplifiedWorkOrderProcessingReport() {
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeType, activeType === '工单处理统计报表' ? `｜${statisticType}` : '', "｜共 ", allRows.length, " 个机构统计结果"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: exportReport, className: "shrink-0 rounded-lg border border-rizhao bg-white px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
-      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[900px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: reportFormulaTips[label] ? /*#__PURE__*/_jsxs("span", { className: "inline-flex items-center gap-1", children: [label, /*#__PURE__*/_jsx("span", { title: reportFormulaTips[label], className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-300 text-[10px] font-black text-slate-400", children: "?" })] }) : label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
+      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[900px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: /*#__PURE__*/_jsx(ReportHeaderLabel, { label: label }) }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
       allRows.length === 0 && /*#__PURE__*/_jsx("div", { className: "py-16 text-center text-sm text-slate-400", children: "当前条件下暂无报表数据" }),
       /*#__PURE__*/_jsx(ListPagination, { total: allRows.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } })
     ] })
