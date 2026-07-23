@@ -898,7 +898,7 @@ const rzAnalyticsOrgOptions = ['全行', '总行消保中心', '东港支行', '
 const rzAnalyticsMetricSets = {
   '投诉总览': [
     { label: '工单总量', value: 168, unit: '件', sub: '按工单编号去重', tone: 'orange' },
-    { label: '未办结工单', value: 23, unit: '件', sub: '待分配/待处理/处理中/待复核', tone: 'blue' },
+    { label: '未办结工单', value: 23, unit: '件', sub: '待处理/处理中/待审核', tone: 'blue' },
     { label: '逾期或即将到期', value: 7, unit: '件', sub: '逾期 3 件，24小时内到期 4 件', tone: 'red' },
     { label: '已办结工单', value: 98, unit: '件', sub: '办结率 78.0%', tone: 'green' }
   ],
@@ -1064,7 +1064,7 @@ const rzReasonDetailRows = [
 ];
 const rzOverviewMetrics = [
   { title: '工单总量', note: '按工单编号去重', value: '168', unit: '件', icon: '□', tone: 'orange', items: [{ label: '客服工单', value: '72 件' }, { label: '自建工单', value: '96 件' }] },
-  { title: '未办结工单', note: '当前仍在流程中', value: '23', unit: '件', icon: '…', tone: 'blue', items: [{ label: '处理中', value: '11 件' }, { label: '待复核/审核', value: '6 件' }] },
+  { title: '未办结工单', note: '当前仍在流程中', value: '23', unit: '件', icon: '…', tone: 'blue', items: [{ label: '处理中', value: '11 件' }, { label: '待审核', value: '6 件' }] },
   { title: '逾期或即将到期', note: '处理时限预警', value: '7', unit: '件', icon: '!', tone: 'red', items: [{ label: '已逾期', value: '3 件' }, { label: '24小时内到期', value: '4 件' }] },
   { title: '已办结工单', note: '完成处理闭环', value: '98', unit: '件', icon: '✓', tone: 'green', items: [{ label: '办结率', value: '78.0%' }, { label: '按时办结', value: '91 件' }] },
   { title: '满意情况', note: '回访评价结果', value: '94.6', unit: '%', icon: '★', tone: 'green', items: [{ label: '满意/基本满意', value: '88 件' }, { label: '不满意', value: '5 件' }] }
@@ -1080,12 +1080,10 @@ const rzOverviewTrendSets = {
   '按月': { labels: ['05月', '06月', '07月'], created: [126, 148, 168], accepted: [119, 140, 154] }
 };
 const rzOverviewStatusData = [
-  { name: '待分配', value: 6, rate: '3.6%', tone: 'slate' },
   { name: '待处理', value: 8, rate: '4.8%', tone: 'orange' },
   { name: '处理中', value: 11, rate: '6.5%', tone: 'blue' },
-  { name: '待复核', value: 4, rate: '2.4%', tone: 'purple' },
-  { name: '已办结', value: 98, rate: '58.3%', tone: 'green' },
-  { name: '已关单', value: 41, rate: '24.4%', tone: 'slate' }
+  { name: '待审核', value: 10, rate: '6.0%', tone: 'purple' },
+  { name: '已办结', value: 139, rate: '82.7%', tone: 'green' }
 ];
 const rzOverviewSourceData = [
   { name: '客服热线投诉', value: 56, rate: '33.3%' },
@@ -1888,7 +1886,7 @@ function RzProductRectification({ selectedProduct }) {
   ] });
 }
 
-const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '原因标签报表', '产品标签报表', '满意情况报表', '工单处理统计报表', '未办结工单报表'];
+const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '原因标签报表', '产品标签报表', '满意情况报表', '工单处理统计报表'];
 const workOrderReportRows = [
   { institution: '东港支行', customers: '12.8万', outlets: 18, previous: 79, total: 86, accepted: 92, valid: 86, invalid: 6, regulatory: 11, repeat: 5, pending: 2, processing: 5, supplement: 1, completed: 78, returned: 5, completionRate: '90.7%', avgDuration: '1.6天', timely: 74, overdue: 4, timelyRate: '94.9%', longest: '4.2天', topProduct: '个人贷款 28件', topReason: '收费争议 19件', abnormal: 2, evaluated: 72, satisfied: 61, basic: 8, dissatisfied: 3, satisfactionRate: '95.8%', agreementRate: '93.0%', due24h: 2, avgAge: '1.4天' },
   { institution: '信用卡中心', customers: '9.6万', outlets: 1, previous: 68, total: 74, accepted: 81, valid: 74, invalid: 7, regulatory: 13, repeat: 8, pending: 2, processing: 3, supplement: 0, completed: 69, returned: 4, completionRate: '93.2%', avgDuration: '1.4天', timely: 65, overdue: 4, timelyRate: '94.2%', longest: '3.8天', topProduct: '信用卡 74件', topReason: '规则告知 22件', abnormal: 3, evaluated: 65, satisfied: 56, basic: 7, dissatisfied: 2, satisfactionRate: '96.9%', agreementRate: '94.6%', due24h: 1, avgAge: '1.1天' },
@@ -1897,21 +1895,29 @@ const workOrderReportRows = [
   { institution: '开发区支行', customers: '6.8万', outlets: 8, previous: 48, total: 52, accepted: 58, valid: 52, invalid: 6, regulatory: 6, repeat: 4, pending: 3, processing: 5, supplement: 1, completed: 43, returned: 4, completionRate: '82.7%', avgDuration: '2.1天', timely: 37, overdue: 6, timelyRate: '86.0%', longest: '5.8天', topProduct: '借记卡 16件', topReason: '服务态度 13件', abnormal: 1, evaluated: 39, satisfied: 30, basic: 6, dissatisfied: 3, satisfactionRate: '92.3%', agreementRate: '88.5%', due24h: 3, avgAge: '2.0天' },
   { institution: '运营管理部', customers: '5.2万', outlets: 6, previous: 44, total: 46, accepted: 49, valid: 46, invalid: 3, regulatory: 4, repeat: 2, pending: 1, processing: 1, supplement: 0, completed: 44, returned: 2, completionRate: '95.7%', avgDuration: '1.2天', timely: 43, overdue: 1, timelyRate: '97.7%', longest: '3.1天', topProduct: '存款业务 15件', topReason: '规则告知 12件', abnormal: 0, evaluated: 42, satisfied: 37, basic: 4, dissatisfied: 1, satisfactionRate: '97.6%', agreementRate: '95.7%', due24h: 0, avgAge: '0.8天' }
 ];
+const reportFormulaTips = {
+  '办结率': '办结率 = 已办结工单量 / 工单总量 × 100%。',
+  '按时办结率': '按时办结率 = 按时办结量 / 已办结工单量 × 100%。',
+  '满意率': '满意率 =（满意 + 基本满意）/ 已评价量 × 100%。',
+  '达成一致率': '达成一致率 = 达成一致工单量 / 已回访工单量 × 100%。',
+  '平均处理时长': '平均处理时长 = 已办结工单从创建到办结的处理耗时平均值。',
+  '标签命中工单量': '标签命中工单量 = 当前机构内命中该高频产品或原因标签的工单去重数量。',
+  '超时办结量': '超时办结量 = 已办结工单中实际办结时间超过规定处理时限的工单数量。'
+};
 const workOrderReportConfigs = {
-  '处理状态明细表': { columns: [['institution','机构名称'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['supplement','待补充'],['completed','已办结'],['returned','退回量'],['completionRate','办结率']] },
-  '处理时效明细表': { columns: [['institution','机构名称'],['completed','办结工单量'],['avgDuration','平均处理时长'],['timely','按时办结量'],['overdue','超时办结量'],['timelyRate','按时办结率'],['longest','最长处理时长']] },
-  '原因标签报表': { columns: [['institution','机构名称'],['topReason','高频原因标签'],['total','标签工单量'],['pending','待处理'],['processing','处理中'],['overdue','逾期工单量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
-  '产品标签报表': { columns: [['institution','机构名称'],['topProduct','高频产品标签'],['total','标签工单量'],['pending','待处理'],['processing','处理中'],['overdue','逾期工单量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
+  '处理状态明细表': { columns: [['institution','机构名称'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['review','待审核'],['completed','已办结'],['completionRate','办结率']] },
+  '处理时效明细表': { columns: [['institution','机构名称'],['completed','办结工单量'],['avgDuration','平均处理时长'],['timely','按时办结量'],['overdue','超时办结量'],['timelyRate','按时办结率']] },
+  '原因标签报表': { columns: [['institution','机构名称'],['topReason','高频原因标签'],['total','标签命中工单量'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
+  '产品标签报表': { columns: [['institution','机构名称'],['topProduct','高频产品标签'],['total','标签命中工单量'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
   '满意情况报表': { columns: [['institution','机构名称'],['evaluated','已评价量'],['satisfied','满意'],['basic','基本满意'],['dissatisfied','不满意'],['satisfactionRate','满意率'],['agreementRate','达成一致率']] },
-  '工单处理统计报表': { columns: [['institution','机构名称'],['customers','客户数'],['outlets','网点数'],['accepted','受理投诉量'],['valid','有效投诉量'],['invalid','无效投诉量'],['regulatory','监管投诉量'],['repeat','重复投诉量'],['completionRate','办结率']] },
-  '未办结工单报表': { columns: [['institution','机构名称'],['pending','待处理'],['processing','处理中'],['supplement','待补充'],['overdue','已逾期'],['due24h','24小时内到期'],['avgAge','未办结工单平均耗时']] }
+  '工单处理统计报表': { columns: [['institution','机构名称'],['outlets','网点数'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['review','待审核'],['completed','已办结'],['overdue','超时办结量'],['completionRate','办结率'],['avgDuration','平均处理时长']] }
 };
 const workOrderStatisticTypes = ['全量工单统计表', '12378统计表', '网银渠道统计表', '监管转办投诉统计表'];
 const reportWorkOrderRows = [
-  { id: 'WD202607150052861800001', source: '网点现场投诉', accepted: '2026-07-15 09:18:21', created: '2026-07-15 09:18:43', level: '普通', limit: '3个工作日', status: '待分配', branch: '东港支行', department: '零售金融部', institution: '东港支行营业部', product: '个人贷款', reason: '提前还款争议', dueDate: '2026-07-18', type: '自建工单', handlerOrg: '东港支行零售金融部', satisfaction: '待回访' },
-  { id: 'ETMS2026071403352861800001', source: '监管转办投诉', accepted: '2026-07-14 10:57:52', created: '2026-07-14 10:58:14', level: '普通', limit: '3个工作日', status: '已联系', branch: '信用卡中心', department: '信用卡部', institution: '信用卡中心', product: '信用卡', reason: '年费告知争议', dueDate: '2026-07-17', type: '自建工单', handlerOrg: '信用卡中心投诉处理组', satisfaction: '满意' },
+  { id: 'WD202607150052861800001', source: '网点现场投诉', accepted: '2026-07-15 09:18:21', created: '2026-07-15 09:18:43', level: '普通', limit: '3个工作日', status: '待处理', branch: '东港支行', department: '零售金融部', institution: '东港支行营业部', product: '个人贷款', reason: '提前还款争议', dueDate: '2026-07-18', type: '自建工单', handlerOrg: '东港支行零售金融部', satisfaction: '待回访' },
+  { id: 'ETMS2026071403352861800001', source: '监管转办投诉', accepted: '2026-07-14 10:57:52', created: '2026-07-14 10:58:14', level: '普通', limit: '3个工作日', status: '已办结', branch: '信用卡中心', department: '信用卡部', institution: '信用卡中心', product: '信用卡', reason: '年费告知争议', dueDate: '2026-07-17', type: '自建工单', handlerOrg: '信用卡中心投诉处理组', satisfaction: '满意' },
   { id: 'ETMS2026071302352860100001', source: '监管转办投诉', accepted: '2026-07-13 11:17:13', created: '2026-07-13 11:19:41', level: '普通', limit: '3个工作日', status: '待处理', branch: '青岛分行', department: '运营管理部', institution: '青岛分行营业部', product: '支付结算', reason: '到账时效争议', dueDate: '2026-07-16', type: '自建工单', handlerOrg: '青岛分行运营管理部', satisfaction: '基本满意' },
-  { id: 'ETMS2026071201352860100002', source: '监管转办投诉', accepted: '2026-07-12 18:55:38', created: '2026-07-12 18:56:15', level: '普通', limit: '3个工作日', status: '待复核', branch: '岚山支行', department: '财富管理部', institution: '岚山支行营业部', product: '理财产品', reason: '风险揭示不足', dueDate: '2026-07-15', type: '自建工单', handlerOrg: '岚山支行财富管理部', satisfaction: '待评价' },
+  { id: 'ETMS2026071201352860100002', source: '监管转办投诉', accepted: '2026-07-12 18:55:38', created: '2026-07-12 18:56:15', level: '普通', limit: '3个工作日', status: '待审核', branch: '岚山支行', department: '财富管理部', institution: '岚山支行营业部', product: '理财产品', reason: '风险揭示不足', dueDate: '2026-07-15', type: '自建工单', handlerOrg: '岚山支行财富管理部', satisfaction: '待评价' },
   { id: 'ETMS2026071101352860100001', source: '客服热线投诉', accepted: '2026-07-11 17:41:41', created: '2026-07-11 17:42:14', level: '重点', limit: '2个工作日', status: '处理中', branch: '开发区支行', department: '运营管理部', institution: '开发区支行营业部', product: '借记卡', reason: '服务态度', dueDate: '2026-07-14', type: '自建工单', handlerOrg: '开发区支行运营管理部', satisfaction: '待回访' }
 ];
 const processingDetailConfigs = {
@@ -1920,8 +1926,7 @@ const processingDetailConfigs = {
   '原因标签报表': [['id','工单编号'],['source','投诉来源'],['accepted','受理时间'],['created','工单创建时间'],['reason','投诉原因标签'],['product','产品标签'],['status','工单状态'],['institution','被投诉机构']],
   '产品标签报表': [['id','工单编号'],['source','投诉来源'],['accepted','受理时间'],['created','工单创建时间'],['product','产品标签'],['reason','投诉原因标签'],['status','工单状态'],['institution','被投诉机构']],
   '满意情况报表': [['id','工单编号'],['institution','被投诉机构'],['source','投诉来源'],['handlerOrg','处理机构'],['dueDate','回访日期'],['satisfaction','满意情况'],['status','工单状态']],
-  '工单处理统计报表': [['id','工单编号'],['source','投诉来源'],['created','工单创建时间'],['branch','所在分行'],['department','涉及部门'],['institution','被投诉机构'],['status','工单状态']],
-  '未办结工单报表': [['id','工单编号'],['created','工单创建时间'],['dueDate','应回复日期'],['source','受理来源'],['type','工单类型'],['handlerOrg','当前处理人机构'],['institution','被投诉机构']]
+  '工单处理统计报表': [['id','工单编号'],['source','投诉来源'],['created','工单创建时间'],['branch','所在分行'],['department','涉及部门'],['institution','被投诉机构'],['status','工单状态']]
 };
 
 function ListPagination({ total, page, pageSize, onPageChange, onPageSizeChange, pageSizeOptions = [5, 10, 20] }) {
@@ -1946,19 +1951,18 @@ function WorkOrderProcessingReport() {
   const [applied, setApplied] = useState(initialFilter);
   const config = workOrderReportConfigs[activeReport];
   const filteredRows = workOrderReportRows.filter(row => applied.org === '全部机构' || row.institution === applied.org);
-  const rows = filteredRows;
+  const rows = filteredRows.map(row => ({ ...row, review: row.review ?? row.returned }));
   const detailRows = reportWorkOrderRows.filter(row =>
     (applied.org === '全部机构' || row.branch === applied.org || row.institution.includes(applied.org.replace('全部机构',''))) &&
     (applied.source === '全部来源' || row.source === applied.source) &&
     (!['处理状态明细表','产品标签报表'].includes(activeReport) || applied.product === '全部产品' || row.product === applied.product) &&
     (activeReport !== '原因标签报表' || applied.reason === '全部原因' || row.reason === applied.reason) &&
     (!applied.workOrderNo || row.id.includes(applied.workOrderNo)) &&
-    (activeReport !== '满意情况报表' || applied.satisfaction === '全部评价' || row.satisfaction === applied.satisfaction) &&
-    (activeReport !== '未办结工单报表' || !['已办结','已关单'].includes(row.status))
+    (activeReport !== '满意情况报表' || applied.satisfaction === '全部评价' || row.satisfaction === applied.satisfaction)
   );
   const totalComplaints = rows.reduce((sum, row) => sum + row.total, 0);
   const completedComplaints = rows.reduce((sum, row) => sum + row.completed, 0);
-  const unresolvedComplaints = rows.reduce((sum, row) => sum + row.pending + row.processing + row.supplement, 0);
+  const unresolvedComplaints = rows.reduce((sum, row) => sum + row.pending + row.processing + (row.review || row.returned || 0), 0);
   const aggregateRate = totalComplaints ? `${(completedComplaints / totalComplaints * 100).toFixed(1)}%` : '0.0%';
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
     /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 text-xs text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "首页" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { children: "报表管理" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { className: "text-slate-600", children: "工单处理报表" })] }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: "工单处理报表" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: "按处理状态、时效、原因标签、产品标签及办结情况查询工单报表" })] }),
@@ -1967,8 +1971,8 @@ function WorkOrderProcessingReport() {
     /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white p-5 shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-end gap-3", children: [
         /*#__PURE__*/_jsxs("label", { className: "w-[220px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "被投诉机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: ['全部机构','东港支行','信用卡中心','青岛分行','岚山支行','开发区支行','运营管理部'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
-        /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: activeReport === '工单处理统计报表' || activeReport === '未办结工单报表' ? '统计周期开始' : '工单创建开始' }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) })] }),
-        /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: activeReport === '工单处理统计报表' || activeReport === '未办结工单报表' ? '统计周期结束' : '工单创建结束' }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] }),
+        /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: activeReport === '工单处理统计报表' ? '统计周期开始' : '工单创建开始' }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) })] }),
+        /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: activeReport === '工单处理统计报表' ? '统计周期结束' : '工单创建结束' }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] }),
         activeReport !== '工单处理统计报表' && /*#__PURE__*/_jsxs("label", { className: "w-[210px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "工单编号" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { value: draft.workOrderNo, onChange: e => setDraft({ ...draft, workOrderNo: e.target.value }), placeholder: "请输入工单编号" }) })] }),
         ['处理状态明细表','工单处理统计报表'].includes(activeReport) && /*#__PURE__*/_jsxs("label", { className: "w-[180px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "投诉来源" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.source, onChange: e => setDraft({ ...draft, source: e.target.value }), children: ['全部来源','网点现场投诉','监管转办投诉','客服热线投诉'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
         ['处理状态明细表','产品标签报表'].includes(activeReport) && /*#__PURE__*/_jsxs("label", { className: "w-[170px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "产品标签" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.product, onChange: e => setDraft({ ...draft, product: e.target.value }), children: ['全部产品','个人贷款','信用卡','支付结算','理财产品','借记卡'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
@@ -1986,7 +1990,7 @@ function WorkOrderProcessingReport() {
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeReport, "｜共 ", rows.length, " 个机构统计结果"] })] }), /*#__PURE__*/_jsx("button", { type: "button", className: "rounded-lg border border-rizhao px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
-      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[1080px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: config.columns.map(([,label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map((row,index) => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: config.columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeReport}-${row.institution}-${index}`)) })] }) }),
+      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[1080px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: config.columns.map(([,label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: reportFormulaTips[label] ? /*#__PURE__*/_jsxs("span", { className: "inline-flex items-center gap-1", children: [label, /*#__PURE__*/_jsx("span", { title: reportFormulaTips[label], className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-300 text-[10px] font-black text-slate-400", children: "?" })] }) : label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map((row,index) => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: config.columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeReport}-${row.institution}-${index}`)) })] }) }),
       rows.length === 0 && /*#__PURE__*/_jsx("div", { className: "py-16 text-center text-sm text-slate-400", children: "当前条件下暂无报表数据" })
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
@@ -2042,10 +2046,9 @@ function SimplifiedWorkOrderProcessingReport() {
       const total = Math.round(row.total * factor);
       const pending = Math.round(row.pending * factor);
       const processing = Math.round(row.processing * factor);
-      const supplement = Math.round(row.supplement * factor);
-      const returned = Math.round(row.returned * factor);
-      const completed = Math.max(0, total - pending - processing - supplement);
-      return { ...row, total, pending, processing, supplement, returned, completed, completionRate: total ? `${(completed / total * 100).toFixed(1)}%` : '0.0%' };
+      const review = Math.round((row.review ?? row.returned) * factor);
+      const completed = Math.max(0, total - pending - processing - review);
+      return { ...row, total, pending, processing, review, completed, completionRate: total ? `${(completed / total * 100).toFixed(1)}%` : '0.0%' };
     });
   const rows = allRows.slice((page - 1) * pageSize, page * pageSize);
   const columns = workOrderReportConfigs[activeType].columns;
@@ -2067,7 +2070,7 @@ function SimplifiedWorkOrderProcessingReport() {
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeType, activeType === '工单处理统计报表' ? `｜${statisticType}` : '', "｜共 ", allRows.length, " 个机构统计结果"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: exportReport, className: "shrink-0 rounded-lg border border-rizhao bg-white px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
-      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[900px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
+      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[900px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: reportFormulaTips[label] ? /*#__PURE__*/_jsxs("span", { className: "inline-flex items-center gap-1", children: [label, /*#__PURE__*/_jsx("span", { title: reportFormulaTips[label], className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-300 text-[10px] font-black text-slate-400", children: "?" })] }) : label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
       allRows.length === 0 && /*#__PURE__*/_jsx("div", { className: "py-16 text-center text-sm text-slate-400", children: "当前条件下暂无报表数据" }),
       /*#__PURE__*/_jsx(ListPagination, { total: allRows.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } })
     ] })
@@ -4165,6 +4168,7 @@ function ReadOnlyComplaintDetail({
   row,
   focusFlow = false
 }) {
+  const isDraftOrder = row.status === '草稿';
   const detailFields = [{
     label: '行内工单编号',
     value: row.no
@@ -4283,7 +4287,7 @@ function ReadOnlyComplaintDetail({
           children: "客户反映业务办理过程中存在沟通不充分、办理进度不清晰等问题，要求银行核实并反馈处理结果。"
         })
       })]
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+    }), !isDraftOrder && /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: assignFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
@@ -4292,7 +4296,7 @@ function ReadOnlyComplaintDetail({
         label: '附件状态',
         value: '暂无附件'
       }]
-    }), /*#__PURE__*/_jsx(StandardSection, {
+    }), !isDraftOrder && /*#__PURE__*/_jsx(StandardSection, {
       title: "联系与沟通记录",
       children: /*#__PURE__*/_jsx(ContactRecordsTable, {
         records: [{
@@ -4305,16 +4309,7 @@ function ReadOnlyComplaintDetail({
           contactContent: '已向客户说明处理进度并确认后续反馈方式，客户认可当前处理方案。'
         }]
       })
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
-      title: "指派处理",
-      fields: [{
-        label: '处理机构',
-        value: row.org
-      }, {
-        label: '处理人',
-        value: '张经理'
-      }]
-    }), /*#__PURE__*/_jsx(FlowRecordSection, {
+    }), !isDraftOrder && /*#__PURE__*/_jsx(FlowRecordSection, {
       highlight: focusFlow,
       records: buildExampleFlowRecords(row)
     })]
@@ -7669,7 +7664,7 @@ function DataScopePanel({ scope, onChange }) {
 
 // ─── 用户管理 ─────────────────────────────────────────────
 const userListData = [
-  { empId: '100001', name: '赵一明', gender: '男', phone: '13800001001', idType: '居民身份证', idNumber: '110101********1234', personType: '正式员工', personStatus: '在职', position: '消保主管', orgCode: ['ZBXB001'], orgName: ['总行消保中心'], deptCode: [], deptName: [], roles: ['工单派发员', '超级管理员'], workStatus: '在岗' },
+  { empId: '100001', name: '赵一明', gender: '男', phone: '13800001001', idType: '居民身份证', idNumber: '110101********1234', personType: '正式员工', personStatus: '在职', position: '消保主管', orgCode: ['ZBXB001'], orgName: ['总行消保中心'], deptCode: [], deptName: [], roles: ['工单派发员', '投诉-超级管理员'], workStatus: '在岗' },
   { empId: '100002', name: '钱立新', gender: '男', phone: '13800001002', idType: '居民身份证', idNumber: '110101********1235', personType: '正式员工', personStatus: '在职', position: '消保专员', orgCode: ['YH001'], orgName: ['银河中支'], deptCode: [], deptName: [], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100003', name: '孙海燕', gender: '女', phone: '13800001003', idType: '居民身份证', idNumber: '110101********1236', personType: '正式员工', personStatus: '在职', position: '消保专员', orgCode: ['SHT001'], orgName: ['山海天支行'], deptCode: [], deptName: [], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100004', name: '李国华', gender: '男', phone: '13800001004', idType: '居民身份证', idNumber: '110101********1237', personType: '正式员工', personStatus: '在职', position: '消保专员', orgCode: ['KFQ001'], orgName: ['开发区中支'], deptCode: [], deptName: [], roles: ['投诉处理员'], workStatus: '在岗' },
@@ -7679,7 +7674,7 @@ const userListData = [
   { empId: '100008', name: '王丽萍', gender: '女', phone: '13800001008', idType: '居民身份证', idNumber: '110101********1241', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['GS001'], deptName: ['银河中支公司部'], roles: ['投诉处理员', '工单派发员'], workStatus: '在岗' },
   { empId: '100009', name: '冯志强', gender: '男', phone: '13800001009', idType: '居民身份证', idNumber: '110101********1242', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['FX001'], deptName: ['银河中支风险部'], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100010', name: '陈嘉欣', gender: '女', phone: '13800001010', idType: '居民身份证', idNumber: '110101********1243', personType: '派遣员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['GK001'], deptName: ['日照港口支行'], roles: ['投诉处理员'], workStatus: '在岗' },
-  { empId: '100011', name: '褚卫东', gender: '男', phone: '13800001011', idType: '居民身份证', idNumber: '110101********1244', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001', 'QD001'], orgName: ['日照银行', '青岛分行'], deptCode: ['YY001'], deptName: ['银河中支营业部'], roles: ['投诉处理员', '超级管理员'], workStatus: '在岗' },
+  { empId: '100011', name: '褚卫东', gender: '男', phone: '13800001011', idType: '居民身份证', idNumber: '110101********1244', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001', 'QD001'], orgName: ['日照银行', '青岛分行'], deptCode: ['YY001'], deptName: ['银河中支营业部'], roles: ['投诉处理员', '审查-超级管理员'], workStatus: '在岗' },
   { empId: '100012', name: '卫兰', gender: '女', phone: '13800001012', idType: '居民身份证', idNumber: '110101********1245', personType: '派遣员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['HH001'], deptName: ['黄海一路网点'], roles: ['投诉处理员'], workStatus: '在岗' },
   { empId: '100013', name: '蒋明辉', gender: '男', phone: '13800001013', idType: '居民身份证', idNumber: '110101********1246', personType: '正式员工', personStatus: '在职', position: '工单派发员', orgCode: ['QD001'], orgName: ['青岛分行'], deptCode: ['QD001'], deptName: ['青岛分行'], roles: ['工单派发员'], workStatus: '在岗' },
   { empId: '100014', name: '沈雅琴', gender: '女', phone: '13800001014', idType: '居民身份证', idNumber: '110101********1247', personType: '正式员工', personStatus: '在职', position: '投诉处理员', orgCode: ['RZ001'], orgName: ['日照银行'], deptCode: ['KJ001'], deptName: ['总行科技部'], roles: ['投诉处理员'], workStatus: '暂停接单' },
@@ -7690,21 +7685,22 @@ function UserManager() {
   var $ = React.createElement;
   var orgOptions = ['日照银行', '总行消保中心', '银河中支', '山海天支行', '开发区中支', '东港支行', '岚山支行', '五莲支行', '开发区支行', '青岛分行', '信用卡中心', '风险管理部'];
   var orgCodeMap = { '日照银行': 'RZ001', '总行消保中心': 'ZBXB001', '银河中支': 'YH001', '山海天支行': 'SHT001', '开发区中支': 'KFQ001', '东港支行': 'DG001', '岚山支行': 'LS001', '五莲支行': 'WL001', '开发区支行': 'KFQ002', '青岛分行': 'QD001', '信用卡中心': 'XYK001', '风险管理部': 'FK001' };
-  var complaintRoleOptions = ['投诉处理员', '工单派发员'];
-  var reviewRoleOptions = ['消保审查员'];
+  var complaintRoleOptions = ['投诉处理员', '工单派发员', '投诉-超级管理员'];
+  var reviewRoleOptions = ['消保审查员', '审查-超级管理员'];
   var orgQueryOptions = orgOptions.map(function(name) { return { id: orgCodeMap[name], name: name }; });
   var roleQueryOptions = [
     { id: 'COMPLAINT_HANDLER', name: '投诉处理员' },
     { id: 'ORG_ADMIN', name: '工单派发员' },
-    { id: 'SUPER_ADMIN', name: '超级管理员' },
+    { id: 'COMPLAINT_SUPER_ADMIN', name: '投诉-超级管理员' },
+    { id: 'REVIEW_SUPER_ADMIN', name: '审查-超级管理员' },
     { id: 'REVIEWER', name: '消保审查员' }
   ];
   var roleQueryMap = roleQueryOptions.reduce(function(map, item) { map[item.id] = item.name; return map; }, {});
   function getComplaintRole(u) {
-    return (u.complaintRole !== undefined ? u.complaintRole : (u.roles || []).find(function(r) { return ['投诉处理员', '工单派发员'].indexOf(r) >= 0; }) || '');
+    return (u.complaintRole !== undefined ? u.complaintRole : (u.roles || []).find(function(r) { return ['投诉处理员', '工单派发员', '投诉-超级管理员'].indexOf(r) >= 0; }) || '');
   }
   function getReviewRole(u) {
-    return (u.reviewRole !== undefined ? u.reviewRole : (u.roles || []).find(function(r) { return r === '消保审查员'; }) || '');
+    return (u.reviewRole !== undefined ? u.reviewRole : (u.roles || []).find(function(r) { return ['消保审查员', '审查-超级管理员'].indexOf(r) >= 0; }) || '');
   }
   function mergeRoles(complaintRole, reviewRole) {
     var list = [];
@@ -7819,7 +7815,7 @@ function UserManager() {
           $("option", { value: "", children: "全部" })
         ].concat(orgQueryOptions.map(function(item) { return $("option", { value: item.id, children: item.id + " - " + item.name }); })) }) })] }),
         $("div", { children: [$("div", { className: "field-label mb-1", children: "手机号" }), $("div", { className: "field-box", children: $("input", { placeholder: "请输入", value: searchPhone, onChange: function(e) { setSearchPhone(e.target.value); } }) })] }),
-        $("div", { children: [$("div", { className: "field-label mb-1", children: "投诉系统角色" }), $("div", { className: "field-box", children: $("select", { value: searchRole, onChange: function(e) { setSearchRole(e.target.value); }, children: [
+        $("div", { children: [$("div", { className: "field-label mb-1", children: "系统角色" }), $("div", { className: "field-box", children: $("select", { value: searchRole, onChange: function(e) { setSearchRole(e.target.value); }, children: [
           $("option", { value: "", children: "全部" })
         ].concat(roleQueryOptions.map(function(item) { return $("option", { value: item.id, children: item.id + " - " + item.name }); })) }) })] }),
         $("div", { children: [$("div", { className: "field-label mb-1", children: "状态" }), $("div", { className: "field-box", children: $("select", { value: searchStatus, onChange: function(e) { setSearchStatus(e.target.value); }, children: [
@@ -7835,7 +7831,7 @@ function UserManager() {
     ]}),
     $("div", { className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white", children: [
       $("table", { className: "w-full text-left text-sm", children: [
-        $("thead", { children: $("tr", { className: "border-b border-slate-200 bg-mist/60", children: ['员工号','姓名','性别','手机号','证件类型','证件号','人员类型','人员状态','职务','机构编号','机构名称','投诉系统角色','操作'].map(function(h) { return $("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }); }) })}),
+        $("thead", { children: $("tr", { className: "border-b border-slate-200 bg-mist/60", children: ['员工号','姓名','性别','手机号','证件类型','证件号','人员类型','人员状态','职务','机构编号','机构名称','系统角色','操作'].map(function(h) { return $("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }); }) })}),
         $("tbody", { children: visibleUsers.map(function(u, i) {
           return $("tr", { key: i, className: "border-b border-slate-100 hover:bg-mist/40", children: [
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: u.empId }),
