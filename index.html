@@ -7429,28 +7429,40 @@ function RolePermissionTree({ tree, selected, setSelected }) {
 }
 function RolePermissionConfig({ role, onBack, onSaveScope }) {
   const permissionItems = [
-    { key: 'entry', name: '工单录入权限', desc: '允许进入工单录入页面并新建投诉工单' },
-    { key: 'view', name: '工单查看权限', desc: '允许查看数据范围内的工单及详情' },
-    { key: 'process', name: '工单处理权限', desc: '允许填写处理结果、联系记录和处理附件' },
-    { key: 'closeAudit', name: '关单审核权限', desc: '允许审核处理结果并执行关单' },
-    { key: 'ledgerQuery', name: '台账查询权限', desc: '允许查询投诉工单台账' },
+    { key: 'workHandle', name: '工单处理权限', desc: '允许处理工单、提交处理结果和申请收回' },
+    { key: 'workManage', name: '工单管理权限', desc: '允许录入、派发、收回和审核工单' },
+    { key: 'ledgerView', name: '台账查看权限', desc: '允许查询和查看投诉工单台账' },
     { key: 'ledgerExport', name: '台账导出权限', desc: '允许导出台账并记录导出日志' },
+    { key: 'reportView', name: '报表查看权限', desc: '允许查询和查看报表结果' },
+    { key: 'reportExport', name: '报表导出权限', desc: '允许导出报表结果' },
+    { key: 'statsView', name: '统计分析查看权限', desc: '允许查看投诉总览、机构、产品和原因统计分析' },
     { key: 'userManage', name: '用户管理权限', desc: '允许维护系统用户、用户状态和角色关联' },
     { key: 'roleManage', name: '角色权限管理权限', desc: '允许维护角色列表并配置功能权限' },
     { key: 'orgManage', name: '机构管理权限', desc: '允许维护机构列表、机构层级和机构负责人' },
     { key: 'paramConfig', name: '参数化配置权限', desc: '允许维护办理时限、标签、级联字典等参数' }
   ];
   const permissionTree = [{
-    name: '投诉管理',
+    name: '工单处理',
     children: [
-      { key: 'entry', name: '工单录入权限' },
-      { key: 'view', name: '工单查看权限' },
-      { key: 'process', name: '工单处理权限' },
-      { key: 'closeAudit', name: '关单审核权限' },
-      { name: '台账管理', children: [
-        { key: 'ledgerQuery', name: '台账查询权限' },
-        { key: 'ledgerExport', name: '台账导出权限' }
-      ] }
+      { key: 'workHandle', name: '处理权限（处理、申请收回）' },
+      { key: 'workManage', name: '管理权限（录入、收回、审核、派发）' }
+    ]
+  }, {
+    name: '台账',
+    children: [
+      { key: 'ledgerView', name: '台账查看权限' },
+      { key: 'ledgerExport', name: '台账导出权限' }
+    ]
+  }, {
+    name: '报表',
+    children: [
+      { key: 'reportView', name: '报表查看权限' },
+      { key: 'reportExport', name: '报表导出权限' }
+    ]
+  }, {
+    name: '统计分析',
+    children: [
+      { key: 'statsView', name: '统计分析查看权限' }
     ]
   }, {
     name: '后台管理',
@@ -7461,11 +7473,11 @@ function RolePermissionConfig({ role, onBack, onSaveScope }) {
       { key: 'paramConfig', name: '参数化配置权限' }
     ]
   }];
-  const defaultPermissions = role.code === 'SUPER_ADMIN'
+  const defaultPermissions = role.code === 'SUPER_ADMIN' || role.code === 'REVIEW_SUPER_ADMIN'
     ? permissionItems.map(item => item.key)
     : role.code === 'ORG_ADMIN'
-      ? ['entry', 'view', 'process', 'closeAudit', 'ledgerQuery', 'ledgerExport']
-      : ['entry', 'view', 'process', 'ledgerQuery'];
+      ? ['workManage', 'ledgerView', 'ledgerExport', 'reportView', 'reportExport', 'statsView']
+      : ['workHandle', 'ledgerView', 'reportView', 'statsView'];
   const [selected, setSelected] = useState(defaultPermissions);
   const [dataScope, setDataScope] = useState(role.dataScope);
   const [saved, setSaved] = useState(false);
