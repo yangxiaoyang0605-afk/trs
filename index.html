@@ -4335,8 +4335,7 @@ function EntryMethodList({
   const dispatchedRows = allRows.filter(r => r.status !== '草稿');
   const draftRows = allRows.filter(r => r.status === '草稿');
   const batchDraftRows = [{
-    no: '1',
-    batchName: '2026-07-08 批量导入草稿',
+    no: '2026-7-26-1',
     fileName: '投诉批量导入模板.xlsx',
     importCount: 8,
     confirmedCount: 1,
@@ -4354,6 +4353,41 @@ function EntryMethodList({
       { no: 'DR202607080006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', status: '待确认', checked: false, errors: null },
       { no: 'DR202607080007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', status: '待确认', checked: false, errors: null },
       { no: 'DR202607080008', title: '征信异议处理', channel: '其它', customer: '刘先生', status: '待确认', checked: false, errors: null }
+    ]
+  }, {
+    no: '2026-7-26-2',
+    fileName: '监管转办投诉批量导入.xlsx',
+    importCount: 5,
+    confirmedCount: 2,
+    pendingCount: 3,
+    failedCount: 0,
+    status: '草稿',
+    time: '2026-07-26 16:40',
+    operator: '赵一明',
+    rows: [
+      { no: 'DR202607260201', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607260202', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607260203', title: '网点服务体验投诉', channel: '银行协会', customer: '陈女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607260204', title: '账户服务咨询', channel: '政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607260205', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', status: '待确认', checked: false, errors: null }
+    ]
+  }, {
+    no: '2026-7-25-1',
+    fileName: '客服渠道投诉批量导入.xlsx',
+    importCount: 6,
+    confirmedCount: 4,
+    pendingCount: 2,
+    failedCount: 0,
+    status: '草稿',
+    time: '2026-07-25 10:18',
+    operator: '赵一明',
+    rows: [
+      { no: 'DR202607250101', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607250102', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607250103', title: '柜面业务办理时效', channel: '银行协会', customer: '马先生', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607250104', title: '征信异议处理', channel: '其它', customer: '刘先生', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607250105', title: '账户服务咨询投诉', channel: '政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607250106', title: '贷款资料补充说明', channel: '市监管局', customer: '孙女士', status: '待确认', checked: false, errors: null }
     ]
   }];
   const [draftTab, setDraftTab] = useState('单笔录入');
@@ -4413,8 +4447,8 @@ function EntryMethodList({
     }), /*#__PURE__*/_jsxs("section", {
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
-        className: "grid grid-cols-1 gap-4 lg:grid-cols-5",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        className: `grid grid-cols-1 gap-4 ${listTab === '草稿箱' && draftTab === '批量录入' ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`,
+        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -4428,7 +4462,7 @@ function EntryMethodList({
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-mist/60 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-                children: (listTab === '草稿箱' && draftTab === '批量录入' ? ['批次编号', '批次名称', '导入文件', '工单数量', '已确认/待确认', '状态', '保存时间', '操作'] : ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作']).map(head => /*#__PURE__*/_jsx("th", {
+                children: (listTab === '草稿箱' && draftTab === '批量录入' ? ['批次编号', '导入文件', '工单数量', '已派发/草稿箱', '状态', '录入时间', '操作'] : ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作']).map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-5 py-4 font-bold",
                 children: head
               }, head))
@@ -4440,9 +4474,6 @@ function EntryMethodList({
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-5 py-4 font-bold text-ink",
-                children: row.batchName
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 text-slate-600",
                 children: row.fileName
@@ -6313,7 +6344,7 @@ function BatchImport({
         children: "正在继续编辑批量导入草稿"
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-1",
-        children: [draftBatch.no, " ｜ ", draftBatch.batchName, " ｜ 已保存 ", draftBatch.importCount, " 条工单信息"]
+        children: ["批次编号：", draftBatch.no, " ｜ 已保存 ", draftBatch.importCount, " 条工单信息"]
       })]
     }), /*#__PURE__*/_jsxs("div", {
       className: "grid grid-cols-1 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]",
