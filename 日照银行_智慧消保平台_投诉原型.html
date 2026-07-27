@@ -2500,9 +2500,14 @@ function EntryWorkspace(props) {
     tagReady,
     handleTag
   } = props;
+  const [batchDraftToEdit, setBatchDraftToEdit] = useState(null);
   return /*#__PURE__*/_jsx("div", {
     children: entryTab === '列表' ? /*#__PURE__*/_jsx(EntryMethodList, {
-      setEntryTab: setEntryTab
+      setEntryTab: setEntryTab,
+      onOpenBatchDraft: draft => {
+        setBatchDraftToEdit(draft);
+        setEntryTab('批量导入');
+      }
     }) : entryTab === '批量导入' ? /*#__PURE__*/_jsxs("div", {
       children: [/*#__PURE__*/_jsx("div", {
         className: "mb-5",
@@ -2520,7 +2525,9 @@ function EntryWorkspace(props) {
         setReasonTag: setReasonTag,
         tagReady: tagReady,
         handleTag: handleTag,
-        setEntryTab: setEntryTab
+        setEntryTab: setEntryTab,
+        draftBatch: batchDraftToEdit,
+        clearDraftBatch: () => setBatchDraftToEdit(null)
       })]
     }) : /*#__PURE__*/_jsxs(_Fragment, {
       children: [/*#__PURE__*/_jsx("div", {
@@ -2740,11 +2747,23 @@ function ProcessingWorkspace({
       setPendingMessageWorkOrder && setPendingMessageWorkOrder(null);
       return;
     }
-    if (pendingMessageWorkOrder.jump === 'detail' || pendingMessageWorkOrder.jump === 'view') {
+    if (pendingMessageWorkOrder.jump === 'detail' || pendingMessageWorkOrder.jump === 'view' || pendingMessageWorkOrder.jump === 'returnVisit') {
       const allRows = effectiveGroups.flatMap(group => group.rows);
-      const targetRow = allRows.find(row => row.no === pendingMessageWorkOrder.no) || allRows[0];
+      const targetRow = allRows.find(row => row.no === pendingMessageWorkOrder.no) || {
+        no: pendingMessageWorkOrder.no,
+        title: '短信联系审核工单',
+        channel: '市监管局',
+        customer: '李女士',
+        org: '信用卡中心',
+        level: '重要',
+        status: '待处理',
+        remain: '剩余 1 天 6 小时',
+        handler: pendingMessageWorkOrder.handler || currentOperator,
+        owner: true,
+        content: pendingMessageWorkOrder.content || content || '短信审核完成后进入工单处理环节，继续补充联系记录和处理意见。'
+      };
       if (targetRow) {
-        setDetailMode(pendingMessageWorkOrder.jump === 'view' ? 'view' : 'process');
+        setDetailMode(pendingMessageWorkOrder.jump === 'view' ? 'view' : pendingMessageWorkOrder.jump === 'returnVisit' ? 'returnVisit' : 'process');
         setDetailRow(targetRow);
       }
       setPendingMessageWorkOrder && setPendingMessageWorkOrder(null);
@@ -2759,7 +2778,9 @@ function ProcessingWorkspace({
         className: "rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700",
         children: "返回处理列表"
       }), detailMode === 'returnVisit' ? /*#__PURE__*/_jsx(ReturnVisitPage, {
-        row: detailRow
+        row: detailRow,
+        smsAuditRows: smsAuditRows,
+        onSubmitSmsAudit: onSubmitSmsAudit
       }) : /*#__PURE__*/_jsx(ProcessingDetail, {
         role: role,
         row: detailRow,
@@ -2979,9 +3000,17 @@ function SmsAuditWorkspace({
       auditTime: getCurrentContactTime(),
       interceptReason
     } : item));
-    window.alert(status === '已同意' ? '短信已同意，审核结果已写入联系记录，请继续填写处理信息。' : '短信已拦截，拦截原因已写入联系记录，请继续填写处理信息。');
-    setPendingMessageWorkOrder({ no: row.workOrderNo, jump: 'detail' });
-    setMainTab('处理工单');
+    window.alert(status === '已同意' ? '短信已同意，审核结果已写入联系记录。' : '短信已拦截，拦截原因已写入联系记录。');
+    if (row.returnTo === 'detail' || row.returnTo === 'returnVisit') {
+      setPendingMessageWorkOrder({
+        no: row.workOrderNo,
+        jump: row.returnTo === 'returnVisit' ? 'returnVisit' : 'detail',
+        handler: row.handler,
+        content: row.content,
+        source: 'smsAudit'
+      });
+      setMainTab('处理工单');
+    }
   };
   const openReject = row => {
     setRejectRow(row);
@@ -3279,11 +3308,11 @@ function ProcessingDetail({
     handler: row.handler || '张经理',
     replyPersonName: row.handler || '张经理',
     replyPhone: '156****2816',
-    contactResult: item.status === '已同意' ? '已联系' : '未联系上',
+    contactResult: '已联系',
     contactContent: '已向客户说明处理进度并确认后续反馈方式，客户认可当前处理方案。'
   }] : []);
   const [showSendSms, setShowSendSms] = useState(false);
-  const [showBbkRecording, setShowBbkRecording] = useState(false);
+  const [showRecordingModal, setShowRecordingModal] = useState(false);
   const [showNewComm, setShowNewComm] = useState(false);
   const [showTransfer, setShowTransfer] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
@@ -3309,7 +3338,7 @@ function ProcessingDetail({
     handler: item.handler,
     replyPersonName: item.handler,
     replyPhone: customerPhone,
-    contactResult: '已联系',
+    contactResult: item.status === '已同意' ? '已联系' : '未联系上',
     contactContent: item.content,
     recordingFile: '-',
     interceptReason: item.interceptReason || ''
@@ -3318,6 +3347,18 @@ function ProcessingDetail({
     ...record,
     recordNo: index + 1
   }));
+  const returnVisitRecords = row.status === '已办结' ? [{
+    type: 'outbound',
+    time: '2026-07-04 09:20',
+    method: '电话联系',
+    handler: row.handler || '张经理',
+    replyPersonName: row.handler || '张经理',
+    replyPhone: customerPhone,
+    contactResult: '已联系',
+    contactContent: '已回访客户，客户确认已收到处理结果反馈，对本次处理流程无新增异议。',
+    recordingFile: '回访录音_15600002816_20260704_0920.mp3',
+    interceptReason: ''
+  }] : [];
 
   const detailFields = [{
     label: '行内工单编号',
@@ -3484,9 +3525,9 @@ function ProcessingDetail({
             })]
           })]
         }), /*#__PURE__*/_jsx("button", {
-          onClick: () => setShowBbkRecording(true),
+          onClick: () => setShowRecordingModal(true),
           className: "h-12 rounded-xl bg-rizhao px-6 text-sm font-black text-white shadow-low",
-          children: "添加步步高录音文件"
+          children: "添加录音文件"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowSendSms(true),
           className: "h-12 rounded-xl border border-rizhao bg-white px-6 text-sm font-black text-rizhao",
@@ -3502,6 +3543,12 @@ function ProcessingDetail({
       title: "联系与沟通记录",
       children: /*#__PURE__*/_jsx(ContactRecordsTable, {
         records: displayCommRecords
+      })
+    }), isViewMode && returnVisitRecords.length > 0 && /*#__PURE__*/_jsx(ProcessingInfoSubSection, {
+      integrated: true,
+      title: "回访记录",
+      children: /*#__PURE__*/_jsx(ContactRecordsTable, {
+        records: returnVisitRecords
       })
     }), /*#__PURE__*/_jsxs(ProcessingInfoSubSection, {
       integrated: true,
@@ -3591,14 +3638,14 @@ function ProcessingDetail({
       handler: row.handler || '当前处理人',
       onClose: () => setShowSendSms(false),
       onSubmitAudit: rec => {
-        onSubmitSmsAudit && onSubmitSmsAudit(rec);
+        onSubmitSmsAudit && onSubmitSmsAudit({ ...rec, returnTo: 'detail' });
         setShowSendSms(false);
         showToast('短信已提交审核');
       }
-    }), showBbkRecording && /*#__PURE__*/_jsx(BbkRecordingModal, {
+    }), showRecordingModal && /*#__PURE__*/_jsx(RecordingFileModal, {
       customerPhone: customerPhone,
-      onClose: () => setShowBbkRecording(false),
-      onSave: rec => { addCommRecord({ type: 'bbkRecording', time: getCurrentContactTime(), ...rec }); setContactResult(rec.contactResult); setShowBbkRecording(false); showToast('已生成一条联系记录'); }
+      onClose: () => setShowRecordingModal(false),
+      onSave: rec => { addCommRecord({ type: 'recording', time: getCurrentContactTime(), ...rec }); setContactResult(rec.contactResult); setShowRecordingModal(false); showToast('已生成一条联系记录'); }
     }), showNewComm && /*#__PURE__*/_jsx(NewCommunicationModal, {
       customerPhone: customerPhone,
       onClose: () => setShowNewComm(false),
@@ -3637,7 +3684,7 @@ function ProcessingDetail({
     })]
   });
 }
-function BbkRecordingModal({ customerPhone, onClose, onSave }) {
+function RecordingFileModal({ customerPhone, onClose, onSave }) {
   const [recordingFile, setRecordingFile] = useState('');
   const [contactResult, setContactResult] = useState('');
   const [contactContent, setContactContent] = useState('');
@@ -3651,7 +3698,7 @@ function BbkRecordingModal({ customerPhone, onClose, onSave }) {
       contactContent: contactContent.trim(),
       recordingFile,
       duration: duration || '-',
-      contactSource: '步步高本地录音'
+      contactSource: '录音文件'
     });
   };
   return /*#__PURE__*/_jsxs("div", {
@@ -3662,7 +3709,7 @@ function BbkRecordingModal({ customerPhone, onClose, onSave }) {
         className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
         children: [/*#__PURE__*/_jsx("div", {
           className: "text-xl font-black text-ink",
-          children: "添加步步高录音文件"
+          children: "添加录音文件"
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
@@ -3687,12 +3734,12 @@ function BbkRecordingModal({ customerPhone, onClose, onSave }) {
           className: "block",
           children: [/*#__PURE__*/_jsx("div", {
             className: "field-label mb-2",
-            children: "* 步步高录音文件"
+            children: "* 录音文件"
           }), /*#__PURE__*/_jsxs("div", {
             className: "flex flex-wrap items-center gap-3",
             children: [/*#__PURE__*/_jsx("button", {
               type: "button",
-              onClick: () => setRecordingFile('步步高录音_15600002816_20260717_1032.mp3'),
+              onClick: () => setRecordingFile('外呼录音_15600002816_20260717_1032.mp3'),
               className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-low",
               children: "上传文件"
             }), recordingFile && /*#__PURE__*/_jsxs("span", {
@@ -4257,7 +4304,8 @@ function AssignModal({ row, onClose, onSave }) {
   });
 }
 function EntryMethodList({
-  setEntryTab
+  setEntryTab,
+  onOpenBatchDraft
 }) {
   const allRows = [{
     no: 'TS202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '东港支行', level: '普通', status: '草稿', time: '2026-07-02 09:24'
@@ -4286,7 +4334,28 @@ function EntryMethodList({
   const [listTab, setListTab] = useState('已派发工单');
   const dispatchedRows = allRows.filter(r => r.status !== '草稿');
   const draftRows = allRows.filter(r => r.status === '草稿');
-  const batchDraftRows = [{ no: 'DR202607080001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 09:24' }, { no: 'DR202607080002', title: '信用卡还款协商', channel: '12378', customer: '李女士', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 10:18' }, { no: 'DR202607080003', title: '账户服务咨询', channel: '政务热线', customer: '张女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 11:05' }, { no: 'DR202607080004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 11:26' }, { no: 'DR202607080005', title: '网点服务体验投诉', channel: '客服中心', customer: '陈女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 13:40' }, { no: 'DR202607080006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 14:08' }, { no: 'DR202607080007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', org: '批量导入', level: '普通', status: '草稿', time: '2026-07-08 14:35' }, { no: 'DR202607080008', title: '征信异议处理', channel: '12378', customer: '刘先生', org: '批量导入', level: '重要', status: '草稿', time: '2026-07-08 15:12' }];
+  const batchDraftRows = [{
+    no: '1',
+    batchName: '2026-07-08 批量导入草稿',
+    fileName: '投诉批量导入模板.xlsx',
+    importCount: 8,
+    confirmedCount: 1,
+    pendingCount: 7,
+    failedCount: 0,
+    status: '草稿',
+    time: '2026-07-08 15:12',
+    operator: '赵一明',
+    rows: [
+      { no: 'DR202607080001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', status: '已确认', checked: false, errors: null },
+      { no: 'DR202607080002', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607080003', title: '账户服务咨询', channel: '政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607080004', title: '经营贷办理进度反馈', channel: '国家局', customer: '赵先生', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607080005', title: '网点服务体验投诉', channel: '银行协会', customer: '陈女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607080006', title: '提前还款费用争议', channel: '省监管局', customer: '周先生', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607080007', title: '银行卡交易限额咨询', channel: '政务热线', customer: '吴女士', status: '待确认', checked: false, errors: null },
+      { no: 'DR202607080008', title: '征信异议处理', channel: '其它', customer: '刘先生', status: '待确认', checked: false, errors: null }
+    ]
+  }];
   const [draftTab, setDraftTab] = useState('单笔录入');
   const currentRows = (listTab === '已派发工单' ? dispatchedRows : draftTab === '单笔录入' ? draftRows : batchDraftRows).map(row => ({
     ...row,
@@ -4359,14 +4428,48 @@ function EntryMethodList({
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-mist/60 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-                children: ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+                children: (listTab === '草稿箱' && draftTab === '批量录入' ? ['批次编号', '批次名称', '导入文件', '工单数量', '已确认/待确认', '状态', '保存时间', '操作'] : ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作']).map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-5 py-4 font-bold",
                 children: head
               }, head))
             })
           }), /*#__PURE__*/_jsx("tbody", {
             className: "divide-y divide-slate-100",
-            children: currentRows.map(row => /*#__PURE__*/_jsxs("tr", {
+            children: currentRows.map(row => listTab === '草稿箱' && draftTab === '批量录入' ? /*#__PURE__*/_jsxs("tr", {
+              className: "hover:bg-mist/50",
+              children: [/*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 font-bold text-rizhao",
+                children: row.no
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 font-bold text-ink",
+                children: row.batchName
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 text-slate-600",
+                children: row.fileName
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4",
+                children: `${row.importCount} 条`
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4",
+                children: `${row.confirmedCount} / ${row.pendingCount}`
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4",
+                children: /*#__PURE__*/_jsx("span", {
+                  className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
+                  children: row.status
+                })
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 text-slate-500",
+                children: row.time
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4",
+                children: /*#__PURE__*/_jsx("button", {
+                  onClick: () => onOpenBatchDraft && onOpenBatchDraft(row),
+                  className: "font-bold text-rizhao",
+                  children: "查看"
+                })
+              })]
+            }, row.no) : /*#__PURE__*/_jsxs("tr", {
               className: "hover:bg-mist/50",
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
@@ -4506,6 +4609,18 @@ function ReadOnlyComplaintDetail({
     label: '处理人',
     value: '张经理'
   }];
+  const hasReturnVisit = row.visitStatus === '是' && (row.status === '已办结' || row.status === '已关单');
+  const returnVisitRecords = [{
+    recordNo: 1,
+    time: '2026-07-04 09:20',
+    method: '电话联系',
+    replyPersonName: row.handler || '张经理',
+    replyPhone: row.phone || '156****2816',
+    contactResult: '已联系',
+    recordingFile: '回访录音_15600002816_20260704_0920.mp3',
+    contactContent: '已回访客户，客户确认已收到处理结果反馈，对本次处理流程无新增异议。',
+    interceptReason: ''
+  }];
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
     children: [/*#__PURE__*/_jsxs("div", {
@@ -4572,6 +4687,11 @@ function ReadOnlyComplaintDetail({
           contactResult: '已联系',
           contactContent: '已向客户说明处理进度并确认后续反馈方式，客户认可当前处理方案。'
         }]
+      })
+    }), !isDraftOrder && hasReturnVisit && /*#__PURE__*/_jsx(StandardSection, {
+      title: "回访记录",
+      children: /*#__PURE__*/_jsx(ContactRecordsTable, {
+        records: returnVisitRecords
       })
     }), !isDraftOrder && /*#__PURE__*/_jsx(FlowRecordSection, {
       highlight: focusFlow,
@@ -5480,11 +5600,11 @@ function StandardComplaintForm({
           className: "rounded-xl border border-line-divider bg-white px-5 py-3 text-sm font-bold text-rizhao",
           onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); if (onSaveDraft) onSaveDraft(); },
           children: "保存草稿"
-        }), rowStatus !== '已确认' ? /*#__PURE__*/_jsx("button", {
-          onClick: () => { if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase()); if (onSaveConfirm) onSaveConfirm(); },
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: () => setShowDispatchConfirm(true),
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
-          children: "保存并确认"
-        }) : null]
+          children: "直接派发"
+        })]
       }) : /*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
@@ -5511,7 +5631,7 @@ function StandardComplaintForm({
       onClose: () => setShowDispatchConfirm(false),
       onConfirm: () => {
         if (!orderNo) setOrderNo('RZYH' + Date.now().toString(36).toUpperCase());
-        if (footerMode === 'dispatch' && onDispatch) onDispatch();
+        if ((footerMode === 'dispatch' || footerMode === 'batch_confirm') && onDispatch) onDispatch();
         showToast('工单已派发');
         setShowDispatchConfirm(false);
       }
@@ -5988,14 +6108,16 @@ function BatchImport({
   setReasonTag,
   tagReady,
   handleTag,
-  setEntryTab
+  setEntryTab,
+  draftBatch,
+  clearDraftBatch
 }) {
   const pageSize = 10;
-  const [phase, setPhase] = useState('upload');
-  const [uploadState, setUploadState] = useState('idle');
+  const [phase, setPhase] = useState(draftBatch ? 'confirm' : 'upload');
+  const [uploadState, setUploadState] = useState(draftBatch ? 'parsed' : 'idle');
   const [parseError, setParseError] = useState(null);
-  const [rows, setRows] = useState([]);
-  const [selectedNo, setSelectedNo] = useState(null);
+  const [rows, setRows] = useState(draftBatch ? draftBatch.rows.map(r => ({ ...r, checked: false })) : []);
+  const [selectedNo, setSelectedNo] = useState(draftBatch?.rows?.[0]?.no || null);
   const [page, setPage] = useState(1);
   const [allChecked, setAllChecked] = useState(false);
   const [errorTriggered, setErrorTriggered] = useState(false);
@@ -6044,6 +6166,7 @@ function BatchImport({
     }, 300);
   }
   function handleReUpload() {
+    clearDraftBatch && clearDraftBatch();
     setPhase('upload');
     setUploadState('idle');
     setParseError(null);
@@ -6053,7 +6176,7 @@ function BatchImport({
     setAllChecked(false);
     setErrorTriggered(false);
   }
-  function handleSaveDraft() { showToast('草稿数据已保存，请确认后提交。'); }
+  function handleSaveDraft() { showToast('当前工单已保存，未派发数据继续保留在本批次草稿中。'); }
   function handleSaveConfirm() {
     const cur = rows.find(r => r.no === selectedNo);
     if (!cur || !cur.no) return;
@@ -6061,6 +6184,15 @@ function BatchImport({
     const next = rows.find(r => r.status === '待确认' && r.no !== selectedNo);
     if (next) setSelectedNo(next.no);
     showToast('数据已确认');
+  }
+  function handleDispatchCurrent() {
+    const cur = rows.find(r => r.no === selectedNo);
+    if (!cur || !cur.no) return;
+    setRows(prev => prev.filter(r => r.no !== selectedNo));
+    const next = rows.find(r => r.status === '待确认' && r.no !== selectedNo);
+    setSelectedNo(next ? next.no : null);
+    setAllChecked(false);
+    showToast('当前工单已派发，其余未完成工单已保留在本批次草稿中。');
   }
   function handleBatchConfirm() {
     const checked = rows.filter(r => r.checked);
@@ -6073,6 +6205,7 @@ function BatchImport({
   function statusBadge(s) {
     if (s === '待确认') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-orange-50 px-2 py-0.5 text-xs font-bold text-orange-600", children: s });
     if (s === '已确认') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-green-50 px-2 py-0.5 text-xs font-bold text-green-700", children: s });
+    if (s === '已派发') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-700", children: s });
     if (s === '校验失败') return /*#__PURE__*/_jsx("span", { className: "rounded-full bg-red-50 px-2 py-0.5 text-xs font-bold text-red-600", children: s });
     return null;
   }
@@ -6086,7 +6219,7 @@ function BatchImport({
         children: [/*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("div", {
             className: "text-xl font-black text-ink",
-            children: "批量导入"
+          children: "批量导入"
           }), /*#__PURE__*/_jsx("div", {
             className: "mt-1 text-sm text-slate-500",
             children: "请使用系统标准模板填写并上传。仅支持 .xlsx 文件。"
@@ -6146,10 +6279,43 @@ function BatchImport({
     });
   }
 
+  if (phase === 'confirm' && rows.length === 0) {
+    return /*#__PURE__*/_jsxs("section", {
+      className: "flex min-h-[460px] flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center",
+      children: [/*#__PURE__*/_jsx("div", {
+        className: "mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 text-3xl font-black text-green-600 shadow-sm",
+        children: "✓"
+      }), /*#__PURE__*/_jsx("div", {
+        className: "mt-5 text-xl font-black text-ink",
+        children: "本批次工单已全部派发完成"
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "mt-3 space-y-1 text-sm text-slate-500",
+        children: [/*#__PURE__*/_jsx("div", {
+          children: "批次编号：" + (draftBatch?.no || '1')
+        }), /*#__PURE__*/_jsx("div", {
+          children: "已派发工单：" + (draftBatch?.importCount || 0) + " 条"
+        })]
+      }), /*#__PURE__*/_jsx("button", {
+        onClick: () => { clearDraftBatch && clearDraftBatch(); setEntryTab('列表'); },
+        className: "mt-8 rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
+        children: "返回工单列表"
+      })]
+    });
+  }
+
   // ── Confirm Phase ──
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-4",
-    children: [/*#__PURE__*/_jsxs("div", {
+    children: [draftBatch && /*#__PURE__*/_jsxs("div", {
+      className: "rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4 text-sm text-orange-700",
+      children: [/*#__PURE__*/_jsx("div", {
+        className: "font-black",
+        children: "正在继续编辑批量导入草稿"
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "mt-1",
+        children: [draftBatch.no, " ｜ ", draftBatch.batchName, " ｜ 已保存 ", draftBatch.importCount, " 条工单信息"]
+      })]
+    }), /*#__PURE__*/_jsxs("div", {
       className: "grid grid-cols-1 gap-5 lg:grid-cols-[340px_minmax(0,1fr)]",
       children: [/*#__PURE__*/_jsxs("aside", {
         className: "self-start sticky top-4 rounded-2xl border border-slate-200 bg-white p-4",
@@ -6220,6 +6386,7 @@ function BatchImport({
           footerMode: "batch_confirm",
           onSaveDraft: handleSaveDraft,
           onSaveConfirm: handleSaveConfirm,
+          onDispatch: handleDispatchCurrent,
           rowStatus: selectedRow ? selectedRow.status : '待确认',
           key: selectedNo
         })
@@ -6280,8 +6447,8 @@ function LedgerExportWorkspace() {
     phone: ['138****0919', '156****2816', '139****7735', '187****6620', '135****0821'][index % 5],
     org: ['东港支行', '信用卡中心', '岚山支行', '五莲支行', '营业部'][index % 5],
     level: index % 3 === 0 ? '重要' : '普通',
-    status: ['待处理', '处理中', '待审核', '已关单'][index % 4],
-    visitStatus: index % 2 === 0 ? '否' : '是',
+    status: index % 2 === 1 ? '已关单' : ['待处理', '处理中', '待审核'][index % 3],
+    visitStatus: index % 2 === 1 ? '是' : '否',
     time: `2026-07-${String(index + 1).padStart(2, '0')} 09:${String(18 + index).padStart(2, '0')}`,
     content: '客户反映相关业务办理问题，要求银行核实后反馈处理结果。'
   }));
@@ -6467,22 +6634,56 @@ function LedgerExportWorkspace() {
   });
 }
 function ReturnVisitPage({
-  row
+  row,
+  smsAuditRows = [],
+  onSubmitSmsAudit
 }) {
-  const [visitWay, setVisitWay] = useState('');
+  const customerPhone = row.phone || '156****2816';
+  const customerPhoneForCopy = customerPhone.replace(/\*/g, '0');
+  const [commRecords, setCommRecords] = useState([{
+    type: 'outbound',
+    recordNo: 1,
+    time: '2026-07-03 09:35',
+    method: '电话联系',
+    handler: '张经理',
+    replyPersonName: '张经理',
+    replyPhone: customerPhone,
+    contactResult: '已联系',
+    contactContent: '客户表示已收到处理反馈，待进一步确认。'
+  }]);
+  const [showSendSms, setShowSendSms] = useState(false);
+  const [showBbkRecording, setShowBbkRecording] = useState(false);
+  const [showNewComm, setShowNewComm] = useState(false);
+  const [visitConclusion, setVisitConclusion] = useState('');
   const [visitResult, setVisitResult] = useState('');
-  const [visitOpinion, setVisitOpinion] = useState('');
-  const [smsContent, setSmsContent] = useState(`尊敬的客户，您好。关于您反馈的${row.title}，日照银行已完成处理，请您对处理情况进行确认。如有疑问请联系我行工作人员。`);
-  const [smsSendStatus, setSmsSendStatus] = useState('');
+  const [toast, setToast] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
-  const sendSms = () => {
-    setSmsSendStatus(Math.random() > 0.35 ? '成功' : '失败');
-  };
+  const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
   const currentUser = {
     name: '张经理',
     workNo: 'RZB-2026-018',
     org: '总行消保中心'
   };
+  const addCommRecord = record => setCommRecords(prev => [...prev, {
+    recordNo: prev.length + 1,
+    handler: currentUser.name,
+    replyPersonName: currentUser.name,
+    replyPhone: customerPhone,
+    ...record
+  }]);
+  const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status !== '待审核').map(item => ({
+    type: 'sms',
+    time: item.auditTime || item.applyTime,
+    method: '短信',
+    handler: item.handler,
+    replyPersonName: item.handler,
+    replyPhone: customerPhone,
+    contactResult: item.status === '已同意' ? '已联系' : '未联系上',
+    contactContent: item.content,
+    recordingFile: '-',
+    interceptReason: item.interceptReason || ''
+  }));
+  const displayCommRecords = commRecords.concat(auditedSmsRecords).map((record, index) => ({ ...record, recordNo: index + 1 }));
   const visitOrderFields = [{
     label: '行内工单编号',
     value: row.no
@@ -6653,129 +6854,101 @@ function ReturnVisitPage({
       }]
     }), /*#__PURE__*/_jsx(FlowRecordSection, {
       records: buildExampleFlowRecords(row)
-    }), /*#__PURE__*/_jsxs(ProcessingInfoSubSection, {
-      title: "回访客户",
+    }), /*#__PURE__*/_jsxs(StandardSection, {
+      title: "回访联系客户",
       children: [/*#__PURE__*/_jsxs("div", {
+        className: "mb-4 flex flex-wrap items-center gap-4",
+        children: [/*#__PURE__*/_jsxs("div", {
+          className: "flex h-12 min-w-[300px] items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-4",
+          children: [/*#__PURE__*/_jsx("span", {
+            className: "text-sm font-black tracking-wide text-ink before:mr-1 before:font-bold before:text-slate-500 before:content-['联系电话：']",
+            children: customerPhone
+          }), /*#__PURE__*/_jsx("button", {
+            type: "button",
+            onClick: async () => {
+              try {
+                await navigator.clipboard.writeText(customerPhoneForCopy);
+                showToast('手机号已复制');
+              } catch (error) {
+                showToast(`手机号：${customerPhoneForCopy}`);
+              }
+            },
+            className: "whitespace-nowrap text-sm font-black text-rizhao",
+            children: "一键复制"
+          })]
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: () => setShowBbkRecording(true),
+          className: "h-12 rounded-xl bg-rizhao px-6 text-sm font-black text-white shadow-low",
+          children: "添加步步高录音文件"
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: () => setShowSendSms(true),
+          className: "h-12 rounded-xl border border-rizhao bg-white px-6 text-sm font-black text-rizhao",
+          children: "发送短信"
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: () => setShowNewComm(true),
+          className: "h-12 rounded-xl border border-slate-300 bg-white px-6 text-sm font-black text-slate-700",
+          children: "新增联系与沟通记录"
+        })]
+      }), /*#__PURE__*/_jsx(ContactRecordsTable, {
+        records: displayCommRecords
+      }), /*#__PURE__*/_jsx("div", {
+        className: "my-5 border-t border-slate-100"
+      }), /*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
         children: [/*#__PURE__*/_jsx(Field, {
-          label: "* 回访方式",
+          label: "* 回访结论",
           type: "select",
-          options: ['电话回访', '短信回访', '系统记录', '线下回访'],
-          value: visitWay,
-          setValue: setVisitWay
-        }), /*#__PURE__*/_jsx(Field, {
-          label: "* 回访结果",
-          type: "select",
-          options: ['满意', '不满意', '未联系上', '无需回访'],
-          value: visitResult,
-          setValue: setVisitResult
+          options: ['客户认可处理结果', '客户不认可处理结果', '未联系上', '无需回访'],
+          value: visitConclusion,
+          setValue: setVisitConclusion
         }), /*#__PURE__*/_jsx("div", {
           className: "xl:col-span-2",
           children: /*#__PURE__*/_jsx(TextArea, {
-            label: "回访说明",
-            placeholder: "请输入客户回访情况、补充意见或未联系原因",
-            value: visitOpinion,
-            setValue: setVisitOpinion
+            label: "* 回访结果",
+            placeholder: "请输入回访过程、客户反馈、补充意见或未联系原因",
+            value: visitResult,
+            setValue: setVisitResult
           })
-        }), visitWay === '电话回访' && /*#__PURE__*/_jsxs("div", {
-          className: "xl:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-4",
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "field-label mb-2",
-            children: "拨打号码"
-          }), /*#__PURE__*/_jsxs("div", {
-            className: "flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white px-4 py-3",
-            children: [/*#__PURE__*/_jsx("span", {
-              className: "text-sm font-black text-ink",
-              children: row.phone
-            }), /*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: () => alert(`正在拨打 ${row.phone}`),
-              className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-mid",
-              children: "拨打号码"
-            })]
-          })]
-        }), visitWay === '短信回访' && /*#__PURE__*/_jsxs("div", {
-          className: "xl:col-span-2 rounded-2xl border border-line-divider bg-mist/40 p-4",
-          children: [/*#__PURE__*/_jsx(TextArea, {
-            label: "短信内容",
-            placeholder: "请输入短信内容",
-            value: smsContent,
-            setValue: setSmsContent
-          }), /*#__PURE__*/_jsx("div", {
-            className: "mt-3 flex justify-end",
-            children: /*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: sendSms,
-              className: "rounded-xl bg-rizhao px-5 py-2.5 text-sm font-black text-white shadow-mid",
-              children: "发送至运营商"
-            })
-          }), smsSendStatus && /*#__PURE__*/_jsxs("div", {
-            className: `mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm font-bold ${smsSendStatus === '成功' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`,
-            children: [/*#__PURE__*/_jsx("span", {
-              children: smsSendStatus === '成功' ? '运营商返回：短信发送成功' : '运营商返回：短信发送失败'
-            }), smsSendStatus === '失败' && /*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: sendSms,
-              className: "rounded-lg bg-white px-3 py-1.5 text-xs font-black text-red-700",
-              children: "重试发送"
-            })]
-          })]
         })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3 border-t border-slate-200 pt-5",
         children: [/*#__PURE__*/_jsx("button", {
-          onClick: () => alert('回访信息已保存。'),
+          onClick: () => showToast('回访联系记录已保存'),
           className: "rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700",
-          children: "保存回访"
+          children: "保存"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => {
-            if (!visitWay || !visitResult) {
-              alert('请选择回访方式和回访结果。');
+            if (!visitConclusion || !visitResult.trim()) {
+              showToast('请填写回访结论和回访结果');
               return;
             }
-            alert('回访已提交。');
+            showToast('回访已提交');
           },
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "提交"
         })]
       })]
-    }), /*#__PURE__*/_jsxs(StandardSection, {
-      title: "回访记录",
-      children: [/*#__PURE__*/_jsx("div", {
-        className: "overflow-hidden rounded-xl border border-slate-200",
-        children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full min-w-[820px] text-left text-sm",
-          children: [/*#__PURE__*/_jsx("thead", {
-            className: "bg-slate-100 text-slate-600",
-            children: /*#__PURE__*/_jsx("tr", {
-              children: ['回访时间', '回访方式', '回访人', '回访结果', '说明'].map(head => /*#__PURE__*/_jsx("th", {
-                className: "px-4 py-3 font-black whitespace-nowrap",
-                children: head
-              }, head))
-            })
-          }), /*#__PURE__*/_jsxs("tbody", {
-            className: "divide-y divide-slate-100",
-            children: [/*#__PURE__*/_jsxs("tr", {
-              children: [/*#__PURE__*/_jsx("td", {
-                className: "px-4 py-3 whitespace-nowrap text-slate-500",
-                children: "2026-07-03 09:35"
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-4 py-3 whitespace-nowrap",
-                children: "电话回访"
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-4 py-3 whitespace-nowrap",
-                children: "张经理"
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-4 py-3 whitespace-nowrap",
-                children: "已联系"
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-4 py-3 text-slate-600",
-                children: "客户表示已收到处理反馈，待进一步确认。"
-              })]
-            })]
-          })]
-        })
-      })]
+    }), showSendSms && /*#__PURE__*/_jsx(SendSmsModal, {
+      customerPhone: customerPhone,
+      workOrderNo: row.no,
+      handler: currentUser.name,
+      onClose: () => setShowSendSms(false),
+      onSubmitAudit: rec => {
+        onSubmitSmsAudit && onSubmitSmsAudit({ ...rec, returnTo: 'returnVisit' });
+        setShowSendSms(false);
+        showToast('短信已提交审核');
+      }
+    }), showBbkRecording && /*#__PURE__*/_jsx(BbkRecordingModal, {
+      customerPhone: customerPhone,
+      onClose: () => setShowBbkRecording(false),
+      onSave: rec => { addCommRecord({ type: 'bbkRecording', time: getCurrentContactTime(), ...rec }); setShowBbkRecording(false); showToast('已生成一条联系记录'); }
+    }), showNewComm && /*#__PURE__*/_jsx(NewCommunicationModal, {
+      customerPhone: customerPhone,
+      onClose: () => setShowNewComm(false),
+      onSave: rec => { addCommRecord({ type: 'manual', time: getCurrentContactTime(), ...rec }); setShowNewComm(false); }
+    }), toast && /*#__PURE__*/_jsx("div", {
+      className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
+      children: toast
     })]
   });
 }
