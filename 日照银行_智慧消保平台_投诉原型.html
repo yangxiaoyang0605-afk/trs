@@ -443,12 +443,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       --rz-text-aux: #707070;
       --rz-text-secondary: #949494;
       --rz-text-disabled: #C1C1C1;
-      --rz-bg-page: #F6F6F6;
+      --rz-bg-page: #FBFBFB;
       --rz-bg-card: #FFFFFF;
       --rz-bg-subtle: #FBFBFB;
+      --rz-bg-disabled: #F6F6F6;
       --rz-line: #EDEDED;
       --rz-line-strong: #E4E4E4;
       --rz-fill-regular: #E4E4E4;
+      --rz-fill-hover: #D2D2D2;
+      --rz-fill-click: #C1C1C1;
       --rz-function-disabled: #D8E6FF;
       --rz-function-hover: #6C98FF;
       --rz-function: #3D71FF;
@@ -471,6 +474,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       --rz-shadow-low: 3px 5px 8px 0px rgba(0, 0, 0, 0.02);
       --rz-shadow-mid: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
       --rz-shadow-high: 0px 17px 24px 0px rgba(0, 0, 0, 0.06);
+      --rz-space-base: 4px;
       --rz-space-xs: 8px;
       --rz-space-card: 16px;
       --rz-space-section: 20px;
@@ -494,6 +498,33 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
     }
+    *, *::before, *::after {
+      letter-spacing: 0 !important;
+    }
+    .font-black,
+    .font-extrabold {
+      font-weight: 600 !important;
+    }
+    .font-bold,
+    .font-semibold {
+      font-weight: 600 !important;
+    }
+    .font-medium {
+      font-weight: 500 !important;
+    }
+    .font-normal,
+    .font-light,
+    .font-extralight,
+    .font-thin {
+      font-weight: 300 !important;
+    }
+    .text-\[10px\],
+    .text-\[11px\] {
+      font-size: 12px !important;
+      line-height: 18px !important;
+    }
+    .text-\[25px\] { font-size: 24px !important; line-height: 36px !important; }
+    .text-\[30px\], .text-3xl { font-size: 32px !important; line-height: 48px !important; }
     .thin-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
     .thin-scroll::-webkit-scrollbar-thumb { background: var(--rz-fill-regular); border-radius: 4px; }
     .thin-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -515,9 +546,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       border-color: var(--rz-brand);
       box-shadow: var(--rz-shadow-mid);
     }
+    .field-box:has(input:disabled),
+    .field-box:has(select:disabled),
+    .field-box:has(textarea:disabled) {
+      background: var(--rz-bg-disabled);
+      color: var(--rz-text-disabled);
+    }
     .role-select-box {
-      min-height: 34px;
-      border-radius: 8px;
+      min-height: 36px;
+      border-radius: var(--rz-radius-control);
       padding: 0 8px;
       font-size: 12px;
     }
@@ -552,8 +589,19 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       line-height: 1.5;
       transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
     }
+    button:not(:disabled):focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--rz-function);
+      outline-offset: 2px;
+    }
     button:disabled {
       cursor: not-allowed;
+      color: var(--rz-text-disabled) !important;
+      background-color: var(--rz-bg-disabled) !important;
+      border-color: var(--rz-line) !important;
       box-shadow: none !important;
     }
     /* 品牌色兜底：即使 Tailwind 自定义配置未及时生效，也保证页面颜色正常 */
@@ -562,6 +610,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .bg-rizhao { background-color: var(--rz-brand); }
     .text-rizhao { color: var(--rz-brand); }
     .border-rizhao { border-color: var(--rz-brand); }
+    .rz-main-card button.bg-ink {
+      background-color: var(--rz-brand) !important;
+      color: #FFFFFF !important;
+    }
+    .rz-main-card button.bg-ink:hover {
+      background-color: #B06F15 !important;
+    }
     .rz-shell {
       height: 100vh;
       min-height: 0 !important;
@@ -574,7 +629,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       position: relative;
       display: grid;
       grid-template-columns: var(--rz-layout-sidebar) var(--rz-layout-gap) minmax(0, var(--rz-layout-content));
-      grid-template-rows: var(--rz-layout-topbar) 8px minmax(0, 1fr);
+      grid-template-rows: var(--rz-layout-topbar) var(--rz-layout-gap) minmax(0, 1fr);
       width: 100%;
       max-width: 1440px;
       height: 100vh;
@@ -637,17 +692,18 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       background: var(--rz-bg-card);
       color: var(--rz-text);
     }
-    .rz-sidebar-brand > div { grid-template-columns: 52px minmax(0, 1fr) !important; gap: 10px !important; }
+    .rz-sidebar-brand > div { grid-template-columns: 52px minmax(0, 1fr) !important; gap: 8px !important; }
     .rz-sidebar-brand > div > div:first-child { width: 52px !important; height: 52px !important; border-radius: 12px !important; box-shadow: none !important; }
     .rz-sidebar-brand .text-\[25px\] { font-size: 18px !important; }
-    .rz-sidebar-brand .text-\[18px\] { margin-top: 6px !important; font-size: 13px !important; }
+    .rz-sidebar-brand .text-\[18px\] { margin-top: 4px !important; font-size: 14px !important; }
     .rz-topbar-title { display: none !important; }
-    .bg-rizhao:hover { background-color: var(--rz-brand); }
+    .bg-rizhao:hover { background-color: #B06F15 !important; }
     .border-rizhao.bg-white:hover,
     .text-rizhao:hover { color: var(--rz-brand); }
     .rounded-3xl, .rounded-2xl { border-radius: var(--rz-radius-card) !important; }
     .rounded-xl { border-radius: var(--rz-radius-control) !important; }
     .rounded-lg { border-radius: var(--rz-radius-control) !important; }
+    .rounded-md { border-radius: var(--rz-radius-control) !important; }
     .rounded-full { border-radius: 999px !important; }
     .shadow-sm, .shadow-lg, .shadow-2xl {
       box-shadow: var(--rz-shadow-mid) !important;
@@ -659,18 +715,20 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .border-gray-100, .border-gray-200, .border-gray-300 { border-color: var(--rz-line-strong) !important; }
     .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
     .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--rz-line) !important; }
-    .bg-slate-50, .bg-slate-100, .bg-gray-50, .bg-gray-100 { background-color: var(--rz-bg-page) !important; }
-    .bg-slate-200, .bg-gray-200, .bg-slate-300, .bg-gray-300 { background-color: var(--rz-fill-regular) !important; }
+    .bg-slate-50, .bg-gray-50 { background-color: var(--rz-bg-subtle) !important; }
+    .bg-slate-100, .bg-gray-100, .bg-mist { background-color: var(--rz-bg-disabled) !important; }
+    .bg-slate-200, .bg-gray-200 { background-color: var(--rz-fill-regular) !important; }
+    .bg-slate-300, .bg-gray-300 { background-color: var(--rz-fill-hover) !important; }
     .bg-white\/82, .bg-white\/78, .bg-white\/60 { background-color: var(--rz-bg-card) !important; }
     .bg-black\/30, .bg-black\/35 { background-color: rgba(32, 32, 32, .35) !important; }
     .bg-rizhao\/5 { background-color: rgba(238, 120, 0, .05) !important; }
     .bg-mist\/40, .bg-mist\/60 { background-color: var(--rz-bg-page) !important; }
     .bg-slate-50\/40, .bg-slate-50\/60 { background-color: var(--rz-bg-subtle) !important; }
-    .hover\:bg-slate-50:hover, .hover\:bg-mist\/40:hover { background-color: var(--rz-bg-subtle) !important; }
+    .hover\:bg-slate-50:hover, .hover\:bg-mist\/40:hover { background-color: var(--rz-bg-disabled) !important; }
     .hover\:border-rizhao:hover { border-color: var(--rz-brand) !important; }
     .hover\:text-rizhao:hover { color: var(--rz-brand) !important; }
     .hover\:text-ink:hover { color: var(--rz-text) !important; }
-    .text-slate-400, .text-gray-400 { color: var(--rz-text-disabled) !important; }
+    .text-slate-400, .text-gray-400,
     .text-slate-500, .text-gray-500 { color: var(--rz-text-secondary) !important; }
     .text-slate-600, .text-slate-700, .text-gray-600, .text-gray-700,
     .text-slate-800, .text-gray-800 { color: var(--rz-text-aux) !important; }
@@ -690,6 +748,51 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .bg-blue-50, .bg-sky-50 { background-color: var(--rz-function-disabled) !important; }
     .bg-blue-500, .bg-blue-600, .bg-sky-500 { background-color: var(--rz-function) !important; }
     .border-blue-200, .border-blue-300, .border-sky-200 { border-color: var(--rz-function-hover) !important; }
+    .gap-1\.5 { gap: var(--rz-space-xs) !important; }
+    .ml-0\.5 { margin-left: var(--rz-space-base) !important; }
+    .mt-0\.5 { margin-top: var(--rz-space-base) !important; }
+    .mt-1\.5 { margin-top: var(--rz-space-xs) !important; }
+    .px-1\.5 { padding-right: var(--rz-space-xs) !important; padding-left: var(--rz-space-xs) !important; }
+    .px-2\.5 { padding-right: 12px !important; padding-left: 12px !important; }
+    .py-0\.5 { padding-top: var(--rz-space-base) !important; padding-bottom: var(--rz-space-base) !important; }
+    .py-1\.5 { padding-top: var(--rz-space-xs) !important; padding-bottom: var(--rz-space-xs) !important; }
+    .py-2\.5 { padding-top: 12px !important; padding-bottom: 12px !important; }
+    .space-y-0\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: var(--rz-space-base) !important; }
+    svg [font-size="10"],
+    svg [font-size="11"] {
+      font-size: 12px !important;
+    }
+    svg [font-weight="700"],
+    svg [font-weight="800"],
+    svg [font-weight="900"] {
+      font-weight: 600 !important;
+    }
+    svg [stroke="#E8EDF3"] { stroke: var(--rz-line) !important; }
+    svg [stroke="#CBD5E1"] { stroke: var(--rz-line-strong) !important; }
+    svg [stroke="#94A3B8"] { stroke: var(--rz-text-secondary) !important; }
+    svg [stroke="#10B981"] { stroke: var(--rz-success) !important; }
+    svg [stroke="#F43F5E"] { stroke: var(--rz-danger) !important; }
+    svg [stroke="#F47B00"] { stroke: var(--rz-brand) !important; }
+    svg [fill="#F8FAFC"] { fill: var(--rz-bg-subtle) !important; }
+    svg [fill="#FFF1F2"] { fill: var(--rz-danger-disabled) !important; }
+    svg [fill="#FFF7ED"],
+    svg [fill="#FFF3D6"] { fill: var(--rz-warning-disabled) !important; }
+    svg [fill="#F0FDF4"] { fill: var(--rz-success-disabled) !important; }
+    svg [fill="#64748B"],
+    svg [fill="#475569"] { fill: var(--rz-text-aux) !important; }
+    svg [fill="#94A3B8"] { fill: var(--rz-text-secondary) !important; }
+    svg [fill="#101828"] { fill: var(--rz-text) !important; }
+    svg [fill="#F47B00"] { fill: var(--rz-brand) !important; }
+    svg [fill="#F97316"],
+    svg [fill="#F59E0B"] { fill: var(--rz-warning) !important; }
+    svg [fill="#FDBA4D"] { fill: var(--rz-warning-hover) !important; }
+    svg [fill="#43A047"] { fill: var(--rz-chart-blue) !important; }
+    svg [fill="#A5D6A7"] { fill: var(--rz-function-disabled) !important; }
+    [role="dialog"],
+    .fixed.inset-0 > .bg-white {
+      border-radius: var(--rz-radius-card) !important;
+      box-shadow: var(--rz-shadow-high) !important;
+    }
     .rz-overdue-row,
     .rz-overdue-row * {
       color: var(--rz-danger) !important;
@@ -704,7 +807,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }
     thead,
     th {
-      background-color: var(--rz-bg-page) !important;
+      background-color: var(--rz-bg-disabled) !important;
       color: var(--rz-text-aux) !important;
       font-weight: 600 !important;
     }
@@ -749,6 +852,21 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       margin-bottom: 16px !important;
       padding-bottom: 0 !important;
       border-bottom: 0 !important;
+    }
+    @media (min-width: 1800px) {
+      :root {
+        --rz-layout-sidebar: 264px;
+        --rz-layout-content: 1592px;
+        --rz-layout-gap: 16px;
+      }
+      .rz-frame {
+        max-width: 1920px;
+        padding-right: 24px;
+        padding-left: 24px;
+      }
+      .rz-sidebar-brand {
+        left: 24px;
+      }
     }
   </style>
 </head>
@@ -840,7 +958,7 @@ function AnalyticsLineChart({ data }) {
     children: [/*#__PURE__*/_jsxs("div", { className: "mb-4 flex items-center justify-between", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black text-ink", children: "投诉趋势" }), /*#__PURE__*/_jsx("span", { className: "rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500", children: "近 7 个月" })] }), /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 400 160", className: "h-44 w-full", children: [/*#__PURE__*/_jsx("line", { x1: "20", y1: "132", x2: "388", y2: "132", stroke: "#E8EDF3", strokeWidth: "2" }), /*#__PURE__*/_jsx("polyline", { points: points, fill: "none", stroke: "#F47B00", strokeWidth: "4", strokeLinecap: "round", strokeLinejoin: "round" }), data.map((item, index) => {
       const x = 24 + index * (352 / Math.max(data.length - 1, 1));
       const y = 128 - item.value / max * 92;
-      return /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x, cy: y, r: "5", fill: "#F47B00" }), /*#__PURE__*/_jsx("text", { x: x, y: "154", textAnchor: "middle", className: "fill-slate-400 text-[10px] font-bold", children: item.month })] }, item.month);
+      return /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x, cy: y, r: "5", fill: "#EE7800" }), /*#__PURE__*/_jsx("text", { x: x, y: "154", textAnchor: "middle", className: "fill-slate-400 text-xs font-medium", children: item.month })] }, item.month);
     })] })]
   });
 }
@@ -1430,7 +1548,7 @@ function RzOverviewTrend({ applied }) {
   ] });
 }
 
-const rzChartColors = ['#EE7800', '#F5555E', '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#64748B'];
+const rzChartColors = ['#3C71FF', '#F5555E', '#FCB723', '#6C98FF', '#F9837F', '#FDCE59', '#2B56DB'];
 
 function RzQuadrantChart({ title, note, data }) {
   const x = value => 90 + value / 20 * 780;
@@ -1533,8 +1651,8 @@ const rzInstitutionTrend = [
   { name: '东港支行', color: '#EE7800', values: [68, 74, 71, 86, 82, 94, 88, 102] },
   { name: '信用卡中心', color: '#F5555E', values: [62, 66, 70, 72, 78, 84, 81, 92] },
   { name: '青岛分行', color: '#3B82F6', values: [54, 58, 61, 59, 66, 72, 76, 80] },
-  { name: '岚山支行', color: '#10B981', values: [58, 60, 57, 62, 61, 65, 63, 66] },
-  { name: '开发区支行', color: '#8B5CF6', values: [46, 51, 49, 56, 54, 61, 59, 68] }
+  { name: '岚山支行', color: '#F5555E', values: [58, 60, 57, 62, 61, 65, 63, 66] },
+  { name: '开发区支行', color: '#FCB723', values: [46, 51, 49, 56, 54, 61, 59, 68] }
 ];
 const rzLineTop10 = [
   { name: '零售金融', value: 2860, rate: '22.9%', mom: '+10.3%', yoy: '+16.8%' },
@@ -1612,7 +1730,7 @@ function RzInstitutionScatterChart({ data, type, compareMode = 'mom' }) {
       /*#__PURE__*/_jsx("rect", { x: "68", y: "42", width: xSplit - 68, height: ySplit - 42, fill: isRegulatory ? "#F8FAFC" : "#FFF1F2" }), /*#__PURE__*/_jsx("rect", { x: xSplit, y: "42", width: 538 - xSplit, height: ySplit - 42, fill: isRegulatory ? "#FFF1F2" : "#F0FDF4" }), /*#__PURE__*/_jsx("rect", { x: "68", y: ySplit, width: xSplit - 68, height: 220 - ySplit, fill: "#F8FAFC" }), /*#__PURE__*/_jsx("rect", { x: xSplit, y: ySplit, width: 538 - xSplit, height: 220 - ySplit, fill: isRegulatory ? "#FFF7ED" : "#FFF1F2" }),
       /*#__PURE__*/_jsx("line", { x1: xSplit, x2: xSplit, y1: "42", y2: "220", stroke: "#CBD5E1", strokeDasharray: "5 5" }), /*#__PURE__*/_jsx("line", { x1: "68", x2: "538", y1: ySplit, y2: ySplit, stroke: "#CBD5E1", strokeDasharray: "5 5" }), /*#__PURE__*/_jsx("line", { x1: "68", x2: "538", y1: "220", y2: "220", stroke: "#94A3B8" }), /*#__PURE__*/_jsx("line", { x1: "68", x2: "68", y1: "42", y2: "220", stroke: "#94A3B8" }),
       /*#__PURE__*/_jsx("text", { x: "76", y: "34", fontSize: "11", fill: "#64748B", children: isRegulatory ? `${compareMode === 'yoy' ? '同比' : '环比'}增幅高 ↑` : "按时办结率高 ↑" }), /*#__PURE__*/_jsx("text", { x: "408", y: "244", fontSize: "11", fill: "#64748B", children: isRegulatory ? "监管投诉占比高 →" : "平均处理时长长 →" }),
-      data.map((item,index) => { const risk = isRegulatory ? xValues[index] >= xThreshold && yValues[index] >= yThreshold : xValues[index] >= xThreshold && yValues[index] < yThreshold; const radius = 10 + item.valid / 900 * 7; return /*#__PURE__*/_jsxs("g", { children: [risk && /*#__PURE__*/_jsx("circle", { cx: x(xValues[index]), cy: y(yValues[index]), r: radius + 5, fill: "none", stroke: "#F43F5E", strokeWidth: "2.5" }), /*#__PURE__*/_jsx("circle", { cx: x(xValues[index]), cy: y(yValues[index]), r: radius, fill: rzChartColors[index], opacity: ".88", stroke: "white", strokeWidth: "2" }), /*#__PURE__*/_jsx("text", { x: x(xValues[index]) + radius + 4, y: y(yValues[index]) - 5, fontSize: "10", fill: "#475569", children: item.name })] }, item.name); })
+      data.map((item,index) => { const risk = isRegulatory ? xValues[index] >= xThreshold && yValues[index] >= yThreshold : xValues[index] >= xThreshold && yValues[index] < yThreshold; const radius = 10 + item.valid / 900 * 7; return /*#__PURE__*/_jsxs("g", { children: [risk && /*#__PURE__*/_jsx("circle", { cx: x(xValues[index]), cy: y(yValues[index]), r: radius + 5, fill: "none", stroke: "#F5555E", strokeWidth: "2.5" }), /*#__PURE__*/_jsx("circle", { cx: x(xValues[index]), cy: y(yValues[index]), r: radius, fill: rzChartColors[index], opacity: ".88", stroke: "white", strokeWidth: "2" }), /*#__PURE__*/_jsx("text", { x: x(xValues[index]) + radius + 4, y: y(yValues[index]) - 5, fontSize: "12", fill: "#707070", children: item.name })] }, item.name); })
     ] }),
     /*#__PURE__*/_jsxs("div", { className: "mt-2 flex flex-wrap justify-between gap-2 border-t border-slate-100 pt-3 text-[11px] text-slate-500", children: [/*#__PURE__*/_jsx("span", { children: isRegulatory ? "气泡面积越大，机构有效投诉量越多" : "右下象限表示处理时长较长且按时办结率偏低" }), /*#__PURE__*/_jsx("span", { children: isRegulatory ? "红圈：占比和增幅同时超过风险边界" : "红圈：处理效率风险机构" })] })
   ] });
@@ -1624,8 +1742,8 @@ function RzInstitutionQualityChart({ data }) {
   const x = index => 88 + index * 98;
   const y = value => 220 - (value - 85) / 15 * 170;
   return /*#__PURE__*/_jsx(RzReasonPanel, { title: '处理质量｜哪些机构与客户达成一致的比例较低？', note: '机构达成一致率排名', info: [{ label: '达成一致率', text: '达成一致工单量除以完成处理工单量。' }, { label: '业务线平均值', text: '当前业务范围机构达成一致率平均值。' }, { label: '监管红线', text: '低于后台配置红线的机构触发预警。' }], children: /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("svg", { viewBox: "0 0 600 270", className: "h-[270px] w-full", role: "img", "aria-label": "机构达成一致率排名", children: [
-      [85,90,95,100].map(value => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("line", { x1: "56", x2: "560", y1: y(value), y2: y(value), stroke: value === businessAverage ? "#10B981" : value === regulatoryLine ? "#F5555E" : "#E8EDF3", strokeDasharray: value === 90 ? "4 4" : "3 5" }), /*#__PURE__*/_jsxs("text", { x: "48", y: y(value) + 4, textAnchor: "end", fontSize: "10", fill: "#94A3B8", children: [value, "%"] })] }, value)),
-      /*#__PURE__*/_jsx("line", { x1: "56", x2: "560", y1: y(businessAverage), y2: y(businessAverage), stroke: "#10B981", strokeDasharray: "4 4" }), /*#__PURE__*/_jsx("text", { x: "558", y: y(businessAverage) - 5, textAnchor: "end", fontSize: "10", fill: "#10B981", children: "业务线平均值 92%" }), /*#__PURE__*/_jsx("text", { x: "558", y: y(regulatoryLine) + 13, textAnchor: "end", fontSize: "10", fill: "#F5555E", children: "监管红线 90%" }),
+      [85,90,95,100].map(value => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("line", { x1: "56", x2: "560", y1: y(value), y2: y(value), stroke: value === businessAverage ? "#16C181" : value === regulatoryLine ? "#F5555E" : "#EDEDED", strokeDasharray: value === 90 ? "4 4" : "3 5" }), /*#__PURE__*/_jsxs("text", { x: "48", y: y(value) + 4, textAnchor: "end", fontSize: "12", fill: "#949494", children: [value, "%"] })] }, value)),
+      /*#__PURE__*/_jsx("line", { x1: "56", x2: "560", y1: y(businessAverage), y2: y(businessAverage), stroke: "#16C181", strokeDasharray: "4 4" }), /*#__PURE__*/_jsx("text", { x: "558", y: y(businessAverage) - 5, textAnchor: "end", fontSize: "12", fill: "#16C181", children: "业务线平均值 92%" }), /*#__PURE__*/_jsx("text", { x: "558", y: y(regulatoryLine) + 13, textAnchor: "end", fontSize: "12", fill: "#F5555E", children: "监管红线 90%" }),
       data.map((item,index) => { const value = parseFloat(item.agreement); const barY = y(value); const color = value < regulatoryLine ? '#F5555E' : value < businessAverage ? '#F59E0B' : '#EE7800'; return /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("rect", { x: x(index), y: barY, width: "58", height: 220 - barY, rx: "5", fill: color }), /*#__PURE__*/_jsxs("text", { x: x(index) + 29, y: barY - 8, textAnchor: "middle", fontSize: "12", fontWeight: "700", fill: color, children: [item.agreement] }), /*#__PURE__*/_jsx("text", { x: x(index) + 29, y: "244", textAnchor: "middle", fontSize: "10", fill: "#64748B", children: item.name })] }, item.name); })
     ] }), /*#__PURE__*/_jsx("div", { className: "border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: "柱高表示达成一致率；低于监管红线显示为红色，低于业务线平均值显示为黄色。" })] }) });
 }
@@ -1731,11 +1849,11 @@ function RzProductExtension({ selectedProduct }) {
 }
 
 const rzSourceDonutData = [
-  { name: '监管转办投诉', value: 423, color: '#F5555E' },
-  { name: '客服热线投诉', value: 368, color: '#60A5FA' },
-  { name: '网点现场投诉', value: 286, color: '#7CCB83' },
-  { name: '政府热线转办', value: 214, color: '#FDBA4D' },
-  { name: '其他来源', value: 126, color: '#A78BFA' }
+  { name: '监管转办投诉', value: 423, color: '#3C71FF' },
+  { name: '客服热线投诉', value: 368, color: '#F5555E' },
+  { name: '网点现场投诉', value: 286, color: '#FCB723' },
+  { name: '政府热线转办', value: 214, color: '#6C98FF' },
+  { name: '其他来源', value: 126, color: '#F9837F' }
 ];
 const rzCommonTrendData = [
   { date: '07-01', count: 72, growth: 17 },
@@ -1887,7 +2005,7 @@ function RzProductRectification({ selectedProduct }) {
   ] });
 }
 
-const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '原因标签报表', '产品标签报表', '满意情况报表', '工单处理统计报表'];
+const workOrderReportTabs = ['处理状态明细表', '处理时效明细表', '投诉产品标签明细表', '投诉原因标签明细表', '满意度明细表', '工单处理统计报表', '投诉渠道来源明细表'];
 const workOrderReportRows = [
   { institution: '东港支行', customers: '12.8万', outlets: 18, previous: 79, total: 86, accepted: 92, valid: 86, invalid: 6, regulatory: 11, repeat: 5, pending: 2, processing: 5, supplement: 1, completed: 78, returned: 5, completionRate: '90.7%', avgDuration: '1.6天', timely: 74, overdue: 4, timelyRate: '94.9%', longest: '4.2天', topProduct: '个人贷款 28件', productShare: '32.6%', topReason: '收费争议 19件', reasonShare: '22.1%', abnormal: 2, evaluated: 72, satisfied: 61, basic: 8, dissatisfied: 3, satisfactionRate: '95.8%', agreementRate: '93.0%', due24h: 2, avgAge: '1.4天' },
   { institution: '信用卡中心', customers: '9.6万', outlets: 1, previous: 68, total: 74, accepted: 81, valid: 74, invalid: 7, regulatory: 13, repeat: 8, pending: 2, processing: 3, supplement: 0, completed: 69, returned: 4, completionRate: '93.2%', avgDuration: '1.4天', timely: 65, overdue: 4, timelyRate: '94.2%', longest: '3.8天', topProduct: '信用卡 74件', productShare: '100.0%', topReason: '规则告知 22件', reasonShare: '29.7%', abnormal: 3, evaluated: 65, satisfied: 56, basic: 7, dissatisfied: 2, satisfactionRate: '96.9%', agreementRate: '94.6%', due24h: 1, avgAge: '1.1天' },
@@ -1896,14 +2014,30 @@ const workOrderReportRows = [
   { institution: '开发区支行', customers: '6.8万', outlets: 8, previous: 48, total: 52, accepted: 58, valid: 52, invalid: 6, regulatory: 6, repeat: 4, pending: 3, processing: 5, supplement: 1, completed: 43, returned: 4, completionRate: '82.7%', avgDuration: '2.1天', timely: 37, overdue: 6, timelyRate: '86.0%', longest: '5.8天', topProduct: '借记卡 16件', productShare: '30.8%', topReason: '服务态度 13件', reasonShare: '25.0%', abnormal: 1, evaluated: 39, satisfied: 30, basic: 6, dissatisfied: 3, satisfactionRate: '92.3%', agreementRate: '88.5%', due24h: 3, avgAge: '2.0天' },
   { institution: '运营管理部', customers: '5.2万', outlets: 6, previous: 44, total: 46, accepted: 49, valid: 46, invalid: 3, regulatory: 4, repeat: 2, pending: 1, processing: 1, supplement: 0, completed: 44, returned: 2, completionRate: '95.7%', avgDuration: '1.2天', timely: 43, overdue: 1, timelyRate: '97.7%', longest: '3.1天', topProduct: '存款业务 15件', productShare: '32.6%', topReason: '规则告知 12件', reasonShare: '26.1%', abnormal: 0, evaluated: 42, satisfied: 37, basic: 4, dissatisfied: 1, satisfactionRate: '97.6%', agreementRate: '95.7%', due24h: 0, avgAge: '0.8天' }
 ];
+const reportChannelSources = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'];
 const reportFormulaTips = {
-  '办结率': '办结率 = 已办结工单量 / 工单总量 × 100%。',
-  '按时办结率': '按时办结率 = 按时办结量 / 已办结工单量 × 100%。',
-  '满意率': '满意率 =（满意 + 基本满意）/ 已评价量 × 100%。',
-  '达成一致率': '达成一致率 = 达成一致工单量 / 已回访工单量 × 100%。',
-  '平均处理时长': '平均处理时长 = 已办结工单从创建到办结的处理耗时平均值。',
-  '标签占比': '标签占比 = 当前高频产品或原因标签命中工单量 / 当前机构总工单量 × 100%。',
-  '超时办结量': '超时办结量 = 已办结工单中实际办结时间超过规定处理时限的工单数量。'
+  '工单总量': '工单总量 = COUNT(DISTINCT 工单ID)，按查询机构和查询时间范围统计。',
+  '投诉量': '投诉量 = COUNT(DISTINCT 工单ID WHERE 投诉有效性=有效)，按机构、时间和对应分类口径统计。',
+  '待处理': '待处理 = COUNT(DISTINCT 工单ID WHERE 当前状态=待处理)。',
+  '处理中': '处理中 = COUNT(DISTINCT 工单ID WHERE 当前状态=处理中)。',
+  '待补充': '待补充 = COUNT(DISTINCT 工单ID WHERE 当前状态 IN（待补充、退回补充）)。',
+  '已办结': '已办结 = COUNT(DISTINCT 工单ID WHERE 当前状态=已办结)。',
+  '退回量': '退回量 = COUNT(DISTINCT 工单ID WHERE 退回次数>0)，同一工单多次退回只计1件。',
+  '办结率': '办结率 = 已办结工单量 / 工单总量 × 100%；工单总量为0时显示0%。',
+  '办结工单量': '办结工单量 = COUNT(DISTINCT 工单ID WHERE 当前状态=已办结)。',
+  '平均处理时长': '平均处理时长 = SUM(办结时间 - 时效起算时间) / 办结工单量；办结工单量为0时显示0。',
+  '按时办结量': '按时办结量 = COUNT(DISTINCT 工单ID WHERE 当前状态=已办结 AND 办结时间<=应办结时间)。',
+  '超时办结量': '超时办结量 = COUNT(DISTINCT 工单ID WHERE 当前状态=已办结 AND 办结时间>应办结时间)。',
+  '按时办结率': '按时办结率 = 按时办结量 / 办结工单量 × 100%；办结工单量为0时显示0%。',
+  '最长处理时长': '最长处理时长 = MAX(办结时间 - 时效起算时间)，统计查询范围内单件已办结工单的最长耗时。',
+  '高频产品标签': '高频产品标签 = 按产品标签分组计数并降序排序，取第1名，展示“标签名称 + 件数”。',
+  '高频原因标签': '高频原因标签 = 按原因标签分组计数并降序排序，取第1名，展示“标签名称 + 件数”。',
+  '重复投诉量': '重复投诉量 = COUNT(DISTINCT 工单ID WHERE 是否重复投诉=是)。',
+  '回访数量': '回访数量 = COUNT(DISTINCT 工单ID WHERE 回访状态=已回访 AND 满意情况 IS NOT NULL)。',
+  '满意数量': '满意数量 = COUNT(DISTINCT 工单ID WHERE 满意情况=满意)。',
+  '不满意数量': '不满意数量 = COUNT(DISTINCT 工单ID WHERE 满意情况=不满意)。',
+  '满意率': '满意率 = 满意数量 / 回访数量 × 100%；回访数量为0时显示0%。',
+  '已逾期': '已逾期 = COUNT(DISTINCT 工单ID WHERE 当前状态<>已办结 AND 当前时间>应办结时间)。'
 };
 function ReportHeaderLabel({ label }) {
   const tip = reportFormulaTips[label];
@@ -1911,8 +2045,8 @@ function ReportHeaderLabel({ label }) {
   return /*#__PURE__*/_jsxs("span", {
     className: "group relative inline-flex items-center gap-1 align-middle",
     children: [label, /*#__PURE__*/_jsx("span", {
-      className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-slate-300 bg-white text-[10px] font-black text-slate-400",
-      children: "?"
+      className: "grid h-4 w-4 cursor-help place-items-center rounded-full border border-orange-200 bg-orange-50 text-[10px] font-black text-rizhao",
+      children: "i"
     }), /*#__PURE__*/_jsx("span", {
       className: "pointer-events-none absolute left-0 top-6 z-30 hidden w-64 whitespace-normal rounded-lg border border-slate-200 bg-white px-3 py-2 text-left text-[11px] font-bold leading-5 text-slate-600 shadow-high group-hover:block",
       children: tip
@@ -1920,12 +2054,13 @@ function ReportHeaderLabel({ label }) {
   });
 }
 const workOrderReportConfigs = {
-  '处理状态明细表': { columns: [['institution','机构名称'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['review','待审核'],['completed','已办结'],['completionRate','办结率']] },
-  '处理时效明细表': { columns: [['institution','机构名称'],['completed','办结工单量'],['avgDuration','平均处理时长'],['timely','按时办结量'],['overdue','超时办结量'],['timelyRate','按时办结率']] },
-  '原因标签报表': { columns: [['institution','机构名称'],['topReason','高频原因标签'],['reasonShare','标签占比'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
-  '产品标签报表': { columns: [['institution','机构名称'],['topProduct','高频产品标签'],['productShare','标签占比'],['pending','待处理'],['processing','处理中'],['overdue','超时办结量'],['avgDuration','平均处理时长'],['completionRate','办结率']] },
-  '满意情况报表': { columns: [['institution','机构名称'],['evaluated','已评价量'],['satisfied','满意'],['basic','基本满意'],['dissatisfied','不满意'],['satisfactionRate','满意率'],['agreementRate','达成一致率']] },
-  '工单处理统计报表': { columns: [['institution','机构名称'],['outlets','网点数'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['review','待审核'],['completed','已办结'],['overdue','超时办结量'],['completionRate','办结率'],['avgDuration','平均处理时长']] }
+  '处理状态明细表': { columns: [['institution','机构名称'],['total','工单总量'],['pending','待处理'],['processing','处理中'],['supplement','待补充'],['completed','已办结'],['returned','退回量'],['completionRate','办结率']] },
+  '处理时效明细表': { columns: [['institution','机构名称'],['completed','办结工单量'],['avgDuration','平均处理时长'],['timely','按时办结量'],['overdue','超时办结量'],['timelyRate','按时办结率'],['maxDuration','最长处理时长']] },
+  '投诉产品标签明细表': { columns: [['institution','机构名称'],['complaintCount','投诉量'],['topProduct','高频产品标签'],['repeatCount','重复投诉量']] },
+  '投诉原因标签明细表': { columns: [['institution','机构名称'],['complaintCount','投诉量'],['topReason','高频原因标签'],['repeatCount','重复投诉量']] },
+  '满意度明细表': { columns: [['institution','机构名称'],['returnVisitCount','回访数量'],['satisfiedCount','满意数量'],['dissatisfiedCount','不满意数量'],['satisfactionRate','满意率']] },
+  '工单处理统计报表': { columns: [['institution','机构名称'],['complaintCount','投诉量'],['completionRate','办结率']] },
+  '投诉渠道来源明细表': { columns: [['institution','机构名称'],['channelSource','投诉渠道来源'],['complaintCount','投诉量'],['completionRate','办结率'],['overdueCount','已逾期']] }
 };
 const workOrderStatisticTypes = ['全量工单统计表', '12378统计表', '网银渠道统计表', '监管转办投诉统计表'];
 const reportWorkOrderRows = [
@@ -2057,13 +2192,41 @@ function SimplifiedWorkOrderProcessingReport() {
   const factor = activeType === '工单处理统计报表' && statisticType === '客服工单' ? 0.42 : activeType === '工单处理统计报表' && statisticType === '自建工单' ? 0.58 : 1;
   const allRows = workOrderReportRows
     .filter(row => applied.org === '全部机构' || row.institution === applied.org)
-    .map(row => {
+    .map((row, index) => {
       const total = Math.round(row.total * factor);
       const pending = Math.round(row.pending * factor);
       const processing = Math.round(row.processing * factor);
-      const review = Math.round((row.review ?? row.returned) * factor);
-      const completed = Math.max(0, total - pending - processing - review);
-      return { ...row, total, pending, processing, review, completed, completionRate: total ? `${(completed / total * 100).toFixed(1)}%` : '0.0%' };
+      const supplement = Math.round((row.supplement ?? 0) * factor);
+      const returned = Math.round((row.returned ?? 0) * factor);
+      const completed = Math.round((row.completed ?? Math.max(0, total - pending - processing - supplement)) * factor);
+      const timely = Math.round((row.timely ?? Math.max(0, completed - (row.overdue ?? 0))) * factor);
+      const overdue = Math.round((row.overdue ?? 0) * factor);
+      const repeatCount = Math.round((row.repeat ?? row.repeatCount ?? 0) * factor);
+      const returnVisitCount = Math.round((row.evaluated ?? row.returnVisitCount ?? 0) * factor);
+      const satisfiedCount = Math.round((row.satisfied ?? row.satisfiedCount ?? 0) * factor);
+      const dissatisfiedCount = Math.round((row.dissatisfied ?? row.dissatisfiedCount ?? 0) * factor);
+      return {
+        ...row,
+        total,
+        complaintCount: total,
+        pending,
+        processing,
+        supplement,
+        completed,
+        returned,
+        completionRate: total ? `${(completed / total * 100).toFixed(1)}%` : '0.0%',
+        timely,
+        overdue,
+        overdueCount: overdue,
+        timelyRate: completed ? `${(timely / completed * 100).toFixed(1)}%` : '0.0%',
+        maxDuration: row.longest,
+        repeatCount,
+        returnVisitCount,
+        satisfiedCount,
+        dissatisfiedCount,
+        satisfactionRate: returnVisitCount ? `${(satisfiedCount / returnVisitCount * 100).toFixed(1)}%` : '0.0%',
+        channelSource: reportChannelSources[index % reportChannelSources.length]
+      };
     });
   const rows = allRows.slice((page - 1) * pageSize, page * pageSize);
   const columns = workOrderReportConfigs[activeType].columns;
@@ -2072,7 +2235,7 @@ function SimplifiedWorkOrderProcessingReport() {
     window.alert('报表已导出。');
   };
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 text-xs text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "首页" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { children: "报表管理" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { className: "text-slate-600", children: "工单处理报表" })] }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: "工单处理报表" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: "按机构和时间查询各类工单处理统计结果" })] }),
+    /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 text-xs text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "首页" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { children: "报表管理" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { className: "text-slate-600", children: "工单处理报表" })] }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: "工单处理报表" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: "按机构、时间查询处理状态、处理时效、标签、满意度和渠道来源统计结果" })] }),
     /*#__PURE__*/_jsx("div", { className: "overflow-x-auto border-b border-slate-200", children: /*#__PURE__*/_jsx("div", { className: "flex min-w-max gap-7 px-1", children: reportTypes.map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setActiveType(name); setPage(1); }, className: `border-b-2 px-1 pb-3 pt-1 text-sm font-black transition ${activeType === name ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-500 hover:text-ink'}`, children: name }, name)) }) }),
     activeType === '工单处理统计报表' && /*#__PURE__*/_jsx("div", { className: "flex flex-wrap gap-3", children: statisticTypes.map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setStatisticType(name); setPage(1); }, className: `min-w-[132px] rounded-lg border px-5 py-3 text-sm font-black transition ${statisticType === name ? 'border-rizhao bg-orange-50 text-rizhao' : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-ink'}`, children: name }, name)) }),
     /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white p-5 shadow-low", children: [
@@ -2085,7 +2248,7 @@ function SimplifiedWorkOrderProcessingReport() {
     ] }),
     /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeType, activeType === '工单处理统计报表' ? `｜${statisticType}` : '', "｜共 ", allRows.length, " 个机构统计结果"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: exportReport, className: "shrink-0 rounded-lg border border-rizhao bg-white px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
-      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[900px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: /*#__PURE__*/_jsx(ReportHeaderLabel, { label: label }) }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'dissatisfied' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
+      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[980px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: /*#__PURE__*/_jsx(ReportHeaderLabel, { label: label }) }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'overdueCount' || key === 'dissatisfiedCount' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
       allRows.length === 0 && /*#__PURE__*/_jsx("div", { className: "py-16 text-center text-sm text-slate-400", children: "当前条件下暂无报表数据" }),
       /*#__PURE__*/_jsx(ListPagination, { total: allRows.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } })
     ] })
@@ -2166,8 +2329,8 @@ function App() {
   const isSuperAdmin = true; // 原型中默认超管，后续接入 SSO 权限判断
 
   // 模拟智能打标：原型里先体现“可自动生成、可人工修改”的交互。
-  const handleTag = () => {
-    if (!content.trim()) {
+  const handleTag = (tagContent = content) => {
+    if (!tagContent.trim()) {
       alert('请先填写投诉内容，再获取标签');
       return;
     }
@@ -3186,9 +3349,12 @@ function getCurrentContactTime() {
 }
 const CONTACT_RESULT_OPTIONS = ['已联系', '未联系上', '无需联系'];
 function ContactRecordsTable({
-  records = []
+  records = [],
+  resultHeader = '联系结果',
+  showInterceptReason = true
 }) {
   const [fullText, setFullText] = useState(null);
+  const headers = ['序号', '联系时间', '触达方式', '答复人姓名', '答复群众电话', resultHeader, '录音文件', '联系内容'].concat(showInterceptReason ? ['拦截原因'] : []);
   const renderLongText = (text, emptyText = '-') => {
     const value = text || emptyText;
     if (!text) return /*#__PURE__*/_jsx("span", { className: "text-slate-400", children: value });
@@ -3207,7 +3373,7 @@ function ContactRecordsTable({
       children: [/*#__PURE__*/_jsx("thead", {
         className: "bg-slate-50 text-slate-600",
         children: /*#__PURE__*/_jsx("tr", {
-          children: ['序号', '联系时间', '触达方式', '答复人姓名', '答复群众电话', '联系结果', '录音文件', '联系内容', '拦截原因'].map((head, index) => /*#__PURE__*/_jsx("th", {
+          children: headers.map((head, index) => /*#__PURE__*/_jsx("th", {
             className: `px-4 py-3 font-bold whitespace-nowrap ${index === 0 ? 'w-[64px]' : index === 1 ? 'w-[150px]' : index === 2 ? 'w-[96px]' : index === 3 ? 'w-[118px]' : index === 4 ? 'w-[138px]' : index === 5 ? 'w-[118px]' : index === 6 ? 'w-[150px]' : index === 8 ? 'w-[160px]' : ''}`,
             children: head
           }, head))
@@ -3216,7 +3382,7 @@ function ContactRecordsTable({
         className: "divide-y divide-slate-100",
         children: records.length === 0 ? /*#__PURE__*/_jsx("tr", {
           children: /*#__PURE__*/_jsx("td", {
-            colSpan: 9,
+            colSpan: headers.length,
             className: "px-4 py-8 text-center text-slate-400",
             children: "暂无联系与沟通记录"
           })
@@ -3246,7 +3412,7 @@ function ContactRecordsTable({
           }), /*#__PURE__*/_jsx("td", {
             className: "px-4 py-3",
             children: renderLongText(record.contactContent || record.content, '-')
-          }), /*#__PURE__*/_jsx("td", {
+          }), showInterceptReason && /*#__PURE__*/_jsx("td", {
             className: "px-4 py-3",
             children: renderLongText(record.interceptReason, '')
           })]
@@ -3548,7 +3714,8 @@ function ProcessingDetail({
       integrated: true,
       title: "回访记录",
       children: /*#__PURE__*/_jsx(ContactRecordsTable, {
-        records: returnVisitRecords
+        records: returnVisitRecords,
+        showInterceptReason: false
       })
     }), /*#__PURE__*/_jsxs(ProcessingInfoSubSection, {
       integrated: true,
@@ -3556,11 +3723,17 @@ function ProcessingDetail({
       children: isReadOnly ? /*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
         children: [/*#__PURE__*/_jsxs("div", {
-          className: "rounded-xl border border-slate-200 bg-slate-50 px-4 py-3",
-          children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "处理结论" }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm font-black text-ink", children: "已与客户达成一致" })]
+          className: "min-h-[96px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-4",
+          children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "处理结论" }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-black leading-6 text-ink", children: "已与客户达成一致" })]
         }), /*#__PURE__*/_jsxs("div", {
-          className: "rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 xl:col-span-2",
-          children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "处理结果" }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm font-black leading-7 text-ink", children: "已核实客户反映事项，结合联系记录完成沟通说明并形成最终处理意见。" })]
+          className: "min-h-[96px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-4",
+          children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "处理结果" }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-black leading-6 text-ink", children: "已核实客户反映事项，结合联系记录完成沟通说明并形成最终处理意见。" })]
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "min-h-[96px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-4",
+          children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "回访结论" }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-black leading-6 text-ink", children: "客户认可处理结果" })]
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "min-h-[96px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-4",
+          children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: "回访结果" }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-black leading-6 text-ink", children: "已完成回访，客户对处理说明和办理结果表示满意。" })]
         })]
       }) : [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
@@ -3684,7 +3857,7 @@ function ProcessingDetail({
     })]
   });
 }
-function RecordingFileModal({ customerPhone, onClose, onSave }) {
+function RecordingFileModal({ customerPhone, onClose, onSave, resultLabel = "* 联系结果", resultOptions = CONTACT_RESULT_OPTIONS, contentLabel = "* 联系内容", contentPlaceholder = "请输入本次电话联系内容、客户反馈或未联系原因", saveText = "保存并生成联系记录" }) {
   const [recordingFile, setRecordingFile] = useState('');
   const [contactResult, setContactResult] = useState('');
   const [contactContent, setContactContent] = useState('');
@@ -3748,9 +3921,9 @@ function RecordingFileModal({ customerPhone, onClose, onSave }) {
             })]
           })]
         }), /*#__PURE__*/_jsx(Field, {
-          label: "* 联系结果",
+          label: resultLabel,
           type: "select",
-          options: CONTACT_RESULT_OPTIONS,
+          options: resultOptions,
           value: contactResult,
           setValue: setContactResult
         }), /*#__PURE__*/_jsx(Field, {
@@ -3759,8 +3932,8 @@ function RecordingFileModal({ customerPhone, onClose, onSave }) {
           value: duration,
           setValue: setDuration
         }), /*#__PURE__*/_jsx(TextArea, {
-          label: "* 联系内容",
-          placeholder: "请输入本次电话联系内容、客户反馈或未联系原因",
+          label: contentLabel,
+          placeholder: contentPlaceholder,
           value: contactContent,
           setValue: setContactContent
         })]
@@ -3773,7 +3946,7 @@ function RecordingFileModal({ customerPhone, onClose, onSave }) {
         }), /*#__PURE__*/_jsx("button", {
           onClick: recordingFile && contactResult && contactContent.trim() ? handleSave : undefined,
           className: `rounded-xl px-5 py-2 text-sm font-black text-white shadow-mid ${recordingFile && contactResult && contactContent.trim() ? 'bg-rizhao' : 'cursor-not-allowed bg-slate-300'}`,
-          children: "保存并生成联系记录"
+          children: saveText
         })]
       })]
     })]
@@ -3890,7 +4063,7 @@ function OutboundCallModal({ customerPhone, onClose, onSave }) {
     })]
   });
 }
-function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAudit }) {
+function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAudit, submitText = "发送审核" }) {
   const [smsTemplate, setSmsTemplate] = useState('');
   const [smsContent, setSmsContent] = useState('');
   const canSubmit = smsTemplate && smsContent.trim();
@@ -3955,13 +4128,13 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
         }), /*#__PURE__*/_jsx("button", {
           onClick: canSubmit ? handleSubmit : undefined,
           className: `rounded-xl px-5 py-2 text-sm font-black text-white shadow-mid ${canSubmit ? 'bg-rizhao' : 'cursor-not-allowed bg-slate-300'}`,
-          children: "发送审核"
+          children: submitText
         })]
       })]
     })]
   });
 }
-function NewCommunicationModal({ customerPhone, onClose, onSave }) {
+function NewCommunicationModal({ customerPhone, onClose, onSave, title = "新增联系与沟通记录", resultLabel = "* 联系结果", resultOptions = CONTACT_RESULT_OPTIONS, contentLabel = "* 联系内容", contentPlaceholder = "请输入本次联系的主要内容" }) {
   const [contactResult, setContactResult] = useState('');
   const [commContent, setCommContent] = useState('');
   const handleSave = () => {
@@ -3981,7 +4154,7 @@ function NewCommunicationModal({ customerPhone, onClose, onSave }) {
         className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
         children: [/*#__PURE__*/_jsx("div", {
           className: "text-xl font-black text-ink",
-          children: "新增联系与沟通记录"
+          children: title
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
@@ -4003,14 +4176,14 @@ function NewCommunicationModal({ customerPhone, onClose, onSave }) {
             })
           })]
         }), /*#__PURE__*/_jsx(Field, {
-          label: "* 联系结果",
+          label: resultLabel,
           type: "select",
-          options: CONTACT_RESULT_OPTIONS,
+          options: resultOptions,
           value: contactResult,
           setValue: setContactResult
         }), /*#__PURE__*/_jsx(TextArea, {
-          label: "* 联系内容",
-          placeholder: "请输入本次联系的主要内容",
+          label: contentLabel,
+          placeholder: contentPlaceholder,
           value: commContent,
           setValue: setCommContent
         })]
@@ -4722,7 +4895,8 @@ function ReadOnlyComplaintDetail({
     }), !isDraftOrder && hasReturnVisit && /*#__PURE__*/_jsx(StandardSection, {
       title: "回访记录",
       children: /*#__PURE__*/_jsx(ContactRecordsTable, {
-        records: returnVisitRecords
+        records: returnVisitRecords,
+        showInterceptReason: false
       })
     }), !isDraftOrder && /*#__PURE__*/_jsx(FlowRecordSection, {
       highlight: focusFlow,
@@ -4899,20 +5073,34 @@ function StandardComplaintForm({
   disableCustomerSearch = false,
   onSaveDraft,
   onSaveConfirm,
-  rowStatus
+  rowStatus,
+  recognizedData = null
 }) {
-  const [orderNo, setOrderNo] = useState('');
+  const [orderNo, setOrderNo] = useState(recognizedData?.innerNo || '');
   const [showHistory, setShowHistory] = useState(false);
   const [historyTab, setHistoryTab] = useState('自建单');
   const [selectedHistory, setSelectedHistory] = useState(null);
   const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showDispatchConfirm, setShowDispatchConfirm] = useState(false);
-  const [complainantName, setComplainantName] = useState('王先生');
-  const [gender, setGender] = useState('');
-  const [idNo, setIdNo] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
-  const [complaintChannel, setComplaintChannel] = useState('');
-  const [complaintDate, setComplaintDate] = useState('2026-07-02');
+  const [title, setTitle] = useState(recognizedData?.title || '');
+  const [entryTime, setEntryTime] = useState(recognizedData?.entryTime || '2026-07-02 08:47');
+  const [orderType, setOrderType] = useState(recognizedData?.orderType || '');
+  const [channelDetail, setChannelDetail] = useState(recognizedData?.channelDetail || '');
+  const [regulatoryNo, setRegulatoryNo] = useState(recognizedData?.regulatoryNo || '');
+  const [orderLevel, setOrderLevel] = useState(recognizedData?.level || '');
+  const [deadline, setDeadline] = useState(recognizedData?.deadline || '');
+  const [isRedo, setIsRedo] = useState(recognizedData?.isRedo || '');
+  const [isOnsite, setIsOnsite] = useState(recognizedData?.isOnsite || '');
+  const [complainantName, setComplainantName] = useState(recognizedData?.customer || '王先生');
+  const [gender, setGender] = useState(recognizedData?.gender || '');
+  const [idNo, setIdNo] = useState(recognizedData?.idNo || '');
+  const [contactPhone, setContactPhone] = useState(recognizedData?.phone || '');
+  const [cardNo, setCardNo] = useState(recognizedData?.cardNo || '');
+  const [complaintChannel, setComplaintChannel] = useState(recognizedData?.channel || '');
+  const [complaintDate, setComplaintDate] = useState(recognizedData?.complaintDate || '2026-07-02');
+  const [complaintOrg, setComplaintOrg] = useState(recognizedData?.org || '');
+  const [complaintDemand, setComplaintDemand] = useState(recognizedData?.demand || '');
+  const [complaintText, setComplaintText] = useState(recognizedData?.content || content || '');
   const isRegulatoryRequired = complaintChannel === '国家局' || complaintChannel === '省监管局';
   const isChannelDetailRequired = complaintChannel === '其它';
   const [bizL1, setBizL1] = useState('');
@@ -5168,11 +5356,13 @@ function StandardComplaintForm({
             className: "xl:col-span-3",
             children: /*#__PURE__*/_jsx(Field, {
               label: "* 标题",
-              placeholder: "请输入工单标题"
+              placeholder: "请输入工单标题",
+              value: title,
+              setValue: setTitle
             })
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 录入时间",
-            placeholder: "2026-07-02 08:47",
+            value: entryTime,
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 投诉时间",
@@ -5186,7 +5376,9 @@ function StandardComplaintForm({
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单类型",
             type: "select",
-            options: ['投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访']
+            options: ['投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访'],
+            value: orderType,
+            setValue: setOrderType
           }), /*#__PURE__*/_jsx(Field, {
           label: "* 投诉反映渠道",
           type: "select",
@@ -5196,27 +5388,37 @@ function StandardComplaintForm({
           }), /*#__PURE__*/_jsx(Field, {
             label: "渠道细分",
             placeholder: "投诉反映渠道为其它时必填，不超过20字",
-            isReq: isChannelDetailRequired
+            isReq: isChannelDetailRequired,
+            value: channelDetail,
+            setValue: setChannelDetail
           }), /*#__PURE__*/_jsx(Field, {
             label: "监管工单编号",
             placeholder: "监管来源必填；其他渠道非必填",
-            isReq: isRegulatoryRequired
+            isReq: isRegulatoryRequired,
+            value: regulatoryNo,
+            setValue: setRegulatoryNo
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 工单级别",
             type: "select",
-            options: ['普通', '重要', '紧急']
+            options: ['普通', '重要', '紧急'],
+            value: orderLevel,
+            setValue: setOrderLevel
           }), /*#__PURE__*/_jsx(Field, {
             label: "办理时限",
-            placeholder: "派发时间 + 3 个工作日（系统自动计算）",
+            value: deadline || "派发时间 + 3 个工作日（系统自动计算）",
             disabled: true
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 是否重办",
             type: "select",
-            options: ['否', '是']
+            options: ['否', '是'],
+            value: isRedo,
+            setValue: setIsRedo
           }), /*#__PURE__*/_jsx(Field, {
             label: "* 是否现场",
             type: "select",
-            options: ['是', '否']
+            options: ['是', '否'],
+            value: isOnsite,
+            setValue: setIsOnsite
           })]
         })
       }), /*#__PURE__*/_jsx(StandardSection, {
@@ -5260,7 +5462,9 @@ function StandardComplaintForm({
               onSearch: () => setShowCustomerModal(true)
             }), /*#__PURE__*/_jsx(Field, {
               label: "卡号",
-              placeholder: "选填，若提供则填写"
+              placeholder: "选填，若提供则填写",
+              value: cardNo,
+              setValue: setCardNo
             })]
           }), showHistory && /*#__PURE__*/_jsxs("div", {
             className: "overflow-hidden rounded-2xl border border-line-divider bg-white",
@@ -5316,11 +5520,15 @@ function StandardComplaintForm({
             children: [/*#__PURE__*/_jsx(SearchableSelectField, {
               label: "* 被投诉机构",
               placeholder: "输入机构名称或从下拉列表选择",
-              options: ['总行消保中心', '东港支行', '岚山支行', '五莲支行', '开发区支行', '青岛分行', '信用卡中心', '运营管理部', '东港支行营业部', '岚山支行营业部']
+              options: ['总行消保中心', '东港支行', '岚山支行', '五莲支行', '开发区支行', '青岛分行', '信用卡中心', '运营管理部', '东港支行营业部', '岚山支行营业部'],
+              value: complaintOrg,
+              setValue: setComplaintOrg
             }), /*#__PURE__*/_jsx(Field, {
               label: "* 投诉人诉求",
               type: "select",
-              options: ['金钱赔偿', '赔礼道歉', '返还财产', '恢复原状', '其他']
+              options: ['金钱赔偿', '赔礼道歉', '返还财产', '恢复原状', '其他'],
+              value: complaintDemand,
+              setValue: setComplaintDemand
             }), /*#__PURE__*/_jsx("div", {
               className: "xl:col-span-1"
             })]
@@ -5328,15 +5536,15 @@ function StandardComplaintForm({
             className: "xl:col-span-3",
             children: /*#__PURE__*/_jsx(TextArea, {
               label: "* 投诉内容",
-              value: content,
-              setValue: setContent,
+              value: complaintText,
+              setValue: value => { setComplaintText(value); setContent && setContent(value); },
               placeholder: "请输入投诉内容"
             })
           }), /*#__PURE__*/_jsx("div", {
             children: /*#__PURE__*/_jsxs("div", {
               className: "flex flex-wrap items-center gap-3",
               children: [/*#__PURE__*/_jsx("button", {
-                onClick: handleTag,
+                onClick: () => handleTag(complaintText),
                 className: "rounded-xl bg-rizhao px-5 py-3 text-sm font-black text-white shadow-mid transition hover:translate-y-[-1px]",
                 children: "一键获取标签"
               }), /*#__PURE__*/_jsx("span", {
@@ -5698,7 +5906,7 @@ function openAttachmentInNewTab(file) {
     window.alert('浏览器已拦截新页签，请允许弹出窗口后重试。');
     return;
   }
-  previewWindow.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileName} - 在线预览</title><style>body{margin:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#101828}.top{height:64px;background:#EE7800;color:#fff;display:flex;align-items:center;padding:0 28px;font-weight:800;font-size:18px}.wrap{padding:32px}.paper{max-width:920px;min-height:640px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 12px 36px rgba(15,23,42,.08);padding:44px 56px}.meta{color:#667085;font-size:13px;margin-top:8px}.title{font-size:26px;font-weight:900;border-bottom:1px solid #e5e7eb;padding-bottom:20px}.content{margin-top:28px;line-height:2;color:#475467;font-size:15px}.hint{margin-top:28px;border-radius:10px;background:#fff7ed;color:#9a3412;padding:16px 18px;font-size:14px;line-height:1.8}</style></head><body><div class="top">附件在线预览</div><div class="wrap"><div class="paper"><div class="title">${fileName}</div><div class="meta">文件信息${fileSize}</div><div class="content">附件内容预览示例：该材料包含投诉事项说明、客户沟通记录、业务办理经过及相关证明信息。正式系统接入文件服务后，将在此新页签中展示 PDF、Word、Excel 等附件的实际内容。</div><div class="hint">当前为原型预览效果，不产生下载动作；图片类附件仍在原页面弹窗中查看。</div></div></div></body></html>`);
+  previewWindow.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${fileName} - 在线预览</title><style>*{box-sizing:border-box;letter-spacing:0}body{margin:0;background:#FBFBFB;font-family:"Microsoft YaHei",sans-serif;color:#202020;font-size:14px;line-height:1.5}.top{height:64px;background:#EE7800;color:#fff;display:flex;align-items:center;padding:0 24px;font-weight:600;font-size:18px}.wrap{padding:24px}.paper{max-width:920px;min-height:640px;margin:0 auto;background:#fff;border:1px solid #EDEDED;border-radius:16px;box-shadow:3px 5px 8px 0 rgba(0,0,0,.02);padding:24px}.meta{color:#949494;font-size:12px;margin-top:8px}.title{font-size:24px;font-weight:600;border-bottom:1px solid #EDEDED;padding-bottom:20px}.content{margin-top:24px;line-height:1.5;color:#707070;font-size:14px}.hint{margin-top:24px;border-radius:12px;background:#FEF6D2;color:#707070;padding:16px 20px;font-size:14px;line-height:1.5}</style></head><body><div class="top">附件在线预览</div><div class="wrap"><div class="paper"><div class="title">${fileName}</div><div class="meta">文件信息${fileSize}</div><div class="content">附件内容预览示例：该材料包含投诉事项说明、客户沟通记录、业务办理经过及相关证明信息。正式系统接入文件服务后，将在此新页签中展示 PDF、Word、Excel 等附件的实际内容。</div><div class="hint">当前为原型预览效果，不产生下载动作；图片类附件仍在原页面弹窗中查看。</div></div></div></body></html>`);
   previewWindow.document.close();
 }
 function previewAttachmentFile(file, setImagePreview) {
@@ -5851,7 +6059,9 @@ function SearchField({
 function SearchableSelectField({
   label,
   placeholder,
-  options = []
+  options = [],
+  value,
+  setValue
 }) {
   const listId = `search-list-${label}`;
   return /*#__PURE__*/_jsxs("label", {
@@ -5863,7 +6073,9 @@ function SearchableSelectField({
       className: "field-box gap-2",
       children: [/*#__PURE__*/_jsx("input", {
         list: listId,
-        placeholder: placeholder || '搜索或选择'
+        placeholder: placeholder || '搜索或选择',
+        value: value !== undefined ? value : undefined,
+        onChange: event => setValue && setValue(event.target.value)
       }), /*#__PURE__*/_jsx("datalist", {
         id: listId,
         children: options.map(option => /*#__PURE__*/_jsx("option", {
@@ -5877,6 +6089,23 @@ function SearchableSelectField({
   });
 }
 function HistoryComplaintModal({ row, onClose }) {
+  const cleanCascadeParts = parts => parts.filter(part => part && part !== '—');
+  const formatCascade = parts => cleanCascadeParts(parts).join(' / ') || '-';
+  const productCascade = () => {
+    if (row.business === '银行卡业务') return formatCascade(['银行卡', '信用卡', '账单服务']);
+    if (row.business === '账户服务') return formatCascade(['账户服务', '网点服务', '排队服务']);
+    return formatCascade(['贷款产品', row.loanType || '个人贷款', row.point]);
+  };
+  const reasonCascade = () => {
+    if (row.point === '账单争议') return formatCascade(['账务争议', '账单服务', row.point]);
+    if (row.point === '服务效率') return formatCascade(['服务质量', '网点服务', row.point]);
+    if (row.point === '办理进度') return formatCascade(['服务质量', '业务办理', row.point]);
+    return formatCascade(['费用与定价', '利息计收', row.point]);
+  };
+  const businessCascade = () => {
+    const businessMiddle = row.loanType && row.loanType !== '—' ? row.loanType : row.business === '银行卡业务' ? '信用卡业务' : row.business === '账户服务' ? '网点服务' : '个人业务';
+    return formatCascade([row.business, businessMiddle, row.point]);
+  };
   const fields = row.sourceType === '客服单' ? [
     ['工单编号', row.workNo], ['来电号码', '13806331234'], ['来电日期', row.incomingDate],
     ['来电时间', row.incomingTime], ['投诉时间', row.complaintDate], ['来电人姓名', row.caller], ['来电人称谓', '先生'],
@@ -5895,9 +6124,8 @@ function HistoryComplaintModal({ row, onClose }) {
     ['是否重办', '否'], ['是否现场', row.onsite], ['投诉人姓名', row.caller],
     ['性别', '男'], ['身份证号码', '37************12'], ['联系电话', row.phone],
     ['卡号', '6228********1234'], ['被投诉机构', row.org], ['投诉人诉求', '核实并说明'],
-    ['投诉产品标签', row.productTag], ['投诉原因标签', row.point], ['业务类别大类', row.business],
-    ['业务类别中类', row.loanType || '个人贷款'], ['业务类别小类', '贷款利息'], ['投诉原因大类', '费用与定价'],
-    ['投诉原因中类', '利息计收'], ['投诉原因小类', row.point], ['附件', 'ATT202607090001'],
+    ['投诉产品标签', productCascade()], ['投诉原因标签', reasonCascade()], ['业务类别', businessCascade()],
+    ['附件', 'ATT202607090001'],
     ['所属机构', row.assignedOrg], ['处理人（工号）', row.handlerUser]
   ];
   return /*#__PURE__*/_jsx("div", {
@@ -6181,6 +6409,13 @@ function BatchImport({
     { no: 'DR202607020014', title: '外汇汇款延迟', channel: '银行协会', customer: '秦先生', status: '待确认', checked: false, errors: null },
     { no: 'DR202607020015', title: '对公开户咨询', channel: '政务热线', customer: '许女士', status: '待确认', checked: false, errors: null }
   ];
+  const recognizedSamples = [
+    { entryTime: '2026-07-02 09:18', orderType: '投诉', channelDetail: '监管转办平台', regulatoryNo: 'RJ202607020001', level: '重要', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '男', idNo: '371102********0919', phone: '138****0919', cardNo: '6228********1234', org: '东港支行', demand: '金钱赔偿', complaintDate: '2026-07-01', content: '客户反映其消费贷款提前还款后，对剩余本金计息和费用收取存在疑问，要求核实计息规则并退还多收费用。' },
+    { entryTime: '2026-07-02 09:24', orderType: '投诉', channelDetail: '市局转办', regulatoryNo: 'RJ202607020002', level: '普通', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '女', idNo: '371103********2816', phone: '156****2816', cardNo: '6228********5678', org: '信用卡中心', demand: '其他', complaintDate: '2026-07-01', content: '客户反映信用卡逾期后曾申请协商还款，认为沟通反馈不及时，要求明确还款方案和后续处理安排。' },
+    { entryTime: '2026-07-02 09:36', orderType: '投诉', channelDetail: '12345热线', regulatoryNo: '', level: '普通', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '女', idNo: '371102********7735', phone: '139****7735', cardNo: '6228********7735', org: '岚山支行', demand: '赔礼道歉', complaintDate: '2026-07-01', content: '客户反映账户业务咨询过程中，多次到网点仍未一次性了解所需材料，要求说明办理口径并改进服务。' },
+    { entryTime: '2026-07-02 09:48', orderType: '投诉', channelDetail: '总局转办', regulatoryNo: 'RJ202607020004', level: '重要', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '男', idNo: '371121********6620', phone: '187****6620', cardNo: '6228********6620', org: '五莲支行', demand: '其他', complaintDate: '2026-07-01', content: '客户反映经营贷申请资料已补充完整，但办理进度长时间未反馈，要求尽快告知审批结果。' }
+  ];
+  const buildRecognizedRow = (row, index) => ({ ...recognizedSamples[index % recognizedSamples.length], ...row, innerNo: row.no });
 
   function handleDownload() { showToast('标准模板下载成功。'); }
   function handleUpload() {
@@ -6189,9 +6424,11 @@ function BatchImport({
       setUploadState('parsing');
       setTimeout(() => {
         setUploadState('parsed');
-        const parsed = initialRows.map(r => ({ ...r, checked: false }));
+        const parsed = initialRows.map((r, index) => buildRecognizedRow({ ...r, checked: false }, index));
         setRows(parsed);
         setSelectedNo(parsed[0].no);
+        setProductTag('');
+        setReasonTag('');
         setPhase('confirm');
       }, 900);
     }, 300);
@@ -6203,6 +6440,8 @@ function BatchImport({
     setParseError(null);
     setRows([]);
     setSelectedNo(null);
+    setProductTag('');
+    setReasonTag('');
     setPage(1);
     setAllChecked(false);
     setErrorTriggered(false);
@@ -6363,7 +6602,7 @@ function BatchImport({
           className: "space-y-2",
           children: pageRows.map(row => /*#__PURE__*/_jsxs("div", {
             className: `cursor-pointer rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light'}`,
-            onClick: () => { setSelectedNo(row.no); setPage(Math.floor(rows.indexOf(row) / pageSize) + 1); },
+            onClick: () => { setSelectedNo(row.no); setProductTag(''); setReasonTag(''); setPage(Math.floor(rows.indexOf(row) / pageSize) + 1); },
             children: [/*#__PURE__*/_jsxs("div", {
               className: "flex-1 min-w-0",
               children: [/*#__PURE__*/_jsx("div", {
@@ -6419,6 +6658,7 @@ function BatchImport({
           onSaveConfirm: handleSaveConfirm,
           onDispatch: handleDispatchCurrent,
           rowStatus: selectedRow ? selectedRow.status : '待确认',
+          recognizedData: selectedRow,
           key: selectedNo
         })
       }) : /*#__PURE__*/_jsx("section", {
@@ -6910,7 +7150,7 @@ function ReturnVisitPage({
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowBbkRecording(true),
           className: "h-12 rounded-xl bg-rizhao px-6 text-sm font-black text-white shadow-low",
-          children: "添加步步高录音文件"
+          children: "添加录音文件"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowSendSms(true),
           className: "h-12 rounded-xl border border-rizhao bg-white px-6 text-sm font-black text-rizhao",
@@ -6918,10 +7158,11 @@ function ReturnVisitPage({
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowNewComm(true),
           className: "h-12 rounded-xl border border-slate-300 bg-white px-6 text-sm font-black text-slate-700",
-          children: "新增联系与沟通记录"
+          children: "新增回访记录"
         })]
       }), /*#__PURE__*/_jsx(ContactRecordsTable, {
-        records: displayCommRecords
+        records: displayCommRecords,
+        showInterceptReason: false
       }), /*#__PURE__*/_jsx("div", {
         className: "my-5 border-t border-slate-100"
       }), /*#__PURE__*/_jsxs("div", {
@@ -6965,18 +7206,33 @@ function ReturnVisitPage({
       handler: currentUser.name,
       onClose: () => setShowSendSms(false),
       onSubmitAudit: rec => {
-        onSubmitSmsAudit && onSubmitSmsAudit({ ...rec, returnTo: 'returnVisit' });
+        addCommRecord({
+          type: 'sms',
+          time: getCurrentContactTime(),
+          method: '短信',
+          replyPhone: customerPhone,
+          contactResult: '已联系',
+          contactContent: rec.content,
+          recordingFile: '-'
+        });
         setShowSendSms(false);
-        showToast('短信已提交审核');
-      }
-    }), showBbkRecording && /*#__PURE__*/_jsx(BbkRecordingModal, {
+        showToast('短信已发送并生成联系记录');
+      },
+      submitText: "发送"
+    }), showBbkRecording && /*#__PURE__*/_jsx(RecordingFileModal, {
       customerPhone: customerPhone,
       onClose: () => setShowBbkRecording(false),
-      onSave: rec => { addCommRecord({ type: 'bbkRecording', time: getCurrentContactTime(), ...rec }); setShowBbkRecording(false); showToast('已生成一条联系记录'); }
+      onSave: rec => { addCommRecord({ type: 'returnVisitRecording', time: getCurrentContactTime(), ...rec }); setShowBbkRecording(false); showToast('已生成一条回访记录'); },
+      contentLabel: "* 回访内容",
+      contentPlaceholder: "请输入本次回访过程、客户反馈或补充意见",
+      saveText: "保存并生成回访记录"
     }), showNewComm && /*#__PURE__*/_jsx(NewCommunicationModal, {
       customerPhone: customerPhone,
       onClose: () => setShowNewComm(false),
-      onSave: rec => { addCommRecord({ type: 'manual', time: getCurrentContactTime(), ...rec }); setShowNewComm(false); }
+      onSave: rec => { addCommRecord({ type: 'returnVisitManual', time: getCurrentContactTime(), ...rec }); setShowNewComm(false); },
+      title: "新增回访记录",
+      contentLabel: "* 回访内容",
+      contentPlaceholder: "请输入本次回访过程、客户反馈或补充意见"
     }), toast && /*#__PURE__*/_jsx("div", {
       className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
       children: toast
