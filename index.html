@@ -981,7 +981,7 @@ function AnalyticsSimpleTable({ title, columns, rows }) {
 function AnalyticsFilterBar() {
   return /*#__PURE__*/_jsxs("div", {
     className: "grid grid-cols-4 gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-low",
-    children: [/*#__PURE__*/_jsx(Field, { label: "统计范围", type: "select", options: ['全行', '总行消保中心', '东港支行', '信用卡中心'], value: "全行", setValue: () => {} }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: channels, value: "", setValue: () => {}, placeholder: "请选择" }), /*#__PURE__*/_jsx(Field, { label: "统计周期", type: "select", options: ['本月', '近三个月', '本年度'], value: "本年度", setValue: () => {} }), /*#__PURE__*/_jsxs("div", { className: "flex items-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "h-12 rounded-xl border border-slate-200 px-5 font-bold text-slate-500", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "h-12 rounded-xl bg-ink px-6 font-bold text-white", children: "查询" })] })]
+    children: [/*#__PURE__*/_jsx(Field, { label: "统计范围", type: "select", options: rzUnifiedOrgFilterOptions, value: "全行", setValue: () => {} }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: channels, value: "", setValue: () => {}, placeholder: "请选择" }), /*#__PURE__*/_jsx(Field, { label: "统计周期", type: "select", options: ['本月', '近三个月', '本年度'], value: "本年度", setValue: () => {} }), /*#__PURE__*/_jsxs("div", { className: "flex items-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "h-12 rounded-xl border border-slate-200 px-5 font-bold text-slate-500", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "h-12 rounded-xl bg-ink px-6 font-bold text-white", children: "查询" })] })]
   });
 }
 
@@ -1013,7 +1013,50 @@ const rzAnalyticsTabMeta = {
   '原因分析': { desc: '从投诉原因标签定位高频问题、关联产品和机构分布', scope: '原因维度下钻' },
   '渠道分析': { desc: '对比各投诉反映渠道的规模、趋势、处理时效和问题结构', scope: '渠道维度下钻' }
 };
-const rzAnalyticsOrgOptions = ['全行', '总行消保中心', '东港支行', '岚山支行', '五莲支行', '开发区支行', '青岛分行', '信用卡中心'];
+const rzUnifiedOrgFilterOptions = ['全行', '总行直属中心', '总行营业部', '东港中心支行', '银海中心支行', '开发区中心支行', '岚山中心支行', '莒县中心支行', '五莲中心支行', '山海天支行', '日照高新支行', '青岛分行', '济南分行', '临沂分行', '潍坊分行', '济宁分行', '枣庄分行', '威海分行', '烟台分行', '聊城分行'];
+const rzUnifiedOrgSelectOptions = rzUnifiedOrgFilterOptions.slice(1);
+const rzAnalyticsOrgOptions = rzUnifiedOrgFilterOptions;
+const rzAnalyticsCurrentDate = new Date('2026-08-04T00:00:00');
+const rzDateString = date => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const day = `${date.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+const rzAnalyticsQuickRanges = [
+  { key: '近7天', label: '近7天', days: 7 },
+  { key: '近30天', label: '近30天', days: 30 },
+  { key: '本月', label: '本月', month: true }
+];
+const rzBuildAnalyticsRange = key => {
+  const current = new Date(rzAnalyticsCurrentDate);
+  if (key === '本月') {
+    const start = new Date(current.getFullYear(), current.getMonth(), 1);
+    return { range: key, start: rzDateString(start), end: rzDateString(current) };
+  }
+  const option = rzAnalyticsQuickRanges.find(item => item.key === key) || rzAnalyticsQuickRanges[1];
+  const start = new Date(current);
+  start.setDate(current.getDate() - option.days + 1);
+  return { range: option.key, start: rzDateString(start), end: rzDateString(current) };
+};
+const rzCompareModeOptions = [
+  { value: 'mom', label: '环比' },
+  { value: 'yoy', label: '同比' }
+];
+const rzCompareModeLabel = mode => mode === 'yoy' ? '同比' : '环比';
+const rzPercentNumber = value => Number.parseFloat(String(value || '0').replace('%', '')) || 0;
+const rzFormatPercent = value => `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+const rzCompareValue = (item, compareMode, index = 0) => {
+  if (compareMode === 'yoy') {
+    const direct = item.yoy || item.yoyChange || item.changeYoy;
+    if (direct) return direct;
+    const base = rzPercentNumber(item.mom || item.change);
+    return rzFormatPercent(base * 1.35 + (index % 3 - 1) * 1.1);
+  }
+  return item.mom || item.change || item.yoy || item.yoyChange || (index % 2 ? '-2.3%' : '+3.6%');
+};
+const rzCompareToneClass = value => value.startsWith('+') ? 'text-rose-500' : 'text-emerald-600';
+const rzCompareTrendGrowth = (value, compareMode, index = 0) => compareMode === 'yoy' ? Math.max(1, Math.round(value * 1.35 + index % 3 * 2)) : value;
 const rzAnalyticsMetricSets = {
   '投诉总览': [
     { label: '工单总量', value: 168, unit: '件', sub: '按工单编号去重', tone: 'orange' },
@@ -1184,6 +1227,7 @@ const rzReasonDetailRows = [
 const rzOverviewMetrics = [
   { title: '投诉总量', note: '按工单编号去重', value: '168', unit: '件', icon: '总', tone: 'orange', items: [{ label: '环比', value: '+8.4%' }, { label: '同比', value: '+12.6%' }] },
   { title: '监管来源投诉', note: '监管渠道转办工单', value: '38', unit: '件', icon: '监', tone: 'orange', items: [{ label: '投诉占比', value: '22.6%' }, { label: '环比', value: '+12.5%' }] },
+  { title: '客服投诉量', note: '客服热线受理工单', value: '56', unit: '件', icon: '客', tone: 'blue', items: [{ label: '投诉占比', value: '33.3%' }, { label: '环比', value: '+6.8%' }] },
   { title: '未办结工单', note: '当前仍在流程中', value: '29', unit: '件', icon: '办', tone: 'blue', items: [{ label: '处理中', value: '11 件' }, { label: '待处理/待审核', value: '18 件' }] },
   { title: '已超期工单', note: '已超过办理时限', value: '3', unit: '件', icon: '超', tone: 'red', items: [{ label: '超期率', value: '1.8%' }, { label: '涉及机构', value: '3 家' }] },
   { title: '24小时临期', note: '未办结且即将到期', value: '4', unit: '件', icon: '临', tone: 'red', items: [{ label: '最短剩余', value: '3小时20分' }, { label: '涉及机构', value: '4 家' }] },
@@ -1207,11 +1251,11 @@ const rzOverviewStatusData = [
   { name: '已办结', value: 139, rate: '82.7%', tone: 'green' }
 ];
 const rzOverviewSourceData = [
-  { name: '客服热线投诉', value: 56, rate: '33.3%', change: '+6.8%' },
-  { name: '网点现场投诉', value: 42, rate: '25.0%', change: '-2.4%' },
-  { name: '监管转办投诉', value: 38, rate: '22.6%', change: '+12.5%' },
-  { name: '政务工单', value: 20, rate: '11.9%', change: '+4.2%' },
-  { name: '网银渠道', value: 12, rate: '7.1%', change: '-1.6%' }
+  { name: '国家局', value: 38, rate: '22.6%', change: '+12.5%' },
+  { name: '省监管局', value: 32, rate: '19.0%', change: '+8.6%' },
+  { name: '市监管局', value: 28, rate: '16.7%', change: '+5.2%' },
+  { name: '政务热线', value: 26, rate: '15.5%', change: '+4.2%' },
+  { name: '银行协会', value: 24, rate: '14.3%', change: '-2.4%' }
 ];
 const rzOverviewDistribution = {
   '机构': [
@@ -1349,16 +1393,17 @@ const rzProductStatusMap = {
   '支付结算': [{ name: '待处理', value: 3, rate: '12.5%' }, { name: '处理中', value: 7, rate: '29.2%' }, { name: '待审核', value: 2, rate: '8.3%' }, { name: '已办结', value: 12, rate: '50.0%' }]
 };
 
-function RzAnalyticsFilter({ draft, setDraft, onQuery, onReset }) {
+function RzAnalyticsFilter({ draft, setDraft, compareMode, setCompareMode, onQuery, onReset }) {
   return /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-low", children: [
     /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-end gap-5", children: [
       /*#__PURE__*/_jsxs("label", { className: "min-w-[230px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "机构范围" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: event => setDraft(data => ({ ...data, org: event.target.value })), children: rzAnalyticsOrgOptions.map(option => /*#__PURE__*/_jsx("option", { children: option }, option)) }) })] }),
-      /*#__PURE__*/_jsxs("label", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "开始日期" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: event => setDraft(data => ({ ...data, start: event.target.value })) }) })] }),
+      /*#__PURE__*/_jsxs("label", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "开始日期" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: event => setDraft(data => ({ ...data, range: '自定义', start: event.target.value })) }) })] }),
       /*#__PURE__*/_jsx("span", { className: "pb-3 text-slate-400", children: "至" }),
-      /*#__PURE__*/_jsxs("label", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "结束日期" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: event => setDraft(data => ({ ...data, end: event.target.value })) }) })] }),
+      /*#__PURE__*/_jsxs("label", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "结束日期" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: event => setDraft(data => ({ ...data, range: '自定义', end: event.target.value })) }) })] }),
+      /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "快捷时间" }), /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: rzAnalyticsQuickRanges.map(option => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setDraft(data => ({ ...data, ...rzBuildAnalyticsRange(option.key) })), className: `rounded px-4 py-2 text-xs font-black ${draft.range === option.key ? 'bg-rizhao text-white shadow-low' : 'text-slate-500 hover:bg-white hover:text-rizhao'}`, children: option.label }, option.key)) })] }),
+      /*#__PURE__*/_jsxs("label", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "对比方式" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: compareMode, onChange: event => setCompareMode(event.target.value), children: rzCompareModeOptions.map(option => /*#__PURE__*/_jsx("option", { value: option.value, children: option.label }, option.value)) }) })] }),
       /*#__PURE__*/_jsxs("div", { className: "ml-auto flex gap-3", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: onReset, className: "h-11 rounded-xl border border-slate-200 px-5 text-sm font-bold text-slate-500 hover:bg-slate-50", children: "重置" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onQuery, className: "h-11 rounded-xl bg-rizhao px-6 text-sm font-bold text-white shadow-low", children: "查询" })] })
-    ] }),
-    /*#__PURE__*/_jsxs("div", { className: "mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "统计口径：按工单创建时间/受理时间统计，工单编号去重，草稿不计入；机构范围受当前账号数据权限控制。" }), /*#__PURE__*/_jsxs("span", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("i", { className: "h-2 w-2 rounded-full bg-emerald-500" }), "数据更新时间：2026-07-15 12:00"] })] })
+    ] })
   ] });
 }
 
@@ -1379,7 +1424,7 @@ function RzAnalyticsTrend({ granularity, setGranularity, applied }) {
   const yReg = value => 220 - value / regMax * 188;
   return /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white shadow-low", children: [
     /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [
-      /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "投诉整体趋势" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [applied.org, "｜", applied.start, " 至 ", applied.end, "｜有效投诉量与监管投诉量双轴对比"] })] }),
+      /*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "投诉整体趋势" }) }),
       /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['日', '周', '月'].map(item => /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => setGranularity(item), className: `rounded px-3 py-1 text-xs font-bold ${granularity === item ? 'bg-white text-rizhao shadow-low' : 'text-slate-500'}`, children: ["按", item] }, item)) })
     ] }),
     /*#__PURE__*/_jsxs("div", { className: "p-5", children: [
@@ -1395,13 +1440,14 @@ function RzAnalyticsTrend({ granularity, setGranularity, applied }) {
   ] });
 }
 
-function RzAnalyticsRank({ title, data, onSwitch }) {
+function RzAnalyticsRank({ title, data, onSwitch, compareMode = 'mom' }) {
   const max = Math.max(...data.map(item => item.value), 1);
+  const compareLabel = rzCompareModeLabel(compareMode);
   return /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white shadow-low", children: [
-    /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: "按有效投诉量识别重点对象，点击进入对应专题分析" })] }), onSwitch && /*#__PURE__*/_jsx("div", { className: "flex gap-1 rounded-md bg-slate-100 p-1", children: analyticsTabs.slice(1).map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => onSwitch(name), className: "rounded px-3 py-1 text-xs font-bold text-slate-500 hover:bg-white hover:text-rizhao", children: name }, name)) })] }),
+    /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }) }), onSwitch && /*#__PURE__*/_jsx("div", { className: "flex gap-1 rounded-md bg-slate-100 p-1", children: analyticsTabs.slice(1).map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => onSwitch(name), className: "rounded px-3 py-1 text-xs font-bold text-slate-500 hover:bg-white hover:text-rizhao", children: name }, name)) })] }),
     /*#__PURE__*/_jsxs("div", { className: "p-5", children: [
-      /*#__PURE__*/_jsxs("div", { className: "mb-3 grid grid-cols-[36px_150px_1fr_120px_80px] gap-3 px-2 text-[11px] text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "序号" }), /*#__PURE__*/_jsx("span", { children: "名称" }), /*#__PURE__*/_jsx("span", { children: "有效投诉量分布" }), /*#__PURE__*/_jsx("span", { className: "text-right", children: "投诉量 / 占比" }), /*#__PURE__*/_jsx("span", { className: "text-right", children: "环比" })] }),
-      /*#__PURE__*/_jsx("div", { className: "space-y-2", children: data.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[36px_150px_1fr_120px_80px] items-center gap-3 rounded-lg px-2 py-2 text-xs hover:bg-orange-50", children: [/*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded bg-rizhao", style: { width: `${item.value / max * 100}%` } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right text-slate-600", children: [item.value, "件 · ", item.rate] }), /*#__PURE__*/_jsx("span", { className: `text-right font-bold ${item.change.startsWith('+') ? 'text-rose-500' : 'text-emerald-600'}`, children: item.change })] }, item.name)) })
+      /*#__PURE__*/_jsxs("div", { className: "mb-3 grid grid-cols-[36px_150px_1fr_120px_80px] gap-3 px-2 text-[11px] text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "序号" }), /*#__PURE__*/_jsx("span", { children: "名称" }), /*#__PURE__*/_jsx("span", { children: "有效投诉量分布" }), /*#__PURE__*/_jsx("span", { className: "text-right", children: "投诉量 / 占比" }), /*#__PURE__*/_jsx("span", { className: "text-right", children: compareLabel })] }),
+      /*#__PURE__*/_jsx("div", { className: "space-y-2", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[36px_150px_1fr_120px_80px] items-center gap-3 rounded-lg px-2 py-2 text-xs hover:bg-orange-50", children: [/*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded bg-rizhao", style: { width: `${item.value / max * 100}%` } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right text-slate-600", children: [item.value, "件 · ", item.rate] }), /*#__PURE__*/_jsx("span", { className: `text-right font-bold ${rzCompareToneClass(change)}`, children: change })] }, item.name); }) })
     ] })
   ] });
 }
@@ -1427,15 +1473,16 @@ function RzAnalyticsInfo({ title, items }) {
 function RzReasonPanel({ title, note, info, children }) {
   return /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white shadow-low", children: [
     /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [
-      /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: note })] }),
+      /*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }) }),
       /*#__PURE__*/_jsx(RzAnalyticsInfo, { title: title, items: info })
     ] }),
     /*#__PURE__*/_jsx("div", { className: "p-5", children: children })
   ] });
 }
 
-function RzReasonTopCard({ item, index, selected, onClick }) {
+function RzReasonTopCard({ item, index, selected, onClick, compareMode = 'mom' }) {
   const active = selected === item.name;
+  const change = rzCompareValue(item, compareMode, index);
   return /*#__PURE__*/_jsxs("button", { type: "button", onClick: onClick, className: `min-h-[148px] rounded-lg border bg-white p-4 text-left shadow-low transition ${active ? 'border-rizhao bg-orange-50 ring-1 ring-rizhao/20' : 'border-slate-200 hover:border-rizhao/60 hover:bg-orange-50/40'}`, children: [
     /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between", children: [
       /*#__PURE__*/_jsx("span", { className: `grid h-7 w-7 place-items-center rounded text-xs font-black ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }),
@@ -1443,10 +1490,7 @@ function RzReasonTopCard({ item, index, selected, onClick }) {
     ] }),
     /*#__PURE__*/_jsx("div", { className: "mt-4 line-clamp-2 min-h-[42px] text-sm font-black leading-5 text-ink", children: item.name }),
     /*#__PURE__*/_jsxs("div", { className: "mt-2 text-2xl font-black leading-none text-ink", children: [item.value.toLocaleString(), /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs font-bold text-slate-400", children: "件" })] }),
-    /*#__PURE__*/_jsxs("div", { className: "mt-3 flex gap-3 text-xs font-bold", children: [
-      /*#__PURE__*/_jsxs("span", { className: item.mom.startsWith('+') ? 'text-rose-500' : 'text-emerald-600', children: ["环比 ", item.mom] }),
-      /*#__PURE__*/_jsxs("span", { className: item.yoy.startsWith('+') ? 'text-rose-500' : 'text-emerald-600', children: ["同比 ", item.yoy] })
-    ] })
+    /*#__PURE__*/_jsx("div", { className: "mt-3 flex gap-3 text-xs font-bold", children: /*#__PURE__*/_jsxs("span", { className: rzCompareToneClass(change), children: [rzCompareModeLabel(compareMode), " ", change] }) })
   ] });
 }
 
@@ -1465,7 +1509,7 @@ function RzReasonDistribution({ data, selected, onSelect, footer }) {
   ] });
 }
 
-function RzReasonAnalysisPage({ applied }) {
+function RzReasonAnalysisPage({ applied, compareMode = 'mom' }) {
   const [selectedReason, setSelectedReason] = useState('服务态度');
   const [selectedSecondary, setSelectedSecondary] = useState('全部');
   const [relatedView, setRelatedView] = useState('产品');
@@ -1494,7 +1538,7 @@ function RzReasonAnalysisPage({ applied }) {
   };
   const currentRelated = relatedView === '产品' ? selectedProduct : relatedView === '机构' ? selectedInstitution : selectedChannel;
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzReasonPanel, { title: "投诉原因标签工单量 Top10", note: `统计范围：${applied.org}｜展示投诉量、占比及同比/环比变化；点击卡片进入原因下钻`, info: [{ label: '指标口径', text: '按最终投诉原因一级标签统计工单量，工单编号去重。' }, { label: '计算公式', text: '占比 = 当前原因工单量 / 查询范围内工单总量。' }, { label: '数据来源', text: '投诉工单、投诉原因标签、人工修正结果。' }], children: /*#__PURE__*/_jsx("div", { className: "grid grid-cols-5 gap-3", children: rzComplaintReasonTop10.map((item, index) => /*#__PURE__*/_jsx(RzReasonTopCard, { item: item, index: index, selected: selectedReason, onClick: () => { setSelectedReason(item.name); resetCrossFilters(); } }, item.name)) }) }),
+    /*#__PURE__*/_jsx(RzReasonPanel, { title: "投诉原因标签工单量 Top10", note: `统计范围：${applied.org}｜展示投诉量、占比及${rzCompareModeLabel(compareMode)}变化；点击卡片进入原因下钻`, info: [{ label: '指标口径', text: '按最终投诉原因一级标签统计工单量，工单编号去重。' }, { label: '计算公式', text: '占比 = 当前原因工单量 / 查询范围内工单总量。' }, { label: '数据来源', text: '投诉工单、投诉原因标签、人工修正结果。' }], children: /*#__PURE__*/_jsx("div", { className: "grid grid-cols-5 gap-3", children: rzComplaintReasonTop10.map((item, index) => /*#__PURE__*/_jsx(RzReasonTopCard, { item: item, index: index, selected: selectedReason, compareMode: compareMode, onClick: () => { setSelectedReason(item.name); resetCrossFilters(); } }, item.name)) }) }),
     /*#__PURE__*/_jsx(RzReasonPanel, { title: `${selectedReason}｜二级投诉原因 Top5`, note: "点击二级原因后，将与产品、机构、渠道共同筛选下方投诉明细", info: [{ label: '指标口径', text: '展示当前一级原因下命中量最高的二级原因。' }, { label: '计算公式', text: '占比 = 二级原因工单量 / 当前一级原因工单量。' }, { label: '数据来源', text: '原因级联配置、智能打标结果、人工修正标签。' }], children: /*#__PURE__*/_jsx("div", { className: "grid grid-cols-5 gap-3", children: secondary.map((item, index) => /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => setSelectedSecondary(selectedSecondary === item.name ? '全部' : item.name), className: `min-h-[126px] rounded-lg border p-4 text-left transition ${selectedSecondary === item.name ? 'border-rizhao bg-orange-50 ring-1 ring-rizhao/20' : 'border-slate-200 hover:border-rizhao/60 hover:bg-orange-50/40'}`, children: [/*#__PURE__*/_jsxs("div", { className: "text-xs font-bold text-slate-400", children: ["Top ", index + 1] }), /*#__PURE__*/_jsx("div", { className: "mt-3 min-h-[40px] text-sm font-black leading-5 text-ink", children: item.name }), /*#__PURE__*/_jsxs("div", { className: "mt-2 text-xl font-black text-ink", children: [item.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs font-bold text-slate-400", children: "件" })] }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-xs font-bold text-slate-400", children: ["占比 ", item.rate] })] }, item.name)) }) }),
     /*#__PURE__*/_jsx(RzReasonPanel, { title: `${selectedReason}｜关联分布 Top5`, note: "切换产品、机构或渠道视角，点击具体对象可叠加筛选投诉明细", info: [{ label: '指标口径', text: '展示当前一级原因下关联投诉对象的 Top5 分布。' }, { label: '计算公式', text: '占比 = 关联对象工单量 / 当前一级原因工单量。' }, { label: '数据来源', text: '投诉产品标签、被投诉机构、投诉来源字段。' }], children: /*#__PURE__*/_jsxs("div", { children: [
       /*#__PURE__*/_jsx("div", { className: "mb-4 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['产品', '机构', '渠道'].map(view => /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => setRelatedView(view), className: `rounded px-5 py-1.5 text-xs font-black transition ${relatedView === view ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: [view, "视角"] }, view)) }) }),
@@ -1525,8 +1569,21 @@ function RzReasonAnalysisPage({ applied }) {
   ] });
 }
 
-function RzOverviewMetricCard({ card }) {
+function RzOverviewMetricCard({ card, compareMode = 'mom' }) {
   const toneClass = card.tone === 'red' ? 'bg-[#FEE7DD] text-danger' : card.tone === 'green' ? 'bg-[#CFFBD9] text-success' : card.tone === 'blue' ? 'bg-[#D8E6FF] text-function' : 'bg-orange-50 text-rizhao';
+  const compareLabel = rzCompareModeLabel(compareMode);
+  const compareItems = card.items.filter(item => item.label === '环比' || item.label === '同比');
+  const displayItems = compareItems.length ? [
+    {
+      label: compareLabel,
+      value: rzCompareValue({
+        mom: (card.items.find(item => item.label === '环比') || {}).value,
+        yoy: (card.items.find(item => item.label === '同比') || {}).value,
+        change: (compareItems[0] || {}).value
+      }, compareMode)
+    },
+    ...card.items.filter(item => item.label !== '环比' && item.label !== '同比')
+  ] : card.items;
   return /*#__PURE__*/_jsxs("article", { className: "rounded-2xl border border-slate-200 bg-white p-4 shadow-low", children: [
     /*#__PURE__*/_jsxs("div", { className: "flex items-start justify-between border-t-2 border-rizhao pt-3", children: [
       /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-sm font-black text-ink", children: card.title }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs font-bold text-slate-400", children: card.note })] }),
@@ -1534,7 +1591,7 @@ function RzOverviewMetricCard({ card }) {
     ] }),
     /*#__PURE__*/_jsxs("div", { className: "rz-number mt-4 text-[30px] font-black leading-none text-ink", children: [card.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs font-bold text-slate-400", children: card.unit })] }),
     /*#__PURE__*/_jsx("div", { className: "my-4 h-px bg-slate-100" }),
-    /*#__PURE__*/_jsx("div", { className: `${card.items.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} grid gap-3`, children: card.items.map(item => /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-[11px] font-bold text-slate-400", children: item.label }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs font-black text-slate-600", children: item.value })] }, item.label)) })
+    /*#__PURE__*/_jsx("div", { className: `${displayItems.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} grid gap-3`, children: displayItems.map(item => /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-[11px] font-bold text-slate-400", children: item.label }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs font-black text-slate-600", children: item.value })] }, item.label)) })
   ] });
 }
 
@@ -1585,12 +1642,12 @@ function RzQuadrantChart({ title, note, data }) {
 // 总览的四类重点分布采用不同图表形式，避免连续出现相同的条形排行。
 function RzOverviewChartCard({ title, note, targetTab, onNavigate, children }) {
   return /*#__PURE__*/_jsxs("article", { className: "overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-low", children: [
-    /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: note })] }), targetTab && /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => onNavigate && onNavigate(targetTab), className: "rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-black text-rizhao hover:bg-orange-100", children: ["查看", targetTab] })] }),
+    /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: title }) }), targetTab && /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => onNavigate && onNavigate(targetTab), className: "rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-black text-rizhao hover:bg-orange-100", children: ["查看", targetTab] })] }),
     children
   ] });
 }
 
-function RzOverviewSourceDonut({ data }) {
+function RzOverviewSourceDonut({ data, compareMode = 'mom' }) {
   const colors = ['#3C71FF', '#F5555E', '#FCB723', '#6C98FF', '#F9837F'];
   const total = data.reduce((sum, item) => sum + item.value, 0);
   let cursor = 0;
@@ -1601,51 +1658,50 @@ function RzOverviewSourceDonut({ data }) {
   });
   return /*#__PURE__*/_jsxs("div", { className: "grid min-h-[280px] grid-cols-[210px_1fr] items-center gap-5 p-5", children: [
     /*#__PURE__*/_jsx("div", { className: "relative mx-auto h-44 w-44 rounded-full shadow-inner", style: { background: `conic-gradient(${segments.join(',')})` }, children: /*#__PURE__*/_jsxs("div", { className: "absolute inset-[28px] grid place-items-center rounded-full bg-white text-center shadow-low", children: [/*#__PURE__*/_jsx("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-[28px] font-black text-ink", children: total }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs font-bold text-slate-400", children: "来源投诉量" })] })] }) }),
-    /*#__PURE__*/_jsx("div", { className: "space-y-3", children: data.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[12px_1fr_56px_52px] items-center gap-2 text-xs", children: [/*#__PURE__*/_jsx("i", { className: "h-2.5 w-2.5 rounded-full", style: { backgroundColor: colors[index] } }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-600", children: item.name }), /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-500", children: [item.value, "件"] }), /*#__PURE__*/_jsx("span", { className: `${item.change.startsWith('+') ? 'text-danger' : 'text-success'} text-right font-black`, children: item.change })] }, item.name)) })
+    /*#__PURE__*/_jsx("div", { className: "space-y-3", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[12px_1fr_56px_52px] items-center gap-2 text-xs", children: [/*#__PURE__*/_jsx("i", { className: "h-2.5 w-2.5 rounded-full", style: { backgroundColor: colors[index] } }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-600", children: item.name }), /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-500", children: [item.value, "件"] }), /*#__PURE__*/_jsx("span", { className: `${change.startsWith('+') ? 'text-danger' : 'text-success'} text-right font-black`, children: change })] }, item.name); }) })
   ] });
 }
 
-function RzOverviewInstitutionRank({ data }) {
+function RzOverviewInstitutionRank({ data, compareMode = 'mom' }) {
   const max = Math.max(...data.map(item => item.value), 1);
-  return /*#__PURE__*/_jsx("div", { className: "min-h-[280px] space-y-4 p-5", children: data.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[32px_92px_1fr_62px_54px] items-center gap-3 text-xs", children: [/*#__PURE__*/_jsx("span", { className: `grid h-7 w-7 place-items-center rounded-md font-black ${index < 3 ? 'bg-rizhao text-white shadow-low' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-700", children: item.name }), /*#__PURE__*/_jsx("span", { className: "h-3 overflow-hidden rounded-full bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded-full bg-rizhao", style: { width: `${item.value / max * 100}%` } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-500", children: [item.value, "件"] }), /*#__PURE__*/_jsx("span", { className: `${item.change.startsWith('+') ? 'text-danger' : 'text-success'} text-right font-black`, children: item.change })] }, item.name)) });
+  return /*#__PURE__*/_jsx("div", { className: "min-h-[280px] space-y-4 p-5", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[32px_92px_1fr_62px_54px] items-center gap-3 text-xs", children: [/*#__PURE__*/_jsx("span", { className: `grid h-7 w-7 place-items-center rounded-md font-black ${index < 3 ? 'bg-rizhao text-white shadow-low' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-700", children: item.name }), /*#__PURE__*/_jsx("span", { className: "h-3 overflow-hidden rounded-full bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded-full bg-rizhao", style: { width: `${item.value / max * 100}%` } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-500", children: [item.value, "件"] }), /*#__PURE__*/_jsx("span", { className: `${change.startsWith('+') ? 'text-danger' : 'text-success'} text-right font-black`, children: change })] }, item.name); }) });
 }
 
-function RzOverviewProductTreemap({ data }) {
+function RzOverviewProductTreemap({ data, compareMode = 'mom' }) {
   const tileClass = ['col-span-3 row-span-2', 'col-span-3', 'col-span-1', 'col-span-1', 'col-span-1'];
   const tileColors = ['#3C71FF', '#F5555E', '#FCB723', '#6C98FF', '#F9837F'];
-  return /*#__PURE__*/_jsx("div", { className: "grid h-[320px] grid-cols-6 grid-rows-2 gap-2 p-5", children: data.map((item, index) => /*#__PURE__*/_jsxs("div", { className: `${tileClass[index]} group relative overflow-hidden rounded-lg p-4 text-white transition hover:-translate-y-0.5 hover:shadow-lg`, style: { backgroundColor: tileColors[index] }, children: [/*#__PURE__*/_jsx("div", { className: "absolute -right-5 -top-5 h-20 w-20 rounded-full bg-white/15 transition group-hover:scale-125" }), /*#__PURE__*/_jsx("div", { className: "relative text-sm font-black", children: item.name }), /*#__PURE__*/_jsxs("div", { className: `${index === 0 ? 'mt-10 text-4xl' : 'mt-3 text-2xl'} relative font-black`, children: [item.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs opacity-80", children: "件" })] }), /*#__PURE__*/_jsxs("div", { className: "relative mt-2 flex items-center gap-2 text-xs font-bold text-white/90", children: [/*#__PURE__*/_jsx("span", { children: item.rate }), /*#__PURE__*/_jsxs("span", { className: "rounded bg-white/20 px-1.5 py-0.5", children: ["环比 ", item.change] })] })] }, item.name)) });
+  return /*#__PURE__*/_jsx("div", { className: "grid h-[320px] grid-cols-6 grid-rows-2 gap-2 p-5", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: `${tileClass[index]} group relative overflow-hidden rounded-lg p-4 text-white transition hover:-translate-y-0.5 hover:shadow-lg`, style: { backgroundColor: tileColors[index] }, children: [/*#__PURE__*/_jsx("div", { className: "absolute -right-5 -top-5 h-20 w-20 rounded-full bg-white/15 transition group-hover:scale-125" }), /*#__PURE__*/_jsx("div", { className: "relative text-sm font-black", children: item.name }), /*#__PURE__*/_jsxs("div", { className: `${index === 0 ? 'mt-10 text-4xl' : 'mt-3 text-2xl'} relative font-black`, children: [item.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs opacity-80", children: "件" })] }), /*#__PURE__*/_jsxs("div", { className: "relative mt-2 flex items-center gap-2 text-xs font-bold text-white/90", children: [/*#__PURE__*/_jsx("span", { children: item.rate }), /*#__PURE__*/_jsxs("span", { className: "rounded bg-white/20 px-1.5 py-0.5", children: [rzCompareModeLabel(compareMode), " ", change] })] })] }, item.name); }) });
 }
 
-function RzOverviewReasonColumns({ data }) {
+function RzOverviewReasonColumns({ data, compareMode = 'mom' }) {
   const max = Math.max(...data.map(item => item.value), 1);
   const barColors = ['#3C71FF', '#6C98FF', '#F5555E', '#F9837F', '#FCB723'];
-  return /*#__PURE__*/_jsx("div", { className: "flex h-[320px] items-end justify-around gap-4 px-6 pb-5 pt-8", children: data.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "flex h-full min-w-0 flex-1 flex-col justify-end text-center", children: [/*#__PURE__*/_jsxs("div", { className: "mb-2 text-xs font-black text-slate-600", children: [item.value, "件"] }), /*#__PURE__*/_jsx("div", { className: "mx-auto flex w-14 items-start justify-center rounded-t-lg pt-3 text-[11px] font-black text-white shadow-low transition hover:brightness-105", style: { height: `${92 + item.value / max * 96}px`, backgroundColor: barColors[index] }, children: item.change }), /*#__PURE__*/_jsx("div", { className: "mx-auto h-1.5 w-20 rounded-full bg-slate-200" }), /*#__PURE__*/_jsx("div", { className: "mt-3 min-h-[34px] text-xs font-black leading-4 text-slate-600", children: item.name }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-[11px] font-bold text-slate-400", children: ["占比 ", item.rate] })] }, item.name)) });
+  return /*#__PURE__*/_jsx("div", { className: "flex h-[320px] items-end justify-around gap-4 px-6 pb-5 pt-8", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: "flex h-full min-w-0 flex-1 flex-col justify-end text-center", children: [/*#__PURE__*/_jsxs("div", { className: "mb-2 text-xs font-black text-slate-600", children: [item.value, "件"] }), /*#__PURE__*/_jsx("div", { className: "mx-auto flex w-14 items-start justify-center rounded-t-lg pt-3 text-[11px] font-black text-white shadow-low transition hover:brightness-105", style: { height: `${92 + item.value / max * 96}px`, backgroundColor: barColors[index] }, children: change }), /*#__PURE__*/_jsx("div", { className: "mx-auto h-1.5 w-20 rounded-full bg-slate-200" }), /*#__PURE__*/_jsx("div", { className: "mt-3 min-h-[34px] text-xs font-black leading-4 text-slate-600", children: item.name }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-[11px] font-bold text-slate-400", children: ["占比 ", item.rate] })] }, item.name); }) });
 }
 
-function RzOverviewPage({ applied, onNavigate }) {
+function RzOverviewPage({ applied, onNavigate, compareMode = 'mom' }) {
   const overviewInstitutionTop5 = rzOverviewDistribution['机构'].slice(0, 5);
   const overviewProductTop5 = rzOverviewDistribution['产品'].slice(0, 5);
   const overviewReasonTop5 = rzOverviewDistribution['原因'].slice(0, 5);
   const overdueMax = Math.max(...rzOverviewOverdueData.map(item => item.value), 1);
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx("section", { className: "grid grid-cols-3 gap-4 xl:grid-cols-6", children: rzOverviewMetrics.map(card => /*#__PURE__*/_jsx(RzOverviewMetricCard, { card: card }, card.title)) }),
+    /*#__PURE__*/_jsx("section", { className: "grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-7", children: rzOverviewMetrics.map(card => /*#__PURE__*/_jsx(RzOverviewMetricCard, { card: card, compareMode: compareMode }, card.title)) }),
     /*#__PURE__*/_jsx(RzOverviewTrend, { applied: applied }),
     /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-1 gap-5 xl:grid-cols-[0.9fr_1.1fr]", children: [
       /*#__PURE__*/_jsxs("div", { className: "rounded-2xl border border-slate-200 bg-white shadow-low", children: [
-        /*#__PURE__*/_jsxs("div", { className: "border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "超期情况｜重点机构" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: "按超期工单量排序，优先关注最长超期工单" })] }),
+        /*#__PURE__*/_jsx("div", { className: "border-b border-slate-100 px-5 py-4", children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "超期情况｜重点机构" }) }),
         /*#__PURE__*/_jsx("div", { className: "space-y-4 p-5", children: rzOverviewOverdueData.map((item, index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[28px_90px_1fr_72px] items-center gap-3 text-xs", children: [/*#__PURE__*/_jsx("span", { className: "grid h-6 w-6 place-items-center rounded bg-danger font-black text-white", children: index + 1 }), /*#__PURE__*/_jsx("span", { className: "font-black text-slate-700", children: item.name }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "h-2 overflow-hidden rounded-full bg-[#FEE7DD]", children: /*#__PURE__*/_jsx("div", { className: "h-full rounded-full bg-danger", style: { width: `${item.value / overdueMax * 100}%` } }) }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-[11px] font-bold text-danger", children: item.extra })] }), /*#__PURE__*/_jsxs("span", { className: "text-right font-black text-danger", children: [item.value, "件 · ", item.rate] })] }, item.name)) }),
-        /*#__PURE__*/_jsx("div", { className: "mx-5 mb-5 rounded-md bg-[#FEE7DD] px-3 py-2 text-[11px] font-bold text-danger", children: "提示：已超期工单应优先督办，点击工单后进入处理详情。" })
       ] }),
       /*#__PURE__*/_jsxs("div", { className: "rounded-2xl border border-slate-200 bg-white shadow-low", children: [
-        /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "临期预警｜未来24小时到期" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: "仅统计未办结工单，按剩余时间由短到长排列" })] }), /*#__PURE__*/_jsxs("span", { className: "rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-rizhao", children: [rzOverviewDueSoonData.length, "件待关注"] })] }),
+        /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "临期预警｜未来24小时到期" }) }), /*#__PURE__*/_jsxs("span", { className: "rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-rizhao", children: [rzOverviewDueSoonData.length, "件待关注"] })] }),
         /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['工单编号', '处理机构', '状态', '剩余时间', '操作'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rzOverviewDueSoonData.map(row => /*#__PURE__*/_jsxs("tr", { className: "hover:bg-orange-50/50", children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-rizhao", children: row.id }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 text-slate-600", children: row.institution }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: /*#__PURE__*/_jsx("span", { className: "rounded bg-slate-100 px-2 py-1 font-bold text-slate-600", children: row.status }) }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-danger", children: row.remaining }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: /*#__PURE__*/_jsx("button", { type: "button", className: "font-black text-rizhao hover:underline", children: "查看工单" }) })] }, row.id)) })] }) })
       ] })
     ] }),
-    /*#__PURE__*/_jsxs("section", { children: [/*#__PURE__*/_jsxs("div", { className: "mb-3 flex items-end justify-between", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black text-ink", children: "重点分布" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs text-slate-400", children: "采用不同图表呈现来源占比、机构排行、产品结构和原因规模" })] }), /*#__PURE__*/_jsx("span", { className: "text-xs font-bold text-slate-400", children: "数据口径：投诉量、占比、环比" })] }), /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-1 gap-5 xl:grid-cols-2", children: [
-      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉来源 Top5", note: "环形图｜识别投诉进入系统的主要渠道", targetTab: "渠道分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewSourceDonut, { data: rzOverviewSourceData }) }),
-      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉机构 Top5", note: "横向排行｜识别投诉压力较高的被投诉机构", targetTab: "机构分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewInstitutionRank, { data: overviewInstitutionTop5 }) }),
-      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉产品 Top5", note: "矩形分布｜面积层级突出主要产品", targetTab: "产品分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewProductTreemap, { data: overviewProductTop5 }) }),
-      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉原因 Top5", note: "柱状对比｜展示高频投诉原因规模", targetTab: "原因分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewReasonColumns, { data: overviewReasonTop5 }) })
+    /*#__PURE__*/_jsxs("section", { children: [/*#__PURE__*/_jsx("div", { className: "mb-3 flex items-end justify-between", children: /*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-lg font-black text-ink", children: "重点分布" }) }) }), /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-1 gap-5 xl:grid-cols-2", children: [
+      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉来源 Top5", note: "环形图｜识别投诉进入系统的主要渠道", targetTab: "渠道分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewSourceDonut, { data: rzOverviewSourceData, compareMode: compareMode }) }),
+      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉机构 Top5", note: "横向排行｜识别投诉压力较高的被投诉机构", targetTab: "机构分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewInstitutionRank, { data: overviewInstitutionTop5, compareMode: compareMode }) }),
+      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉产品 Top5", note: "矩形分布｜面积层级突出主要产品", targetTab: "产品分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewProductTreemap, { data: overviewProductTop5, compareMode: compareMode }) }),
+      /*#__PURE__*/_jsx(RzOverviewChartCard, { title: "投诉原因 Top5", note: "柱状对比｜展示高频投诉原因规模", targetTab: "原因分析", onNavigate: onNavigate, children: /*#__PURE__*/_jsx(RzOverviewReasonColumns, { data: overviewReasonTop5, compareMode: compareMode }) })
     ] })] })
   ] });
 }
@@ -1761,11 +1817,11 @@ function RzInstitutionTrendPanel({ applied }) {
   ] }) });
 }
 
-function RzInstitutionPressureChart({ data }) {
+function RzInstitutionPressureChart({ data, compareMode = 'mom' }) {
   const max = Math.max(...data.map(item => item.valid), 1);
-  return /*#__PURE__*/_jsx(RzReasonPanel, { title: '投诉压力｜哪些机构投诉最多？', note: '机构有效投诉量排名', info: [{ label: '有效投诉量', text: '机构范围内有效投诉事件单去重数。' }, { label: '投诉占比', text: '本机构有效投诉量除以当前管理范围有效投诉总量。' }, { label: '预警点', text: '色点表示该机构触发环比或同比预警。' }], children: /*#__PURE__*/_jsxs("div", { children: [
-    /*#__PURE__*/_jsx("div", { className: "space-y-3", children: data.map((item,index) => { const alert = parseFloat(item.mom) >= 10; return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[30px_112px_1fr_118px] items-center gap-3", children: [/*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded text-xs font-black ${index < 3 ? 'bg-orange-100 text-rizhao' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsxs("span", { className: "flex items-center gap-2 text-sm font-bold text-slate-700", children: [item.name, alert && /*#__PURE__*/_jsx("i", { className: `h-2 w-2 rounded-full ${parseFloat(item.mom) >= 15 ? 'bg-rose-500' : 'bg-amber-500'}` })] }), /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("i", { className: "block h-full rounded", style: { width: `${item.valid / max * 100}%`, background: 'linear-gradient(90deg, #EE7800 0%, #F5A623 100%)' } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right", children: [/*#__PURE__*/_jsxs("b", { className: "text-sm text-ink", children: [item.valid.toLocaleString(), " 件"] }), /*#__PURE__*/_jsxs("div", { className: "mt-0.5 text-[11px] text-slate-400", children: ["占", item.share, " · ", /*#__PURE__*/_jsx("em", { className: `not-italic font-bold ${item.mom.startsWith('+') ? 'text-rose-500' : 'text-emerald-600'}`, children: item.mom })] })] })] }, item.name); }) }),
-    /*#__PURE__*/_jsx("div", { className: "mt-4 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: "按有效投诉量降序展示当前机构范围；色点表示已触发环比或同比预警。" })
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: '投诉压力｜哪些机构投诉最多？', note: '机构有效投诉量排名', info: [{ label: '有效投诉量', text: '机构范围内有效投诉事件单去重数。' }, { label: '投诉占比', text: '本机构有效投诉量除以当前管理范围有效投诉总量。' }, { label: '预警点', text: `色点表示该机构触发${rzCompareModeLabel(compareMode)}预警。` }], children: /*#__PURE__*/_jsxs("div", { children: [
+    /*#__PURE__*/_jsx("div", { className: "space-y-3", children: data.map((item,index) => { const change = rzCompareValue({ mom: item.mom, yoy: item.yoy }, compareMode, index); const alert = parseFloat(change) >= 10; return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[30px_112px_1fr_118px] items-center gap-3", children: [/*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded text-xs font-black ${index < 3 ? 'bg-orange-100 text-rizhao' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }), /*#__PURE__*/_jsxs("span", { className: "flex items-center gap-2 text-sm font-bold text-slate-700", children: [item.name, alert && /*#__PURE__*/_jsx("i", { className: `h-2 w-2 rounded-full ${parseFloat(change) >= 15 ? 'bg-rose-500' : 'bg-amber-500'}` })] }), /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("i", { className: "block h-full rounded", style: { width: `${item.valid / max * 100}%`, background: 'linear-gradient(90deg, #EE7800 0%, #F5A623 100%)' } }) }), /*#__PURE__*/_jsxs("span", { className: "text-right", children: [/*#__PURE__*/_jsxs("b", { className: "text-sm text-ink", children: [item.valid.toLocaleString(), " 件"] }), /*#__PURE__*/_jsxs("div", { className: "mt-0.5 text-[11px] text-slate-400", children: ["占", item.share, " · ", /*#__PURE__*/_jsx("em", { className: `not-italic font-bold ${rzCompareToneClass(change)}`, children: change })] })] })] }, item.name); }) }),
+    /*#__PURE__*/_jsxs("div", { className: "mt-4 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: ["按有效投诉量降序展示当前机构范围；色点表示已触发", rzCompareModeLabel(compareMode), "预警。"] })
   ] }) });
 }
 
@@ -1811,10 +1867,9 @@ function RzInstitutionRectificationChart({ data }) {
   return /*#__PURE__*/_jsx(RzReasonPanel, { title: '整改效果｜重点机构整改后投诉是否下降？', note: '整改前后有效投诉量及下降幅度对比', info: [{ label: '整改任务数量', text: '当前机构关联整改任务数量及状态分布。' }, { label: '整改前投诉量', text: '整改任务基准周期内有效投诉量。' }, { label: '整改后投诉量', text: '整改实施后同口径统计周期有效投诉量。' }], children: /*#__PURE__*/_jsx("div", { className: "grid grid-cols-5 gap-4", children: data.map(item => { const drop = (item.before - item.after) / item.before * 100; return /*#__PURE__*/_jsxs("article", { className: "rounded-lg border border-slate-200 p-4", children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between", children: [/*#__PURE__*/_jsx("b", { className: "text-sm text-ink", children: item.name }), /*#__PURE__*/_jsxs("span", { className: "text-xs font-bold text-rizhao", children: [item.tasks, "项任务"] })] }), /*#__PURE__*/_jsxs("div", { className: "mt-5 flex h-[130px] items-end justify-center gap-4 border-b border-slate-200", children: [/*#__PURE__*/_jsxs("span", { className: "flex w-12 flex-col items-center justify-end", children: [/*#__PURE__*/_jsx("b", { className: "mb-1 text-xs text-slate-500", children: item.before }), /*#__PURE__*/_jsx("i", { className: "block w-full rounded-t bg-slate-300", style: { height: `${item.before / max * 100}px` } })] }), /*#__PURE__*/_jsxs("span", { className: "flex w-12 flex-col items-center justify-end", children: [/*#__PURE__*/_jsx("b", { className: "mb-1 text-xs text-emerald-600", children: item.after }), /*#__PURE__*/_jsx("i", { className: "block w-full rounded-t bg-emerald-500", style: { height: `${item.after / max * 100}px` } })] })] }), /*#__PURE__*/_jsxs("div", { className: "mt-3 flex justify-between text-[11px]", children: [/*#__PURE__*/_jsx("span", { className: "text-slate-400", children: "整改前 / 整改后" }), /*#__PURE__*/_jsxs("b", { className: "text-emerald-600", children: ["下降 ", drop.toFixed(1), "%"] })] })] }, item.name); }) }) });
 }
 
-function RzInstitutionChartGrid({ data }) {
-  const [compareMode, setCompareMode] = useState('mom');
+function RzInstitutionChartGrid({ data, compareMode = 'mom' }) {
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-2 gap-5", children: [/*#__PURE__*/_jsx(RzInstitutionPressureChart, { data: data }), /*#__PURE__*/_jsx(RzReasonPanel, { title: '监管风险｜哪些机构更容易形成监管压力？', note: '监管风险机构分布', info: [{ label: '横轴', text: '机构监管投诉占本机构有效投诉量比例。' }, { label: '纵轴', text: '机构监管投诉环比或同比增幅。' }, { label: '气泡面积', text: '机构有效投诉量映射为气泡面积。' }], children: /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "mb-2 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: [{ key: 'mom', label: '环比' }, { key: 'yoy', label: '同比' }].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setCompareMode(item.key), className: `rounded px-4 py-1.5 text-xs font-black ${compareMode === item.key ? 'bg-rizhao text-white' : 'text-slate-500'}`, children: item.label }, item.key)) }) }), /*#__PURE__*/_jsx(RzInstitutionScatterChart, { data: data, type: 'regulatory', compareMode: compareMode })] }) })] }),
+    /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-2 gap-5", children: [/*#__PURE__*/_jsx(RzInstitutionPressureChart, { data: data, compareMode: compareMode }), /*#__PURE__*/_jsx(RzReasonPanel, { title: '监管风险｜哪些机构更容易形成监管压力？', note: '监管风险机构分布', info: [{ label: '横轴', text: '机构监管投诉占本机构有效投诉量比例。' }, { label: '纵轴', text: `机构监管投诉${rzCompareModeLabel(compareMode)}增幅。` }, { label: '气泡面积', text: '机构有效投诉量映射为气泡面积。' }], children: /*#__PURE__*/_jsx(RzInstitutionScatterChart, { data: data, type: 'regulatory', compareMode: compareMode }) })] }),
     /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-2 gap-5", children: [/*#__PURE__*/_jsx(RzReasonPanel, { title: '处理效率｜哪些机构处理最慢？', note: '处理效率机构分布', info: [{ label: '横轴', text: '机构已结工单平均处理时长。' }, { label: '纵轴', text: '机构在规定期限内办结工单比例。' }, { label: '风险边界', text: '平均时长3天、按时办结率95%。' }], children: /*#__PURE__*/_jsx(RzInstitutionScatterChart, { data: data, type: 'efficiency' }) }), /*#__PURE__*/_jsx(RzInstitutionQualityChart, { data: data })] }),
     /*#__PURE__*/_jsx(RzInstitutionRectificationChart, { data: data })
   ] });
@@ -1856,7 +1911,7 @@ function RzInstitutionBarList({ data, valueKey = 'value', unit = '件', tone = '
   ] }, item.name)) });
 }
 
-function RzInstitutionAnalysisPage({ applied }) {
+function RzInstitutionAnalysisPage({ applied, compareMode = 'mom' }) {
   const total = rzInstitutionRows.reduce((sum, item) => sum + item.total, 0);
   const pending = rzInstitutionRows.reduce((sum, item) => sum + item.pending + item.processing + item.review, 0);
   const overdue = rzInstitutionRows.reduce((sum, item) => sum + item.overdue, 0);
@@ -1871,19 +1926,19 @@ function RzInstitutionAnalysisPage({ applied }) {
   const x = value => 74 + value / (maxPending + 3) * 430;
   const y = value => 220 - value / 3 * 158;
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzReasonPanel, { title: "投诉规模｜各机构投诉量排名", note: `${applied.org}｜按被投诉机构汇总，行内工单编号去重`, info: [{ label: '统计口径', text: '投诉规模按被投诉机构统计，不与录入机构、处理机构混用。' }, { label: '投诉占比', text: '本机构投诉量除以当前查询范围投诉工单总量。' }, { label: '环比口径', text: '当前查询周期与等长上一周期比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+    /*#__PURE__*/_jsx(RzReasonPanel, { title: "投诉规模｜各机构投诉量排名", note: `${applied.org}｜按被投诉机构汇总，行内工单编号去重`, info: [{ label: '统计口径', text: '投诉规模按被投诉机构统计，不与录入机构、处理机构混用。' }, { label: '投诉占比', text: '本机构投诉量除以当前查询范围投诉工单总量。' }, { label: `${rzCompareModeLabel(compareMode)}口径`, text: compareMode === 'yoy' ? '当前查询周期与去年同期比较。' : '当前查询周期与等长上一周期比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
       /*#__PURE__*/_jsx("section", { className: "mb-5 grid grid-cols-4 gap-4", children: [
         { label: '投诉工单量', value: total, unit: '件', sub: '按工单编号去重', tone: 'orange' },
         { label: '被投诉机构数', value: rzInstitutionRows.length, unit: '家', sub: '当前查询范围', tone: 'blue' },
         { label: '已办结工单', value: closed, unit: '件', sub: `办结率 ${(closed / total * 100).toFixed(1)}%`, tone: 'green' },
         { label: '未办结工单', value: pending, unit: '件', sub: `占比 ${(pending / total * 100).toFixed(1)}%`, tone: 'red' }
       ].map(item => /*#__PURE__*/_jsx(RzAnalyticsMetricCard, { item: item }, item.label)) }),
-      /*#__PURE__*/_jsx("div", { className: "space-y-3", children: scaleRows.map((item,index) => /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[30px_112px_1fr_170px] items-center gap-3 text-xs", children: [
+      /*#__PURE__*/_jsx("div", { className: "space-y-3", children: scaleRows.map((item,index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[30px_112px_1fr_170px] items-center gap-3 text-xs", children: [
         /*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded font-black ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }),
         /*#__PURE__*/_jsx("span", { className: "font-black text-slate-700", children: item.name }),
         /*#__PURE__*/_jsx("span", { className: "h-8 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded bg-rizhao", style: { width: `${item.total / maxTotal * 100}%` } }) }),
-        /*#__PURE__*/_jsxs("span", { className: "text-right", children: [/*#__PURE__*/_jsxs("b", { className: "text-slate-700", children: [item.total, "件 · ", item.rate] }), /*#__PURE__*/_jsxs("small", { className: "ml-2 font-bold text-rose-500", children: ["环比 ", item.mom] })] })
-      ] }, item.name)) })
+        /*#__PURE__*/_jsxs("span", { className: "text-right", children: [/*#__PURE__*/_jsxs("b", { className: "text-slate-700", children: [item.total, "件 · ", item.rate] }), /*#__PURE__*/_jsxs("small", { className: `ml-2 font-bold ${rzCompareToneClass(change)}`, children: [rzCompareModeLabel(compareMode), " ", change] })] })
+      ] }, item.name); }) })
     ] }) }),
 
     /*#__PURE__*/_jsx(RzInstitutionTrendPanel, { applied: applied }),
@@ -1924,25 +1979,25 @@ function RzInstitutionAnalysisPage({ applied }) {
   ] });
 }
 
-function RzSelectableLineChart({ data, selected, onSelect, applied }) {
+function RzSelectableLineChart({ data, selected, onSelect, applied, compareMode = 'mom' }) {
   const max = Math.max(...data.map(item => item.value), 1);
   const rowHeight = 42;
   const chartHeight = data.length * rowHeight + 34;
   return /*#__PURE__*/_jsx(RzReasonPanel, { title: '各业务条线有效投诉量对比', note: `${applied.org}｜展示全部业务条线，不设 Top 排名；点击柱形选择条线并查看关联分布`, info: [{ label: '展示范围', text: '展示当前查询范围内全部业务条线，不截取TopN。' }, { label: '指标口径', text: '按最终生效业务条线统计有效投诉量，事件单编号去重。' }, { label: '交互说明', text: '点击任一柱形后，关联分布与投诉明细同步刷新。' }], children: /*#__PURE__*/_jsxs("div", { children: [
     /*#__PURE__*/_jsxs("div", { className: "mb-3 flex items-center justify-between text-xs", children: [/*#__PURE__*/_jsx("span", { className: "font-bold text-slate-500", children: "全部业务条线" }), /*#__PURE__*/_jsxs("span", { className: "rounded-md bg-orange-50 px-3 py-1.5 font-black text-rizhao", children: ["当前选择：", selected] })] }),
-    /*#__PURE__*/_jsx("svg", { viewBox: `0 0 1000 ${chartHeight}`, className: "w-full", style: { height: `${chartHeight}px` }, role: "img", "aria-label": "全部业务条线有效投诉量柱状图", children: data.map((item,index) => { const y = 10 + index * rowHeight; const active = selected === item.name; const barWidth = item.value / max * 650; return /*#__PURE__*/_jsxs("g", { onClick: () => onSelect(item.name), style: { cursor: 'pointer' }, children: [/*#__PURE__*/_jsx("text", { x: "4", y: y + 21, fontSize: "12", fontWeight: active ? "700" : "500", fill: active ? "#EE7800" : "#334155", children: item.name }), /*#__PURE__*/_jsx("rect", { x: "125", y: y + 3, width: "650", height: "26", rx: "5", fill: active ? "#FFF3D6" : "#F1F5F9" }), /*#__PURE__*/_jsx("rect", { x: "125", y: y + 3, width: barWidth, height: "26", rx: "5", fill: active ? "#EE7800" : "#F59E0B", opacity: active ? "1" : ".72" }), /*#__PURE__*/_jsxs("text", { x: "792", y: y + 21, fontSize: "12", fontWeight: "700", fill: active ? "#EE7800" : "#475569", children: [item.value.toLocaleString(), "件 · ", item.rate] }), /*#__PURE__*/_jsxs("text", { x: "930", y: y + 21, textAnchor: "end", fontSize: "11", fill: item.mom.startsWith('+') ? "#F5555E" : "#10B981", children: ["环比 ", item.mom] })] }, item.name); }) }),
-    /*#__PURE__*/_jsx("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: "柱长表示有效投诉量；右侧同步展示投诉量、占比和环比。橙色高亮柱为当前选中条线。" })
+    /*#__PURE__*/_jsx("svg", { viewBox: `0 0 1000 ${chartHeight}`, className: "w-full", style: { height: `${chartHeight}px` }, role: "img", "aria-label": "全部业务条线有效投诉量柱状图", children: data.map((item,index) => { const y = 10 + index * rowHeight; const active = selected === item.name; const barWidth = item.value / max * 650; const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("g", { onClick: () => onSelect(item.name), style: { cursor: 'pointer' }, children: [/*#__PURE__*/_jsx("text", { x: "4", y: y + 21, fontSize: "12", fontWeight: active ? "700" : "500", fill: active ? "#EE7800" : "#334155", children: item.name }), /*#__PURE__*/_jsx("rect", { x: "125", y: y + 3, width: "650", height: "26", rx: "5", fill: active ? "#FFF3D6" : "#F1F5F9" }), /*#__PURE__*/_jsx("rect", { x: "125", y: y + 3, width: barWidth, height: "26", rx: "5", fill: active ? "#EE7800" : "#F59E0B", opacity: active ? "1" : ".72" }), /*#__PURE__*/_jsxs("text", { x: "792", y: y + 21, fontSize: "12", fontWeight: "700", fill: active ? "#EE7800" : "#475569", children: [item.value.toLocaleString(), "件 · ", item.rate] }), /*#__PURE__*/_jsxs("text", { x: "930", y: y + 21, textAnchor: "end", fontSize: "11", fill: change.startsWith('+') ? "#F5555E" : "#10B981", children: [rzCompareModeLabel(compareMode), " ", change] })] }, item.name); }) }),
+    /*#__PURE__*/_jsxs("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: ["柱长表示有效投诉量；右侧同步展示投诉量、占比和", rzCompareModeLabel(compareMode), "。橙色高亮柱为当前选中条线。"] })
   ] }) });
 }
 
-function RzLineAnalysisPage({ applied }) {
+function RzLineAnalysisPage({ applied, compareMode = 'mom' }) {
   const [selectedLine, setSelectedLine] = useState('零售金融');
   const [view, setView] = useState('产品');
   const [selectedAssociation, setSelectedAssociation] = useState('全部');
   const data = rzLineAssociation[view];
   const filtered = rzLineDetails.filter(row => row.line === selectedLine && (selectedAssociation === '全部' || row.product === selectedAssociation || row.reason === selectedAssociation || row.institution === selectedAssociation));
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzSelectableLineChart, { data: rzLineTop10, selected: selectedLine, onSelect: value => { setSelectedLine(value); setSelectedAssociation('全部'); }, applied: applied }),
+    /*#__PURE__*/_jsx(RzSelectableLineChart, { data: rzLineTop10, selected: selectedLine, onSelect: value => { setSelectedLine(value); setSelectedAssociation('全部'); }, applied: applied, compareMode: compareMode }),
     /*#__PURE__*/_jsx(RzReasonPanel, { title: `${selectedLine}｜关联分布 Top5`, note: '支持产品、原因、机构视角，点击对象叠加筛选下方投诉明细', info: [{ label: '指标口径', text: '展示选中条线关联产品、原因或责任机构前5名。' }, { label: '计算公式', text: '占比为组合投诉量除以当前条线投诉量。' }, { label: '交叉筛选', text: '选择对象后同步刷新明细。' }], children: /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "mb-4 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['产品','原因','机构'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setView(item); setSelectedAssociation('全部'); }, className: `rounded px-5 py-1.5 text-xs font-black ${view === item ? 'bg-white text-rizhao shadow-low' : 'text-slate-500'}`, children: `${item}视角` }, item)) }) }), /*#__PURE__*/_jsx(RzReasonDistribution, { data: data, selected: selectedAssociation, onSelect: setSelectedAssociation })] }) }),
     /*#__PURE__*/_jsx(RzReasonPanel, { title: '条线关联投诉明细', note: `当前条线：${selectedLine}｜匹配 ${filtered.length} 笔示例数据`, info: [{ label: '明细口径', text: '继承机构、日期、条线及关联对象筛选。' }, { label: '原因标签', text: '优先采用人工修正后的最终原因标签。' }, { label: '事件状态', text: '取当前流程实例状态。' }], children: /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['事件单编号','客户投诉时间','所属业务条线','修正投诉原因','产品一级分类','投诉责任机构','事件单状态','操作'].map(label => /*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: label }, label)) }) }), /*#__PURE__*/_jsxs("tbody", { className: "divide-y divide-slate-100", children: [filtered.map(row => /*#__PURE__*/_jsxs("tr", { children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-black text-rizhao", children: row.id }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.date }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.line }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.reason }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.product }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.institution }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.status }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-black text-rizhao", children: "查看详情" })] }, row.id)), filtered.length === 0 && /*#__PURE__*/_jsx("tr", { children: /*#__PURE__*/_jsx("td", { colSpan: "8", className: "px-5 py-10 text-center text-slate-400", children: "当前条件下暂无匹配投诉" }) })] })] }) }) })
   ] });
@@ -2013,17 +2068,17 @@ function RzMiniDonut({ title, data }) {
   ] }) });
 }
 
-function RzSideRank({ title, data, selected, onSelect }) {
+function RzSideRank({ title, data, selected, onSelect, compareMode = 'mom' }) {
   const max = Math.max(...data.map(item => item.value), 1);
-  return /*#__PURE__*/_jsx(RzReasonPanel, { title: title, note: '按工单量降序展示重点对象，点击可作为当前分析对象', info: [{ label: '排名字段', text: '取当前维度最终生效标签或对象名称。' }, { label: '数量字段', text: '按工单编号去重统计投诉量。' }, { label: '变化字段', text: '示例展示环比变化，用于识别近期波动。' }], children: /*#__PURE__*/_jsx("div", { className: "max-h-[284px] space-y-3 overflow-y-auto pr-1", children: data.map((item, index) => {
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: title, note: '按工单量降序展示重点对象，点击可作为当前分析对象', info: [{ label: '排名字段', text: '取当前维度最终生效标签或对象名称。' }, { label: '数量字段', text: '按工单编号去重统计投诉量。' }, { label: '变化字段', text: `示例展示${rzCompareModeLabel(compareMode)}变化，用于识别近期波动。` }], children: /*#__PURE__*/_jsx("div", { className: "max-h-[284px] space-y-3 overflow-y-auto pr-1", children: data.map((item, index) => {
     const active = selected === item.name;
-    const change = item.mom || item.yoy || (index % 2 ? '-2.3%' : '+3.6%');
+    const change = rzCompareValue(item, compareMode, index);
     return /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => onSelect && onSelect(item.name), className: `grid w-full grid-cols-[34px_120px_1fr_96px_64px] items-center gap-3 rounded-lg px-2 py-2 text-left text-xs transition ${active ? 'bg-orange-50 ring-1 ring-rizhao/20' : 'hover:bg-slate-50'}`, children: [
       /*#__PURE__*/_jsx("span", { className: `grid h-7 w-7 place-items-center rounded-full font-black ${index < 3 ? 'bg-orange-100 text-rizhao' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }),
       /*#__PURE__*/_jsx("span", { className: "truncate font-black text-ink", children: item.name }),
       /*#__PURE__*/_jsx("span", { className: "h-2 overflow-hidden rounded-full bg-orange-50", children: /*#__PURE__*/_jsx("i", { className: "block h-full rounded-full bg-rizhao", style: { width: `${item.value / max * 100}%` } }) }),
       /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-slate-600", children: [item.value.toLocaleString(), "件"] }),
-      /*#__PURE__*/_jsx("span", { className: `text-right font-bold ${change.startsWith('+') ? 'text-rose-500' : 'text-emerald-600'}`, children: change })
+      /*#__PURE__*/_jsx("span", { className: `text-right font-bold ${rzCompareToneClass(change)}`, children: change })
     ] }, item.name);
   }) }) });
 }
@@ -2038,21 +2093,22 @@ function RzLevel2Rank({ title, data }) {
   ] }, item.name)) }) });
 }
 
-function RzComplaintTrendBars({ title, applied }) {
-  const maxCount = Math.max(...rzCommonTrendData.map(item => item.count), 1);
-  const maxGrowth = Math.max(...rzCommonTrendData.map(item => item.growth), 1);
+function RzComplaintTrendBars({ title, applied, compareMode = 'mom' }) {
+  const trendData = rzCommonTrendData.map((item,index) => ({ ...item, growth: rzCompareTrendGrowth(item.growth, compareMode, index) }));
+  const maxCount = Math.max(...trendData.map(item => item.count), 1);
+  const maxGrowth = Math.max(...trendData.map(item => item.growth), 1);
   const x = index => 72 + index * 88;
   const yGrowth = value => 210 - value / maxGrowth * 150;
-  return /*#__PURE__*/_jsx(RzReasonPanel, { title: title, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形展示投诉量，折线展示环比增长`, info: [{ label: '投诉量', text: '按日期聚合工单量，工单编号去重。' }, { label: '环比增长', text: '与上一统计周期同口径数据对比。' }, { label: '用途', text: '识别短期集中爆发日期和波动幅度。' }], children: /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[280px] w-full", role: "img", "aria-label": title, children: [
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: title, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形展示投诉量，折线展示${rzCompareModeLabel(compareMode)}增长`, info: [{ label: '投诉量', text: '按日期聚合工单量，工单编号去重。' }, { label: `${rzCompareModeLabel(compareMode)}增长`, text: compareMode === 'yoy' ? '与去年同期同口径数据对比。' : '与上一统计周期同口径数据对比。' }, { label: '用途', text: '识别短期集中爆发日期和波动幅度。' }], children: /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[280px] w-full", role: "img", "aria-label": title, children: [
     [0,1,2,3,4].map(i => /*#__PURE__*/_jsx("line", { x1: "54", x2: "952", y1: 34 + i * 44, y2: 34 + i * 44, stroke: "#E8EDF3", strokeDasharray: "4 5" }, i)),
-    rzCommonTrendData.map((item, index) => /*#__PURE__*/_jsxs("g", { children: [
+    trendData.map((item, index) => /*#__PURE__*/_jsxs("g", { children: [
       /*#__PURE__*/_jsx("rect", { x: x(index) - 16, y: 210 - item.count / maxCount * 160, width: "32", height: item.count / maxCount * 160, rx: "5", fill: index === 2 || index === 6 ? "#43A047" : "#A5D6A7" }),
       /*#__PURE__*/_jsx("text", { x: x(index), y: "238", textAnchor: "middle", fontSize: "11", fill: "#64748B", children: item.date })
     ] }, item.date)),
-    /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#FDBA4D", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: rzCommonTrendData.map((item,index) => `${x(index)},${yGrowth(item.growth)}`).join(' ') }),
-    rzCommonTrendData.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yGrowth(item.growth), r: "4", fill: "white", stroke: "#FDBA4D", strokeWidth: "2.5" }), /*#__PURE__*/_jsxs("text", { x: x(index), y: yGrowth(item.growth) - 9, textAnchor: "middle", fontSize: "11", fill: "#64748B", children: [item.growth, "%"] })] }, `${item.date}-growth`)),
+    /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#FDBA4D", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: trendData.map((item,index) => `${x(index)},${yGrowth(item.growth)}`).join(' ') }),
+    trendData.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yGrowth(item.growth), r: "4", fill: "white", stroke: "#FDBA4D", strokeWidth: "2.5" }), /*#__PURE__*/_jsxs("text", { x: x(index), y: yGrowth(item.growth) - 9, textAnchor: "middle", fontSize: "11", fill: "#64748B", children: [item.growth, "%"] })] }, `${item.date}-growth`)),
     /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#43A047", children: "投诉量（件）" }),
-    /*#__PURE__*/_jsx("text", { x: "864", y: "22", fontSize: "11", fill: "#FDBA4D", children: "环比增长（%）" })
+    /*#__PURE__*/_jsxs("text", { x: "864", y: "22", fontSize: "11", fill: "#FDBA4D", children: [rzCompareModeLabel(compareMode), "增长（%）"] })
   ] }) });
 }
 
@@ -2131,25 +2187,25 @@ const rzProductTrendSets = {
   '月': [{ date: '2月', count: 1186, growth: 8 }, { date: '3月', count: 1268, growth: 11 }, { date: '4月', count: 1226, growth: 6 }, { date: '5月', count: 1384, growth: 16 }, { date: '6月', count: 1462, growth: 19 }, { date: '7月', count: 1528, growth: 22 }]
 };
 
-function RzProductTrendPanel({ selectedProduct, applied }) {
+function RzProductTrendPanel({ selectedProduct, applied, compareMode = 'mom' }) {
   const [granularity, setGranularity] = useState('日');
   const baseData = rzProductTrendSets[granularity];
   const product = rzProductTop10.find(item => item.name === selectedProduct) || rzProductTop10[0];
   const scale = Math.max(product.value / rzProductTop10[0].value, 0.28);
-  const data = baseData.map(item => ({ ...item, count: Math.max(1, Math.round(item.count * scale)) }));
+  const data = baseData.map((item,index) => ({ ...item, count: Math.max(1, Math.round(item.count * scale)), growth: rzCompareTrendGrowth(item.growth, compareMode, index) }));
   const maxCount = Math.max(...data.map(item => item.count), 1);
   const maxGrowth = Math.max(...data.map(item => item.growth), 1);
   const step = 850 / Math.max(data.length - 1, 1);
   const x = index => 76 + index * step;
   const yGrowth = value => 210 - value / maxGrowth * 150;
-  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedProduct}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形为投诉量，折线为环比`, info: [{ label: '时间口径', text: '支持按日、周、月聚合投诉时间。' }, { label: '投诉量', text: '当前产品标签下按行内工单编号去重统计。' }, { label: '环比', text: '与相邻上一日、上一周或上一月同口径比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedProduct}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形为投诉量，折线为${rzCompareModeLabel(compareMode)}`, info: [{ label: '时间口径', text: '支持按日、周、月聚合投诉时间。' }, { label: '投诉量', text: '当前产品标签下按行内工单编号去重统计。' }, { label: rzCompareModeLabel(compareMode), text: compareMode === 'yoy' ? '与去年同期同口径数据比较。' : '与相邻上一日、上一周或上一月同口径比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
     /*#__PURE__*/_jsx("div", { className: "mb-3 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['日','周','月'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setGranularity(item), className: `rounded px-4 py-1.5 text-xs font-black ${granularity === item ? 'bg-rizhao text-white shadow-low' : 'text-slate-500'}`, children: `按${item}` }, item)) }) }),
     /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[280px] w-full", role: "img", "aria-label": `${selectedProduct}投诉趋势`, children: [
       [0,1,2,3,4].map(i => /*#__PURE__*/_jsx("line", { x1: "54", x2: "952", y1: 34 + i * 44, y2: 34 + i * 44, stroke: "#E8EDF3", strokeDasharray: "4 5" }, i)),
       data.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("rect", { x: x(index) - 18, y: 210 - item.count / maxCount * 160, width: "36", height: item.count / maxCount * 160, rx: "5", fill: "#FDBA4D" }), /*#__PURE__*/_jsx("text", { x: x(index), y: "238", textAnchor: "middle", fontSize: "11", fill: "#64748B", children: item.date })] }, item.date)),
       /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#EE7800", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: data.map((item,index) => `${x(index)},${yGrowth(item.growth)}`).join(' ') }),
       data.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yGrowth(item.growth), r: "4", fill: "white", stroke: "#EE7800", strokeWidth: "2.5" }), /*#__PURE__*/_jsxs("text", { x: x(index), y: yGrowth(item.growth) - 9, textAnchor: "middle", fontSize: "11", fill: "#64748B", children: [item.growth, "%"] })] }, `${item.date}-growth`)),
-      /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#64748B", children: "投诉量（件）" }), /*#__PURE__*/_jsx("text", { x: "862", y: "22", fontSize: "11", fill: "#EE7800", children: "环比（%）" })
+      /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#64748B", children: "投诉量（件）" }), /*#__PURE__*/_jsxs("text", { x: "862", y: "22", fontSize: "11", fill: "#EE7800", children: [rzCompareModeLabel(compareMode), "（%）"] })
     ] })
   ] }) });
 }
@@ -2177,12 +2233,12 @@ function RzProductStructureDrill({ selectedProduct, onSelectProduct }) {
   ] }) });
 }
 
-function RzProductAnalysisPageV2({ applied }) {
+function RzProductAnalysisPageV2({ applied, compareMode = 'mom' }) {
   const [selectedProduct, setSelectedProduct] = useState('信用卡');
   const reasons = rzProductTopReasonMap[selectedProduct] || rzProductTopReasonFallback;
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzSideRank, { title: "投诉规模｜产品排名、投诉量、占比与环比", data: rzProductTop10, selected: selectedProduct, onSelect: setSelectedProduct }),
-    /*#__PURE__*/_jsx(RzProductTrendPanel, { selectedProduct: selectedProduct, applied: applied }),
+    /*#__PURE__*/_jsx(RzSideRank, { title: `投诉规模｜产品排名、投诉量、占比与${rzCompareModeLabel(compareMode)}`, data: rzProductTop10, selected: selectedProduct, compareMode: compareMode, onSelect: setSelectedProduct }),
+    /*#__PURE__*/_jsx(RzProductTrendPanel, { selectedProduct: selectedProduct, applied: applied, compareMode: compareMode }),
     /*#__PURE__*/_jsx(RzProductStructureDrill, { selectedProduct: selectedProduct, onSelectProduct: setSelectedProduct }),
     /*#__PURE__*/_jsx(RzReasonPanel, { title: `原因结构｜${selectedProduct}关联投诉原因 Top10`, note: "按最终生效投诉原因标签统计，点击产品排名后同步刷新", info: [{ label: '关联口径', text: '筛选当前产品标签后，按投诉原因标签汇总工单量。' }, { label: '投诉量', text: '同一原因下按行内工单编号去重统计。' }, { label: '多标签规则', text: '一笔工单可命中多个原因标签，但产品投诉总量不重复累计。' }], children: /*#__PURE__*/_jsx(RzInstitutionBarList, { data: reasons, tone: "amber" }) })
   ] });
@@ -2196,25 +2252,25 @@ const rzReasonLevel3Map = {
   '业务执行不一致': [{ name: '不同网点执行不一致', value: 86 }, { name: '人员解释口径不一致', value: 64 }, { name: '线上线下规则不一致', value: 42 }]
 };
 
-function RzReasonTrendPanel({ selectedReason, applied }) {
+function RzReasonTrendPanel({ selectedReason, applied, compareMode = 'mom' }) {
   const [granularity, setGranularity] = useState('日');
   const baseData = rzProductTrendSets[granularity];
   const reason = rzComplaintReasonTop10.find(item => item.name === selectedReason) || rzComplaintReasonTop10[0];
   const scale = Math.max(reason.value / rzComplaintReasonTop10[0].value, 0.3);
-  const data = baseData.map(item => ({ ...item, count: Math.max(1, Math.round(item.count * scale * 0.82)) }));
+  const data = baseData.map((item,index) => ({ ...item, count: Math.max(1, Math.round(item.count * scale * 0.82)), growth: rzCompareTrendGrowth(item.growth, compareMode, index) }));
   const maxCount = Math.max(...data.map(item => item.count), 1);
   const maxGrowth = Math.max(...data.map(item => item.growth), 1);
   const step = 850 / Math.max(data.length - 1, 1);
   const x = index => 76 + index * step;
   const yGrowth = value => 210 - value / maxGrowth * 150;
-  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedReason}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形为投诉量，折线为环比`, info: [{ label: '时间口径', text: '支持按日、周、月聚合投诉时间。' }, { label: '投诉量', text: '当前原因标签下按行内工单编号去重统计。' }, { label: '环比', text: '与相邻上一日、上一周或上一月同口径比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedReason}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形为投诉量，折线为${rzCompareModeLabel(compareMode)}`, info: [{ label: '时间口径', text: '支持按日、周、月聚合投诉时间。' }, { label: '投诉量', text: '当前原因标签下按行内工单编号去重统计。' }, { label: rzCompareModeLabel(compareMode), text: compareMode === 'yoy' ? '与去年同期同口径数据比较。' : '与相邻上一日、上一周或上一月同口径比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
     /*#__PURE__*/_jsx("div", { className: "mb-3 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['日','周','月'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setGranularity(item), className: `rounded px-4 py-1.5 text-xs font-black ${granularity === item ? 'bg-rizhao text-white shadow-low' : 'text-slate-500'}`, children: `按${item}` }, item)) }) }),
     /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[280px] w-full", role: "img", "aria-label": `${selectedReason}投诉趋势`, children: [
       [0,1,2,3,4].map(i => /*#__PURE__*/_jsx("line", { x1: "54", x2: "952", y1: 34 + i * 44, y2: 34 + i * 44, stroke: "#E8EDF3", strokeDasharray: "4 5" }, i)),
       data.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("rect", { x: x(index) - 18, y: 210 - item.count / maxCount * 160, width: "36", height: item.count / maxCount * 160, rx: "5", fill: "#FDBA4D" }), /*#__PURE__*/_jsx("text", { x: x(index), y: "238", textAnchor: "middle", fontSize: "11", fill: "#64748B", children: item.date })] }, item.date)),
       /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#EE7800", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: data.map((item,index) => `${x(index)},${yGrowth(item.growth)}`).join(' ') }),
       data.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yGrowth(item.growth), r: "4", fill: "white", stroke: "#EE7800", strokeWidth: "2.5" }), /*#__PURE__*/_jsxs("text", { x: x(index), y: yGrowth(item.growth) - 9, textAnchor: "middle", fontSize: "11", fill: "#64748B", children: [item.growth, "%"] })] }, `${item.date}-growth`)),
-      /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#64748B", children: "投诉量（件）" }), /*#__PURE__*/_jsx("text", { x: "862", y: "22", fontSize: "11", fill: "#EE7800", children: "环比（%）" })
+      /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#64748B", children: "投诉量（件）" }), /*#__PURE__*/_jsxs("text", { x: "862", y: "22", fontSize: "11", fill: "#EE7800", children: [rzCompareModeLabel(compareMode), "（%）"] })
     ] })
   ] }) });
 }
@@ -2243,14 +2299,14 @@ function RzReasonStructureDrill({ selectedReason, onSelectReason }) {
   ] }) });
 }
 
-function RzReasonAnalysisPageV2({ applied }) {
+function RzReasonAnalysisPageV2({ applied, compareMode = 'mom' }) {
   const [selectedReason, setSelectedReason] = useState('服务态度');
   const reason = rzComplaintReasonTop10.find(item => item.name === selectedReason) || rzComplaintReasonTop10[0];
   const weights = [0.24, 0.19, 0.14, 0.11, 0.09, 0.07, 0.05, 0.04, 0.03, 0.02];
   const relatedProducts = rzProductTop10.map((item,index) => ({ name: item.name, value: Math.max(1, Math.round(reason.value * weights[index])), rate: `${(weights[index] * 100).toFixed(1)}%` }));
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzSideRank, { title: "投诉规模｜原因排名、投诉量、占比与环比", data: rzComplaintReasonTop10, selected: selectedReason, onSelect: setSelectedReason }),
-    /*#__PURE__*/_jsx(RzReasonTrendPanel, { selectedReason: selectedReason, applied: applied }),
+    /*#__PURE__*/_jsx(RzSideRank, { title: `投诉规模｜原因排名、投诉量、占比与${rzCompareModeLabel(compareMode)}`, data: rzComplaintReasonTop10, selected: selectedReason, compareMode: compareMode, onSelect: setSelectedReason }),
+    /*#__PURE__*/_jsx(RzReasonTrendPanel, { selectedReason: selectedReason, applied: applied, compareMode: compareMode }),
     /*#__PURE__*/_jsx(RzReasonStructureDrill, { selectedReason: selectedReason, onSelectReason: setSelectedReason }),
     /*#__PURE__*/_jsx(RzReasonPanel, { title: `产品结构｜${selectedReason}关联投诉产品 Top10`, note: "按最终生效产品标签统计，点击原因排名后同步刷新", info: [{ label: '关联口径', text: '筛选当前投诉原因后，按投诉产品标签汇总工单量。' }, { label: '投诉量', text: '同一产品下按行内工单编号去重统计。' }, { label: '多标签规则', text: '一笔工单可命中多个产品标签，但原因投诉总量不重复累计。' }], children: /*#__PURE__*/_jsx(RzInstitutionBarList, { data: relatedProducts, tone: "orange" }) })
   ] });
@@ -2365,16 +2421,16 @@ function ListPagination({ total, page, pageSize, onPageChange, onPageSizeChange,
 }
 
 function WorkOrderProcessingReport() {
-  const initialFilter = { org: '全部机构', start: '2026-07-01', end: '2026-07-15', source: '全部来源', product: '全部产品', reason: '全部原因', workOrderNo: '', satisfaction: '全部评价' };
+  const initialFilter = { org: '全行', start: '2026-07-01', end: '2026-07-15', source: '全部来源', product: '全部产品', reason: '全部原因', workOrderNo: '', satisfaction: '全部评价' };
   const [activeReport, setActiveReport] = useState(workOrderReportTabs[0]);
   const [statisticType, setStatisticType] = useState(workOrderStatisticTypes[0]);
   const [draft, setDraft] = useState(initialFilter);
   const [applied, setApplied] = useState(initialFilter);
   const config = workOrderReportConfigs[activeReport];
-  const filteredRows = workOrderReportRows.filter(row => applied.org === '全部机构' || row.institution === applied.org);
+  const filteredRows = workOrderReportRows.filter(row => applied.org === '全行' || row.institution === applied.org);
   const rows = filteredRows.map(row => ({ ...row, review: row.review ?? row.returned }));
   const detailRows = reportWorkOrderRows.filter(row =>
-    (applied.org === '全部机构' || row.branch === applied.org || row.institution.includes(applied.org.replace('全部机构',''))) &&
+    (applied.org === '全行' || row.branch === applied.org || row.institution.includes(applied.org)) &&
     (applied.source === '全部来源' || row.source === applied.source) &&
     (!['处理状态明细表','产品标签报表'].includes(activeReport) || applied.product === '全部产品' || row.product === applied.product) &&
     (activeReport !== '原因标签报表' || applied.reason === '全部原因' || row.reason === applied.reason) &&
@@ -2391,7 +2447,7 @@ function WorkOrderProcessingReport() {
     activeReport === '工单处理统计报表' && /*#__PURE__*/_jsx("div", { className: "flex gap-2", children: workOrderStatisticTypes.map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setStatisticType(name), className: `rounded-md border px-4 py-2 text-xs font-black ${statisticType === name ? 'border-rizhao bg-orange-50 text-rizhao' : 'border-slate-200 bg-white text-slate-500'}`, children: name }, name)) }),
     /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white p-5 shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-end gap-3", children: [
-        /*#__PURE__*/_jsxs("label", { className: "w-[220px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "被投诉机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: ['全部机构','东港支行','信用卡中心','青岛分行','岚山支行','开发区支行','运营管理部'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
+        /*#__PURE__*/_jsxs("label", { className: "w-[220px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "被投诉机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: rzUnifiedOrgFilterOptions.map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
         /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: activeReport === '工单处理统计报表' ? '统计周期开始' : '工单创建开始' }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) })] }),
         /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: activeReport === '工单处理统计报表' ? '统计周期结束' : '工单创建结束' }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] }),
         activeReport !== '工单处理统计报表' && /*#__PURE__*/_jsxs("label", { className: "w-[210px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "工单编号" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { value: draft.workOrderNo, onChange: e => setDraft({ ...draft, workOrderNo: e.target.value }), placeholder: "请输入工单编号" }) })] }),
@@ -2425,18 +2481,18 @@ function WorkOrderProcessingReport() {
 
 function WorkOrderManagementReport() {
   const [active, setActive] = useState('全量工单明细表');
-  const initial = { org: '全部机构', source: '全部来源', start: '2026-07-01', end: '2026-07-15', workOrderNo: '' };
+  const initial = { org: '全行', source: '全部来源', start: '2026-07-01', end: '2026-07-15', workOrderNo: '' };
   const [draft, setDraft] = useState(initial);
   const [applied, setApplied] = useState(initial);
-  const details = reportWorkOrderRows.filter(row => (applied.org === '全部机构' || row.branch === applied.org) && (applied.source === '全部来源' || row.source === applied.source) && (!applied.workOrderNo || row.id.includes(applied.workOrderNo)));
-  const statistics = workOrderReportRows.filter(row => applied.org === '全部机构' || row.institution === applied.org);
+  const details = reportWorkOrderRows.filter(row => (applied.org === '全行' || row.branch === applied.org) && (applied.source === '全部来源' || row.source === applied.source) && (!applied.workOrderNo || row.id.includes(applied.workOrderNo)));
+  const statistics = workOrderReportRows.filter(row => applied.org === '全行' || row.institution === applied.org);
   const total = statistics.reduce((sum,row) => sum + row.total, 0);
   const previous = statistics.reduce((sum,row) => sum + row.previous, 0);
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
     /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-xs text-slate-400", children: "首页 / 报表管理 / 工单管理报表" }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: "工单管理报表" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: "查询全量工单明细及各机构投诉工单统计情况" })] }),
     /*#__PURE__*/_jsx("div", { className: "border-b border-slate-200", children: /*#__PURE__*/_jsx("div", { className: "flex gap-8", children: ['全量工单明细表','投诉工单统计表'].map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setActive(name), className: `border-b-2 px-1 pb-3 text-sm font-black ${active === name ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-500'}`, children: name }, name)) }) }),
     /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white p-5 shadow-low", children: [/*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-end gap-3", children: [
-      /*#__PURE__*/_jsxs("label", { className: "w-[220px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "被投诉机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: ['全部机构','东港支行','信用卡中心','青岛分行','岚山支行','开发区支行','运营管理部'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
+      /*#__PURE__*/_jsxs("label", { className: "w-[220px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "被投诉机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: rzUnifiedOrgFilterOptions.map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
       /*#__PURE__*/_jsxs("label", { className: "w-[180px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "投诉来源" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.source, onChange: e => setDraft({ ...draft, source: e.target.value }), children: ['全部来源','网点现场投诉','监管转办投诉','客服热线投诉'].map(item => /*#__PURE__*/_jsx("option", { children: item }, item)) }) })] }),
       /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "统计开始日期" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) })] }),
       /*#__PURE__*/_jsxs("label", { className: "w-[160px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "统计结束日期" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] }),
@@ -2453,7 +2509,7 @@ function WorkOrderManagementReport() {
 function SimplifiedWorkOrderProcessingReport() {
   const reportTypes = workOrderReportTabs;
   const statisticTypes = ['全量工单', '客服工单', '自建工单'];
-  const initialFilter = { org: '全部机构', start: '2026-07-01', end: '2026-07-15' };
+  const initialFilter = { org: '全行', start: '2026-07-01', end: '2026-07-15' };
   const [activeType, setActiveType] = useState(reportTypes[0]);
   const [statisticType, setStatisticType] = useState(statisticTypes[0]);
   const [draft, setDraft] = useState(initialFilter);
@@ -2462,7 +2518,7 @@ function SimplifiedWorkOrderProcessingReport() {
   const [pageSize, setPageSize] = useState(5);
   const factor = activeType === '工单处理统计报表' && statisticType === '客服工单' ? 0.42 : activeType === '工单处理统计报表' && statisticType === '自建工单' ? 0.58 : 1;
   const allRows = workOrderReportRows
-    .filter(row => applied.org === '全部机构' || row.institution === applied.org)
+    .filter(row => applied.org === '全行' || row.institution === applied.org)
     .map((row, index) => {
       const total = Math.round(row.total * factor);
       const pending = Math.round(row.pending * factor);
@@ -2511,7 +2567,7 @@ function SimplifiedWorkOrderProcessingReport() {
     activeType === '工单处理统计报表' && /*#__PURE__*/_jsx("div", { className: "flex flex-wrap gap-3", children: statisticTypes.map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setStatisticType(name); setPage(1); }, className: `min-w-[132px] rounded-lg border px-5 py-3 text-sm font-black transition ${statisticType === name ? 'border-rizhao bg-orange-50 text-rizhao' : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-ink'}`, children: name }, name)) }),
     /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white p-5 shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-end gap-4", children: [
-        /*#__PURE__*/_jsxs("label", { className: "w-[240px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "查询机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: ['全部机构', '东港支行', '信用卡中心', '青岛分行', '岚山支行', '开发区支行', '运营管理部'].map(item => /*#__PURE__*/_jsx("option", { value: item, children: item }, item)) }) })] }),
+        /*#__PURE__*/_jsxs("label", { className: "w-[240px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "查询机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: rzUnifiedOrgFilterOptions.map(item => /*#__PURE__*/_jsx("option", { value: item, children: item }, item)) }) })] }),
         /*#__PURE__*/_jsxs("label", { className: "min-w-[380px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "查询时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box w-[170px]", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "至" }), /*#__PURE__*/_jsx("div", { className: "field-box w-[170px]", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] })] }),
         /*#__PURE__*/_jsxs("div", { className: "flex gap-2", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setDraft(initialFilter); setApplied(initialFilter); setPage(1); }, className: "h-11 rounded-lg border border-slate-200 px-5 text-xs font-black text-slate-500 hover:bg-slate-50", children: "重置" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setApplied(draft); setPage(1); }, className: "h-11 rounded-lg bg-rizhao px-6 text-xs font-black text-white hover:bg-[#D86D00]", children: "查询" })] })
       ] }),
@@ -2536,29 +2592,29 @@ const rzChannelAnalysisRows = [
   { name: '省监管局', value: 32, rate: '19.0%', mom: '+8.6%', yoy: '+14.2%', type: '监管渠道', closed: 26, overdue: 1, due24h: 1, duration: 2.5 },
   { name: '市监管局', value: 28, rate: '16.7%', mom: '+5.2%', yoy: '+9.8%', type: '监管渠道', closed: 23, overdue: 1, due24h: 0, duration: 2.3 },
   { name: '政务热线', value: 26, rate: '15.5%', mom: '+4.2%', yoy: '+6.5%', type: '政务渠道', closed: 22, overdue: 0, due24h: 1, duration: 1.8 },
-  { name: '消保邮箱', value: 24, rate: '14.3%', mom: '-2.4%', yoy: '+3.1%', type: '自有渠道', closed: 21, overdue: 0, due24h: 1, duration: 1.5 },
+  { name: '银行协会', value: 24, rate: '14.3%', mom: '-2.4%', yoy: '+3.1%', type: '协会渠道', closed: 21, overdue: 0, due24h: 1, duration: 1.5 },
   { name: '其他', value: 20, rate: '11.9%', mom: '-1.6%', yoy: '-3.2%', type: '其他渠道', closed: 17, overdue: 0, due24h: 0, duration: 1.4 }
 ];
 
-function RzChannelTrendPanel({ selectedChannel, applied }) {
+function RzChannelTrendPanel({ selectedChannel, applied, compareMode = 'mom' }) {
   const [granularity, setGranularity] = useState('日');
   const channel = rzChannelAnalysisRows.find(item => item.name === selectedChannel) || rzChannelAnalysisRows[0];
   const baseData = rzProductTrendSets[granularity];
   const scale = Math.max(channel.value / rzChannelAnalysisRows[0].value, 0.35);
-  const data = baseData.map((item,index) => ({ ...item, count: Math.max(1, Math.round(item.count * scale * (granularity === '日' ? 0.12 : granularity === '周' ? 0.18 : 0.2))), growth: Math.max(1, item.growth + (channel.mom.startsWith('-') ? -4 : index % 2)) }));
+  const data = baseData.map((item,index) => ({ ...item, count: Math.max(1, Math.round(item.count * scale * (granularity === '日' ? 0.12 : granularity === '周' ? 0.18 : 0.2))), growth: rzCompareTrendGrowth(Math.max(1, item.growth + (rzCompareValue(channel, compareMode, index).startsWith('-') ? -4 : index % 2)), compareMode, index) }));
   const maxCount = Math.max(...data.map(item => item.count), 1);
   const maxGrowth = Math.max(...data.map(item => item.growth), 1);
   const step = 850 / Math.max(data.length - 1, 1);
   const x = index => 76 + index * step;
   const yGrowth = value => 210 - value / maxGrowth * 150;
-  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedChannel}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形为投诉量，折线为环比`, info: [{ label: '时间口径', text: '支持按日、周、月聚合投诉反映时间。' }, { label: '投诉量', text: '筛选当前投诉反映渠道后，按行内工单编号去重。' }, { label: '环比', text: '与相邻上一日、上一周或上一月同口径比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedChannel}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}｜柱形为投诉量，折线为${rzCompareModeLabel(compareMode)}`, info: [{ label: '时间口径', text: '支持按日、周、月聚合投诉反映时间。' }, { label: '投诉量', text: '筛选当前投诉反映渠道后，按行内工单编号去重。' }, { label: rzCompareModeLabel(compareMode), text: compareMode === 'yoy' ? '与去年同期同口径数据比较。' : '与相邻上一日、上一周或上一月同口径比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
     /*#__PURE__*/_jsx("div", { className: "mb-3 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['日','周','月'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setGranularity(item), className: `rounded px-4 py-1.5 text-xs font-black ${granularity === item ? 'bg-rizhao text-white shadow-low' : 'text-slate-500'}`, children: `按${item}` }, item)) }) }),
     /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[280px] w-full", role: "img", "aria-label": `${selectedChannel}投诉趋势`, children: [
       [0,1,2,3,4].map(i => /*#__PURE__*/_jsx("line", { x1: "54", x2: "952", y1: 34 + i * 44, y2: 34 + i * 44, stroke: "#E4E4E4", strokeDasharray: "4 5" }, i)),
       data.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("rect", { x: x(index) - 18, y: 210 - item.count / maxCount * 160, width: "36", height: item.count / maxCount * 160, rx: "5", fill: "#3C71FF" }), /*#__PURE__*/_jsx("text", { x: x(index), y: "238", textAnchor: "middle", fontSize: "11", fill: "#707070", children: item.date })] }, item.date)),
       /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#EE7800", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: data.map((item,index) => `${x(index)},${yGrowth(item.growth)}`).join(' ') }),
       data.map((item,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yGrowth(item.growth), r: "4", fill: "white", stroke: "#EE7800", strokeWidth: "2.5" }), /*#__PURE__*/_jsxs("text", { x: x(index), y: yGrowth(item.growth) - 9, textAnchor: "middle", fontSize: "11", fill: "#707070", children: [item.growth, "%"] })] }, `${item.date}-growth`)),
-      /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#3C71FF", children: "投诉量（件）" }), /*#__PURE__*/_jsx("text", { x: "862", y: "22", fontSize: "11", fill: "#EE7800", children: "环比（%）" })
+      /*#__PURE__*/_jsx("text", { x: "56", y: "22", fontSize: "11", fill: "#3C71FF", children: "投诉量（件）" }), /*#__PURE__*/_jsxs("text", { x: "862", y: "22", fontSize: "11", fill: "#EE7800", children: [rzCompareModeLabel(compareMode), "（%）"] })
     ] })
   ] }) });
 }
@@ -2590,7 +2646,7 @@ function RzChannelEfficiencyPanel({ selectedChannel, onSelect }) {
   ] }) });
 }
 
-function RzChannelAnalysisPage({ applied }) {
+function RzChannelAnalysisPage({ applied, compareMode = 'mom' }) {
   const [selectedChannel, setSelectedChannel] = useState('国家局');
   const channelIndex = Math.max(rzChannelAnalysisRows.findIndex(item => item.name === selectedChannel), 0);
   const selected = rzChannelAnalysisRows[channelIndex];
@@ -2602,8 +2658,8 @@ function RzChannelAnalysisPage({ applied }) {
   const institutionSource = [{ name: '东港支行' }, { name: '信用卡中心' }, { name: '青岛分行' }, { name: '岚山支行' }, { name: '开发区支行' }, { name: '五莲支行' }];
   const institutionData = buildDistribution(institutionSource, channelIndex % 2);
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzSideRank, { title: "投诉规模｜渠道排名、投诉量、占比与环比", data: rzChannelAnalysisRows, selected: selectedChannel, onSelect: setSelectedChannel }),
-    /*#__PURE__*/_jsx(RzChannelTrendPanel, { selectedChannel: selectedChannel, applied: applied }),
+    /*#__PURE__*/_jsx(RzSideRank, { title: `投诉规模｜渠道排名、投诉量、占比与${rzCompareModeLabel(compareMode)}`, data: rzChannelAnalysisRows, selected: selectedChannel, compareMode: compareMode, onSelect: setSelectedChannel }),
+    /*#__PURE__*/_jsx(RzChannelTrendPanel, { selectedChannel: selectedChannel, applied: applied, compareMode: compareMode }),
     /*#__PURE__*/_jsx(RzChannelEfficiencyPanel, { selectedChannel: selectedChannel, onSelect: setSelectedChannel }),
     /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-1 gap-5 xl:grid-cols-3", children: [
       /*#__PURE__*/_jsx(RzReasonPanel, { title: `产品结构｜${selectedChannel}高频产品 Top5`, note: "按最终生效产品标签统计", info: [{ label: '关联口径', text: '筛选当前渠道后，按投诉产品标签汇总。' }, { label: '投诉量', text: '同一产品下按行内工单编号去重。' }, { label: '用途', text: '识别不同渠道集中反映的产品问题。' }], children: /*#__PURE__*/_jsx(RzInstitutionBarList, { data: productData, tone: "orange" }) }),
@@ -2614,23 +2670,21 @@ function RzChannelAnalysisPage({ applied }) {
 }
 
 function AnalyticsWorkspace({ tab = '投诉总览', onNavigate }) {
-  const initialQuery = { org: '全行', channel: '全部渠道', start: '2026-07-01', end: '2026-07-15' };
+  const initialQuery = { org: '全行', channel: '全部渠道', ...rzBuildAnalyticsRange('近30天') };
   const [draft, setDraft] = useState(initialQuery);
   const [applied, setApplied] = useState(initialQuery);
   const [granularity, setGranularity] = useState('日');
+  const [compareMode, setCompareMode] = useState('mom');
   const meta = rzAnalyticsTabMeta[tab];
   const panelTitle = tab === '投诉总览' ? '重点分布' : `${tab.replace('分析', '')}投诉排行`;
   const tableTitle = tab === '投诉总览' ? '重点风险提示' : `${tab}明细`;
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsxs("div", { className: "flex items-end justify-between gap-6", children: [
-      /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 text-xs text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "首页" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { children: "统计分析" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { className: "text-slate-600", children: tab })] }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: tab }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: meta.desc })] }),
-      /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-4", children: [/*#__PURE__*/_jsxs("div", { className: "text-right text-xs text-slate-400", children: [/*#__PURE__*/_jsx("div", { className: "font-bold text-slate-500", children: meta.scope }), /*#__PURE__*/_jsxs("div", { className: "mt-1", children: [applied.org, "｜", applied.start, " 至 ", applied.end] })] }), tab === '投诉总览' && /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setApplied({ ...applied }), className: "h-10 rounded-lg bg-rizhao px-4 text-xs font-black text-white shadow-low hover:bg-[#D86D00]", children: "刷新数据" })] })
-    ] }),
-    /*#__PURE__*/_jsx(RzAnalyticsFilter, { draft: draft, setDraft: setDraft, onQuery: () => setApplied(draft), onReset: () => { setDraft(initialQuery); setApplied(initialQuery); } }),
-    tab === '投诉总览' ? /*#__PURE__*/_jsx(RzOverviewPage, { applied: applied, onNavigate: onNavigate }) : tab === '机构分析' ? /*#__PURE__*/_jsx(RzInstitutionAnalysisPage, { applied: applied }) : tab === '产品分析' ? /*#__PURE__*/_jsx(RzProductAnalysisPageV2, { applied: applied }) : tab === '原因分析' ? /*#__PURE__*/_jsx(RzReasonAnalysisPageV2, { applied: applied }) : tab === '渠道分析' ? /*#__PURE__*/_jsx(RzChannelAnalysisPage, { applied: applied }) : /*#__PURE__*/_jsxs(React.Fragment, { children: [
+    /*#__PURE__*/_jsx("h2", { className: "text-2xl font-black text-ink", children: tab }),
+    /*#__PURE__*/_jsx(RzAnalyticsFilter, { draft: draft, setDraft: setDraft, compareMode: compareMode, setCompareMode: setCompareMode, onQuery: () => setApplied(draft), onReset: () => { setDraft(initialQuery); setApplied(initialQuery); setCompareMode('mom'); } }),
+    tab === '投诉总览' ? /*#__PURE__*/_jsx(RzOverviewPage, { applied: applied, compareMode: compareMode, onNavigate: onNavigate }) : tab === '机构分析' ? /*#__PURE__*/_jsx(RzInstitutionAnalysisPage, { applied: applied, compareMode: compareMode }) : tab === '产品分析' ? /*#__PURE__*/_jsx(RzProductAnalysisPageV2, { applied: applied, compareMode: compareMode }) : tab === '原因分析' ? /*#__PURE__*/_jsx(RzReasonAnalysisPageV2, { applied: applied, compareMode: compareMode }) : tab === '渠道分析' ? /*#__PURE__*/_jsx(RzChannelAnalysisPage, { applied: applied, compareMode: compareMode }) : /*#__PURE__*/_jsxs(React.Fragment, { children: [
       /*#__PURE__*/_jsx("section", { className: "grid grid-cols-4 gap-4", children: rzAnalyticsMetricSets[tab].map(item => /*#__PURE__*/_jsx(RzAnalyticsMetricCard, { item: item }, item.label)) }),
       /*#__PURE__*/_jsx(RzAnalyticsTrend, { granularity: granularity, setGranularity: setGranularity, applied: applied }),
-      /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-[1.05fr_0.95fr] gap-5", children: [/*#__PURE__*/_jsx(RzAnalyticsRank, { title: panelTitle, data: rzAnalyticsRankSets[tab], onSwitch: null }), /*#__PURE__*/_jsx(RzAnalyticsTable, { tab: tab, title: tableTitle })] })
+      /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-[1.05fr_0.95fr] gap-5", children: [/*#__PURE__*/_jsx(RzAnalyticsRank, { title: panelTitle, data: rzAnalyticsRankSets[tab], compareMode: compareMode, onSwitch: null }), /*#__PURE__*/_jsx(RzAnalyticsTable, { tab: tab, title: tableTitle })] })
     ] })
   ] });
 }
@@ -2867,32 +2921,17 @@ function Sidebar({
             })
           }), item.name === '投诉管理' && expandedPrimary['投诉管理'] && /*#__PURE__*/_jsxs("div", {
             className: "ml-4 mt-1 space-y-0.5 border-l border-white/14 pl-2",
-            children: [/*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: () => toggleComplaintMenu('投诉处理'),
-              className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${['录入工单', '处理工单', '短信审核', '台账导出'].includes(mainTab) ? 'bg-white/10 text-white' : 'text-white/76 hover:bg-white/8 hover:text-white'}`,
-              children: "投诉处理"
-            }), expandedComplaintMenu['投诉处理'] && /*#__PURE__*/_jsx("div", {
-              className: "ml-2 space-y-0.5 border-l border-white/14 pl-2",
-              children: subMenus.map(name => /*#__PURE__*/_jsx("button", {
-                onClick: () => openSubMenu(name),
-                className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
-                children: name
-              }, name))
-            }), /*#__PURE__*/_jsx("button", {
+            children: [subMenus.map(name => /*#__PURE__*/_jsx("button", {
+              onClick: () => openSubMenu(name),
+              className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
+              children: name
+            }, name)), /*#__PURE__*/_jsx("button", {
               onClick: () => {
-                toggleComplaintMenu('报表管理');
                 setMainTab('报表管理');
+                setReportTab('工单处理报表');
               },
               className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === '报表管理' ? 'bg-rizhao text-white' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
               children: "报表管理"
-            }), expandedComplaintMenu['报表管理'] && /*#__PURE__*/_jsx("div", {
-              className: "ml-2 space-y-0.5 border-l border-white/14 pl-2",
-              children: reportSubMenus.map(name => /*#__PURE__*/_jsx("button", {
-                onClick: () => openReportSubMenu(name),
-                className: `block w-full rounded-lg px-2 py-1.5 text-left text-xs font-bold transition ${mainTab === '报表管理' && reportTab === name ? 'bg-rizhao text-white shadow-sm' : 'text-white/64 hover:bg-white/8 hover:text-white'}`,
-                children: name
-              }, name))
             }), /*#__PURE__*/_jsx("button", {
               onClick: () => {
                 toggleComplaintMenu('统计分析');
@@ -8492,7 +8531,7 @@ function ReviewStats({ tasks }) {
   }).join(' ');
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
     /*#__PURE__*/_jsxs("section", { className: "grid grid-cols-[repeat(3,minmax(0,1fr))_auto] gap-3 rounded-2xl border border-slate-200 bg-white p-5 shadow-low", children: [
-      /*#__PURE__*/_jsx(Field, { label: "选择机构", type: "select", options: ['全行', '总行消保中心', '电子银行部', '财富管理部'], value: "全行", setValue: () => {} }),
+      /*#__PURE__*/_jsx(Field, { label: "选择机构", type: "select", options: rzUnifiedOrgFilterOptions, value: "全行", setValue: () => {} }),
       /*#__PURE__*/_jsx(Field, { label: "审查类型", type: "select", options: ['全部', '产品资料类', '营销宣传类', '短信模版类'], value: "全部", setValue: () => {} }),
       /*#__PURE__*/_jsx(Field, { label: "提单时间", value: "2025-07-01 至 2026-07-31", setValue: () => {} }),
       /*#__PURE__*/_jsx("button", { type: "button", className: "self-end rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-500", children: "重置" })
