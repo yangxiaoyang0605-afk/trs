@@ -876,6 +876,58 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       font-size: 11px;
       font-weight: 600;
     }
+    .rz-message-header {
+      position: relative;
+      flex: none;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start !important;
+      gap: 12px;
+      row-gap: 12px;
+    }
+    .rz-message-header:has(.rz-message-read-tabs) + div {
+      padding-top: 48px !important;
+    }
+    .rz-message-title-row { display: contents !important; }
+    .rz-message-title-row > .text-base {
+      order: 1;
+      margin-left: 0;
+    }
+    .rz-message-module-tabs { order: 2; }
+    .rz-message-read-tabs {
+      order: 3;
+      position: absolute;
+      right: 16px;
+      bottom: -42px;
+      display: inline-flex;
+      width: auto;
+      border-radius: 999px !important;
+      background: #F2F4F7 !important;
+      padding: 2px !important;
+      z-index: 2;
+    }
+    .rz-message-read-tabs button { background: transparent; outline: none !important; box-shadow: none !important; }
+    .rz-message-read-tabs button.text-rizhao { background: #FFFFFF !important; }
+    .rz-message-read-tabs button:first-child { border-radius: 999px 0 0 999px !important; }
+    .rz-message-read-tabs button:last-child { border-radius: 0 999px 999px 0 !important; }
+    .rz-message-read-tabs button {
+      min-width: 56px;
+      padding: 7px 14px !important;
+    }
+    .rz-message-read-tabs button:focus,
+    .rz-message-read-tabs button:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .rz-message-popover {
+      height: auto;
+      max-height: none;
+      display: block;
+    }
+    .rz-message-list {
+      max-height: 420px;
+      overflow-y: auto !important;
+    }
     .bg-rizhao:hover { background-color: #B06F15 !important; }
     .border-rizhao.bg-white:hover,
     .text-rizhao:hover { color: var(--rz-brand); }
@@ -2590,7 +2642,7 @@ function ListPagination({ total, page, pageSize, onPageChange, onPageSizeChange,
     return pages;
   };
   const pages = buildPages();
-  return /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-500", children: [
+  return /*#__PURE__*/_jsxs("div", { className: "rz-list-pagination flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 px-5 py-4 text-sm text-slate-500", children: [
     /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-3 whitespace-nowrap", children: [/*#__PURE__*/_jsxs("span", { children: ["共 ", total, " 条"] }), onPageSizeChange && /*#__PURE__*/_jsxs("label", { className: "flex items-center gap-2 whitespace-nowrap", children: [/*#__PURE__*/_jsx("span", { children: "每页" }), /*#__PURE__*/_jsx("select", { value: pageSize, onChange: event => onPageSizeChange(Number(event.target.value)), className: "h-8 rounded-md border border-slate-200 bg-white px-2 text-xs font-bold text-slate-600", children: pageSizeOptions.map(size => /*#__PURE__*/_jsx("option", { value: size, children: size }, size)) }), /*#__PURE__*/_jsx("span", { children: "条" })] })] }),
     /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 whitespace-nowrap", children: [
       /*#__PURE__*/_jsx("button", { type: "button", disabled: currentPage === 1, onClick: () => onPageChange(currentPage - 1), className: "h-8 rounded-md border border-slate-200 px-3 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-40", children: "上一页" }),
@@ -2961,7 +3013,7 @@ function App() {
           children: /*#__PURE__*/_jsxs("section", {
             className: "rz-main-card",
             children: [/*#__PURE__*/_jsx("div", {
-              className: "p-6",
+              className: "h-full p-6",
               children: mainTab === '录入工单' ? /*#__PURE__*/_jsx(EntryWorkspace, {
                 entryTab: entryTab,
                 setEntryTab: setEntryTab,
@@ -3265,8 +3317,8 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
             className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700",
             children: [/*#__PURE__*/_jsx("span", { children: "消息提醒" }), /*#__PURE__*/_jsx("span", { className: "ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[11px] font-black leading-none text-white", children: unreadComplaintCount })]
           }), showMessages && /*#__PURE__*/_jsxs("div", {
-            className: "absolute right-0 top-full z-50 mt-2 w-[520px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-high",
-            children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-3", children: [/*#__PURE__*/_jsx("div", { className: "text-base font-black text-ink", children: selectedMessage ? "消息详情" : "消息提醒" }), !selectedMessage && /*#__PURE__*/_jsx("div", { className: "rounded-xl bg-slate-100 p-1", children: ['未读', '已读'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setMessageReadTab(tab), className: `rounded-lg px-3 py-1.5 text-xs font-black transition ${messageReadTab === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsx("button", { className: "text-sm font-bold text-rizhao", onClick: () => setSelectedMessage(null), children: "返回列表" }) : /*#__PURE__*/_jsx("div", { className: "rounded-xl bg-slate-100 p-1", children: ['投诉', '审查'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setMessageModule(tab); setSelectedMessage(null); setMessageReadTab('未读'); }, className: `rounded-lg px-4 py-2 text-xs font-black transition ${messageModule === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsxs("div", { className: "space-y-5 p-5", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-2xl bg-red-50 p-5", children: [/*#__PURE__*/_jsx("span", { className: "inline-block rounded-full bg-white px-3 py-1 text-xs font-black text-rizhao", children: "已读" }), /*#__PURE__*/_jsx("div", { className: "mt-5 text-sm font-bold text-slate-400", children: selectedMessage.scene }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-xl font-black text-ink", children: selectedMessage.no }), /*#__PURE__*/_jsx("div", { className: "mt-5 leading-8 text-slate-600", children: selectedMessage.template })] }), selectedMessage.jump !== 'none' && /*#__PURE__*/_jsx("button", { className: "w-full rounded-xl bg-rizhao px-4 py-3 font-black text-white", onClick: jumpToWorkOrder, children: "查看对应工单" })] }) : /*#__PURE__*/_jsx("div", { className: "max-h-[420px] overflow-auto p-3", children: visibleMessages.length ? visibleMessages.map(message => /*#__PURE__*/_jsxs("button", { onClick: () => openMessageDetail(message), className: "mb-2 block w-full rounded-2xl border border-slate-100 bg-white p-4 text-left transition hover:border-rizhao hover:bg-orange-50", children: [/*#__PURE__*/_jsxs("div", { className: "mb-2 flex items-center gap-2", children: [messageReadTab === '未读' && /*#__PURE__*/_jsx("span", { className: "h-2.5 w-2.5 rounded-full bg-red-600" }), /*#__PURE__*/_jsx("span", { className: "text-sm font-black text-ink", children: message.scene })] }), /*#__PURE__*/_jsx("div", { className: "text-sm leading-6 text-slate-600", children: message.template })] }, message.no)) : /*#__PURE__*/_jsx("div", { className: "py-10 text-center text-sm font-bold text-slate-400", children: messageModule === '审查' ? "审查消息暂无模板" : messageReadTab === '未读' ? "暂无未读消息" : "暂无已读消息" }) })]
+            className: "rz-message-popover absolute right-0 top-full z-50 mt-2 w-[520px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-high",
+            children: [/*#__PURE__*/_jsxs("div", { className: "rz-message-header flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { className: "rz-message-title-row flex items-center gap-3", children: [/*#__PURE__*/_jsx("div", { className: "text-base font-black text-ink", children: selectedMessage ? "消息详情" : "消息提醒" }), !selectedMessage && /*#__PURE__*/_jsx("div", { className: "rz-message-read-tabs rounded-full bg-slate-100 p-1", children: ['未读', '已读'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setMessageReadTab(tab), className: `rounded-full px-3 py-1.5 text-xs font-black transition ${messageReadTab === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsx("button", { className: "text-sm font-bold text-rizhao", onClick: () => setSelectedMessage(null), children: "返回列表" }) : /*#__PURE__*/_jsx("div", { className: "rz-message-module-tabs rounded-xl bg-slate-100 p-1", children: ['投诉', '审查'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setMessageModule(tab); setSelectedMessage(null); setMessageReadTab('未读'); }, className: `rounded-lg px-4 py-2 text-xs font-black transition ${messageModule === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsxs("div", { className: "rz-message-list space-y-5 p-5", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-2xl bg-red-50 p-5", children: [/*#__PURE__*/_jsx("span", { className: "inline-block rounded-full bg-white px-3 py-1 text-xs font-black text-rizhao", children: "已读" }), /*#__PURE__*/_jsx("div", { className: "mt-5 text-sm font-bold text-slate-400", children: selectedMessage.scene }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-xl font-black text-ink", children: selectedMessage.no }), /*#__PURE__*/_jsx("div", { className: "mt-5 leading-8 text-slate-600", children: selectedMessage.template })] }), selectedMessage.jump !== 'none' && /*#__PURE__*/_jsx("button", { className: "w-full rounded-xl bg-rizhao px-4 py-3 font-black text-white", onClick: jumpToWorkOrder, children: "查看对应工单" })] }) : /*#__PURE__*/_jsx("div", { className: "rz-message-list overflow-auto p-3", children: visibleMessages.length ? visibleMessages.map(message => /*#__PURE__*/_jsxs("button", { onClick: () => openMessageDetail(message), className: "mb-2 block w-full rounded-2xl border border-slate-100 bg-white p-4 text-left transition hover:border-rizhao hover:bg-orange-50", children: [/*#__PURE__*/_jsxs("div", { className: "mb-2 flex items-center gap-2", children: [messageReadTab === '未读' && /*#__PURE__*/_jsx("span", { className: "h-2.5 w-2.5 rounded-full bg-red-600" }), /*#__PURE__*/_jsx("span", { className: "text-sm font-black text-ink", children: message.scene })] }), /*#__PURE__*/_jsx("div", { className: "text-sm leading-6 text-slate-600", children: message.template })] }, message.no)) : /*#__PURE__*/_jsx("div", { className: "py-10 text-center text-sm font-bold text-slate-400", children: messageModule === '审查' ? "审查消息暂无模板" : messageReadTab === '未读' ? "暂无未读消息" : "暂无已读消息" }) })]
           })]
         }), /*#__PURE__*/_jsxs("div", {
           className: "relative",
@@ -10435,16 +10487,16 @@ function OrgManager() {
   }
 
   return /*#__PURE__*/_jsxs("div", {
-    className: "grid grid-cols-1 gap-4 xl:grid-cols-[300px_minmax(0,1fr)]",
+    className: "grid h-full grid-cols-[300px_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)_auto] gap-4",
     children: [/*#__PURE__*/_jsx("div", {
-        className: "flex justify-end xl:col-span-2",
+        className: "col-span-2 flex justify-end",
         children: /*#__PURE__*/_jsx("button", {
           className: "rounded-lg bg-rizhao px-5 py-2 text-sm font-bold text-white",
           onClick: startAdd,
           children: "+ 增加机构"
         })
       }), /*#__PURE__*/_jsxs("section", {
-        className: "rounded-2xl border border-line-strong bg-white p-4 shadow-low xl:max-h-[640px]",
+        className: "flex min-h-0 flex-col rounded-2xl border border-line-strong bg-white p-4 shadow-low",
         children: [/*#__PURE__*/_jsx("div", {
           className: "mb-3 flex items-center justify-between border-b border-line-divider pb-3",
           children: /*#__PURE__*/_jsx("h3", {
@@ -10452,7 +10504,7 @@ function OrgManager() {
             children: "机构树"
           })
         }), /*#__PURE__*/_jsx("div", {
-          className: "max-h-72 overflow-auto thin-scroll pr-2 xl:max-h-[560px]",
+          className: "min-h-0 flex-1 overflow-auto thin-scroll pr-2",
           children: /*#__PURE__*/_jsx(OrgNode, {
             node: tree,
             depth: 0,
@@ -10461,7 +10513,7 @@ function OrgManager() {
           })
         })]
       }), /*#__PURE__*/_jsx("div", {
-        className: "min-w-0 overflow-auto thin-scroll rounded-2xl border border-slate-200 bg-white xl:max-h-[640px]",
+        className: "min-h-0 min-w-0 overflow-auto thin-scroll rounded-2xl border border-slate-200 bg-white",
         children: /*#__PURE__*/_jsxs("table", {
           className: "min-w-[1180px] w-full table-fixed text-left text-sm leading-5",
           children: [/*#__PURE__*/_jsx("colgroup", {
@@ -10488,7 +10540,7 @@ function OrgManager() {
             }, o.id))
           })]
         })
-      }), /*#__PURE__*/_jsx("div", { className: "overflow-hidden rounded-2xl border border-slate-200 bg-white xl:col-span-2", children: /*#__PURE__*/_jsx(ListPagination, { total: flat.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); }, pageSizeOptions: [10, 20, 50] }) }), /*#__PURE__*/_jsx(Modal, {
+      }), /*#__PURE__*/_jsx("div", { className: "col-span-2 overflow-hidden rounded-2xl border border-slate-200 bg-white", children: /*#__PURE__*/_jsx(ListPagination, { total: flat.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); }, pageSizeOptions: [10, 20, 50] }) }), /*#__PURE__*/_jsx(Modal, {
         show: showAdd,
         onClose: () => setShowAdd(false),
         title: "新增机构",
