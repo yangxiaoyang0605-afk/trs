@@ -1235,13 +1235,14 @@ const rzOverviewMetrics = [
 ];
 const rzOverviewTrend = {
   labels: ['07-01', '07-03', '07-05', '07-07', '07-09', '07-11', '07-13', '07-15'],
-  complaint: [16, 18, 17, 21, 20, 24, 23, 29],
-  completed: [14, 17, 16, 18, 18, 21, 20, 25]
+  total: [16, 18, 17, 21, 20, 24, 23, 29],
+  regulatory: [4, 5, 4, 6, 5, 7, 5, 8],
+  customer: [5, 6, 6, 7, 6, 8, 7, 11]
 };
 const rzOverviewTrendSets = {
   '按日': rzOverviewTrend,
-  '按周': { labels: ['第1周', '第2周', '第3周'], complaint: [50, 58, 60], completed: [43, 51, 55] },
-  '按月': { labels: ['05月', '06月', '07月'], complaint: [132, 155, 168], completed: [126, 146, 149] }
+  '按周': { labels: ['第1周', '第2周', '第3周'], total: [50, 58, 60], regulatory: [12, 13, 13], customer: [16, 18, 22] },
+  '按月': { labels: ['05月', '06月', '07月'], total: [132, 155, 168], regulatory: [31, 35, 38], customer: [43, 50, 56] }
 };
 const rzOverviewStatusData = [
   { name: '待处理', value: 8, rate: '4.8%', tone: 'orange' },
@@ -1598,32 +1599,32 @@ function RzOverviewMetricCard({ card, compareMode = 'mom' }) {
 function RzOverviewTrend({ applied }) {
   const [granularity, setGranularity] = useState('按日');
   const trend = rzOverviewTrendSets[granularity];
-  const maxComplaint = Math.ceil(Math.max(...trend.complaint) * 1.18 / 10) * 10;
-  const maxCompleted = Math.ceil(Math.max(...trend.completed) * 1.18 / 10) * 10;
+  const maxValue = Math.ceil(Math.max(...trend.total, ...trend.regulatory, ...trend.customer) * 1.18 / 10) * 10;
   const x = index => 78 + index * 830 / Math.max(trend.labels.length - 1, 1);
-  const yComplaint = value => 215 - value / maxComplaint * 178;
-  const yCompleted = value => 215 - value / maxCompleted * 178;
-  const currentComplaint = granularity === '按月' ? trend.complaint[trend.complaint.length - 1] : trend.complaint.reduce((sum, value) => sum + value, 0);
-  const currentCompleted = granularity === '按月' ? trend.completed[trend.completed.length - 1] : trend.completed.reduce((sum, value) => sum + value, 0);
-  const pressure = Math.max(currentComplaint - currentCompleted, 0);
+  const yValue = value => 215 - value / maxValue * 178;
+  const currentTotal = granularity === '按月' ? trend.total[trend.total.length - 1] : trend.total.reduce((sum, value) => sum + value, 0);
+  const currentRegulatory = granularity === '按月' ? trend.regulatory[trend.regulatory.length - 1] : trend.regulatory.reduce((sum, value) => sum + value, 0);
+  const currentCustomer = granularity === '按月' ? trend.customer[trend.customer.length - 1] : trend.customer.reduce((sum, value) => sum + value, 0);
   return /*#__PURE__*/_jsxs("section", { className: "rounded-2xl border border-slate-200 bg-white shadow-low", children: [
     /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [
-      /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "投诉趋势｜新增投诉与办结量" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [applied.org, "｜", applied.start, " 至 ", applied.end, "｜用于判断投诉增长与未办结压力"] })] }),
+      /*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "投诉趋势｜投诉总量与来源投诉量" }) }),
       /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-4 text-xs font-bold", children: [
-        /*#__PURE__*/_jsxs("span", { className: "text-rizhao", children: ["● ", "新增投诉量"] }),
-        /*#__PURE__*/_jsxs("span", { className: "text-[#3C71FF]", children: ["● ", "办结量"] }),
+        /*#__PURE__*/_jsxs("span", { className: "text-rizhao", children: ["● ", "投诉总量"] }),
+        /*#__PURE__*/_jsxs("span", { className: "text-[#F5555E]", children: ["● ", "监管来源投诉量"] }),
+        /*#__PURE__*/_jsxs("span", { className: "text-[#3C71FF]", children: ["● ", "客服投诉量"] }),
         /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['按日', '按周', '按月'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setGranularity(item), className: `rounded px-3 py-1 text-xs font-black ${granularity === item ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: item }, item)) })
       ] })
     ] }),
     /*#__PURE__*/_jsxs("div", { className: "p-5", children: [
-      /*#__PURE__*/_jsxs("div", { className: "mb-2 flex justify-between text-[11px] font-bold", children: [/*#__PURE__*/_jsx("span", { className: "text-rizhao", children: "新增投诉量（件）" }), /*#__PURE__*/_jsx("span", { className: "text-[#3C71FF]", children: "办结量（件）" })] }),
+      /*#__PURE__*/_jsx("div", { className: "mb-2 text-[11px] font-bold text-slate-500", children: "单位：件" }),
       /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[270px] w-full", role: "img", "aria-label": "投诉整体趋势", children: [
-        [0, 1, 2, 3, 4].map(i => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("line", { x1: "78", x2: "930", y1: 37 + i * 44, y2: 37 + i * 44, stroke: "#E4E4E4", strokeDasharray: "4 5" }), /*#__PURE__*/_jsx("text", { x: "64", y: 41 + i * 44, textAnchor: "end", fontSize: "10", fill: "#EE7800", children: Math.round(maxComplaint * (4 - i) / 4) }), /*#__PURE__*/_jsx("text", { x: "948", y: 41 + i * 44, fontSize: "10", fill: "#3C71FF", children: Math.round(maxCompleted * (4 - i) / 4) })] }, i)),
-        /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#EE7800", strokeWidth: "4", strokeLinecap: "round", strokeLinejoin: "round", points: trend.complaint.map((value, index) => `${x(index)},${yComplaint(value)}`).join(' ') }),
-        /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#3C71FF", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: trend.completed.map((value, index) => `${x(index)},${yCompleted(value)}`).join(' ') }),
-        trend.labels.map((label, index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yComplaint(trend.complaint[index]), r: "5", fill: "white", stroke: "#EE7800", strokeWidth: "3" }), /*#__PURE__*/_jsx("circle", { cx: x(index), cy: yCompleted(trend.completed[index]), r: "5", fill: "white", stroke: "#3C71FF", strokeWidth: "3" }), /*#__PURE__*/_jsx("text", { x: x(index), y: "250", textAnchor: "middle", fontSize: "11", fill: "#949494", children: label })] }, label))
+        [0, 1, 2, 3, 4].map(i => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("line", { x1: "78", x2: "930", y1: 37 + i * 44, y2: 37 + i * 44, stroke: "#E4E4E4", strokeDasharray: "4 5" }), /*#__PURE__*/_jsx("text", { x: "64", y: 41 + i * 44, textAnchor: "end", fontSize: "10", fill: "#64748B", children: Math.round(maxValue * (4 - i) / 4) })] }, i)),
+        /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#EE7800", strokeWidth: "4", strokeLinecap: "round", strokeLinejoin: "round", points: trend.total.map((value, index) => `${x(index)},${yValue(value)}`).join(' ') }),
+        /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#F5555E", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: trend.regulatory.map((value, index) => `${x(index)},${yValue(value)}`).join(' ') }),
+        /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#3C71FF", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: trend.customer.map((value, index) => `${x(index)},${yValue(value)}`).join(' ') }),
+        trend.labels.map((label, index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("circle", { cx: x(index), cy: yValue(trend.total[index]), r: "5", fill: "white", stroke: "#EE7800", strokeWidth: "3" }), /*#__PURE__*/_jsx("circle", { cx: x(index), cy: yValue(trend.regulatory[index]), r: "4", fill: "white", stroke: "#F5555E", strokeWidth: "2.5" }), /*#__PURE__*/_jsx("circle", { cx: x(index), cy: yValue(trend.customer[index]), r: "4", fill: "white", stroke: "#3C71FF", strokeWidth: "2.5" }), /*#__PURE__*/_jsx("text", { x: x(index), y: "250", textAnchor: "middle", fontSize: "11", fill: "#949494", children: label })] }, label))
       ] }),
-      /*#__PURE__*/_jsxs("div", { className: "mt-3 grid grid-cols-1 gap-3 border-t border-slate-100 pt-3 text-xs font-bold md:grid-cols-3", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-md bg-orange-50 px-3 py-2 text-rizhao", children: ["新增投诉：", currentComplaint.toLocaleString(), "件"] }), /*#__PURE__*/_jsxs("div", { className: "rounded-md bg-[#D8E6FF] px-3 py-2 text-[#3C71FF]", children: ["办结：", currentCompleted.toLocaleString(), "件"] }), /*#__PURE__*/_jsxs("div", { className: `${pressure > 0 ? 'bg-[#FEE7DD] text-danger' : 'bg-[#CFFBD9] text-success'} rounded-md px-3 py-2`, children: [pressure > 0 ? "新增高于办结，净增压力 " : "办结能力覆盖新增投诉 ", pressure > 0 ? `${pressure}件` : '正常'] })] })
+      /*#__PURE__*/_jsxs("div", { className: "mt-3 grid grid-cols-1 gap-3 border-t border-slate-100 pt-3 text-xs font-bold md:grid-cols-3", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-md bg-orange-50 px-3 py-2 text-rizhao", children: ["投诉总量：", currentTotal.toLocaleString(), "件"] }), /*#__PURE__*/_jsxs("div", { className: "rounded-md bg-rose-50 px-3 py-2 text-[#F5555E]", children: ["监管来源投诉量：", currentRegulatory.toLocaleString(), "件"] }), /*#__PURE__*/_jsxs("div", { className: "rounded-md bg-[#D8E6FF] px-3 py-2 text-[#3C71FF]", children: ["客服投诉量：", currentCustomer.toLocaleString(), "件"] })] })
     ] })
   ] });
 }
@@ -1670,7 +1671,7 @@ function RzOverviewInstitutionRank({ data, compareMode = 'mom' }) {
 function RzOverviewProductTreemap({ data, compareMode = 'mom' }) {
   const tileClass = ['col-span-3 row-span-2', 'col-span-3', 'col-span-1', 'col-span-1', 'col-span-1'];
   const tileColors = ['#3C71FF', '#F5555E', '#FCB723', '#6C98FF', '#F9837F'];
-  return /*#__PURE__*/_jsx("div", { className: "grid h-[320px] grid-cols-6 grid-rows-2 gap-2 p-5", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: `${tileClass[index]} group relative overflow-hidden rounded-lg p-4 text-white transition hover:-translate-y-0.5 hover:shadow-lg`, style: { backgroundColor: tileColors[index] }, children: [/*#__PURE__*/_jsx("div", { className: "absolute -right-5 -top-5 h-20 w-20 rounded-full bg-white/15 transition group-hover:scale-125" }), /*#__PURE__*/_jsx("div", { className: "relative text-sm font-black", children: item.name }), /*#__PURE__*/_jsxs("div", { className: `${index === 0 ? 'mt-10 text-4xl' : 'mt-3 text-2xl'} relative font-black`, children: [item.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs opacity-80", children: "件" })] }), /*#__PURE__*/_jsxs("div", { className: "relative mt-2 flex items-center gap-2 text-xs font-bold text-white/90", children: [/*#__PURE__*/_jsx("span", { children: item.rate }), /*#__PURE__*/_jsxs("span", { className: "rounded bg-white/20 px-1.5 py-0.5", children: [rzCompareModeLabel(compareMode), " ", change] })] })] }, item.name); }) });
+  return /*#__PURE__*/_jsx("div", { className: "grid h-[320px] grid-cols-6 grid-rows-2 gap-2 p-5", children: data.map((item, index) => { const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("div", { className: `${tileClass[index]} group relative flex min-w-0 flex-col justify-between overflow-hidden rounded-lg p-4 text-white transition hover:-translate-y-0.5 hover:shadow-lg`, style: { backgroundColor: tileColors[index] }, children: [/*#__PURE__*/_jsx("div", { className: "absolute -right-5 -top-5 h-20 w-20 rounded-full bg-white/15 transition group-hover:scale-125" }), /*#__PURE__*/_jsxs("div", { className: "relative min-w-0", children: [/*#__PURE__*/_jsx("div", { className: "truncate text-sm font-black", title: item.name, children: item.name }), /*#__PURE__*/_jsxs("div", { className: `${index === 0 ? 'mt-10 text-4xl' : 'mt-3 text-2xl'} font-black leading-none`, children: [item.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs opacity-80", children: "件" })] })] }), /*#__PURE__*/_jsxs("div", { className: "relative mt-3 space-y-1 text-xs font-bold text-white/95", children: [/*#__PURE__*/_jsx("div", { className: "whitespace-nowrap", children: item.rate }), /*#__PURE__*/_jsxs("div", { className: "inline-flex max-w-full flex-wrap rounded bg-white/20 px-1.5 py-0.5 leading-4", children: [rzCompareModeLabel(compareMode), " ", change] })] })] }, item.name); }) });
 }
 
 function RzOverviewReasonColumns({ data, compareMode = 'mom' }) {
