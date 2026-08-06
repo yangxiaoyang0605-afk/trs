@@ -1802,7 +1802,6 @@ function RzReasonAnalysisPage({ applied, compareMode = 'mom' }) {
 }
 
 function RzOverviewMetricCard({ card, compareMode = 'mom' }) {
-  const toneClass = card.tone === 'red' ? 'bg-[#FEE7DD] text-danger' : card.tone === 'green' ? 'bg-[#CFFBD9] text-success' : card.tone === 'blue' ? 'bg-[#D8E6FF] text-function' : 'bg-orange-50 text-rizhao';
   const compareLabel = rzCompareModeLabel(compareMode);
   const compareItems = card.items.filter(item => item.label === '环比' || item.label === '同比');
   const displayItems = compareItems.length ? [
@@ -1817,10 +1816,7 @@ function RzOverviewMetricCard({ card, compareMode = 'mom' }) {
     ...card.items.filter(item => item.label !== '环比' && item.label !== '同比')
   ] : card.items;
   return /*#__PURE__*/_jsxs("article", { className: "rounded-2xl border border-slate-200 bg-white p-4 shadow-low", children: [
-    /*#__PURE__*/_jsxs("div", { className: "flex items-start justify-between border-t-2 border-rizhao pt-3", children: [
-      /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-sm font-black text-ink", children: card.title }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-xs font-bold text-slate-400", children: card.note })] }),
-      /*#__PURE__*/_jsx("span", { className: `${toneClass} grid h-8 w-8 place-items-center rounded-lg text-sm font-black`, children: card.icon })
-    ] }),
+    /*#__PURE__*/_jsx("div", { className: "border-t-2 border-rizhao pt-3", children: /*#__PURE__*/_jsx("h3", { className: "text-sm font-black text-ink", children: card.title }) }),
     /*#__PURE__*/_jsxs("div", { className: "rz-number mt-4 text-[30px] font-black leading-none text-ink", children: [card.value, /*#__PURE__*/_jsx("span", { className: "ml-1 text-xs font-bold text-slate-400", children: card.unit })] }),
     /*#__PURE__*/_jsx("div", { className: "my-4 h-px bg-slate-100" }),
     /*#__PURE__*/_jsx("div", { className: `${displayItems.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} grid gap-3`, children: displayItems.map(item => /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-[11px] font-bold text-slate-400", children: item.label }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-xs font-black text-slate-600", children: item.value })] }, item.label)) })
