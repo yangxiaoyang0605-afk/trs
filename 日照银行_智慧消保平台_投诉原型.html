@@ -2772,82 +2772,151 @@ function WorkOrderManagementReport() {
   ] });
 }
 
+const rzReportOrgOptions = ['全行', '东港支行', '信用卡中心', '青岛分行', '岚山支行', '开发区支行', '日照分行', '莒县支行', '五莲支行', '运营管理部'];
+
+const rzReportFilterMeta = {
+  workOrderNo: { label: '行内工单编号', type: 'text' },
+  entryTime: { label: '录入时间', type: 'dateRange' },
+  type: { label: '工单类型', type: 'select', options: ['全部', '投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访'] },
+  channel: { label: '投诉反映渠道', type: 'select', options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] },
+  status: { label: '工单状态', type: 'select', options: ['全部', '已派发', '待处理', '处理中', '待审核', '已办结'] },
+  productTag: { label: '投诉产品标签', type: 'select', options: ['全部', '信用卡', '个人贷款', '借记卡', '支付结算', '理财产品', '手机银行', '存款业务', '消费贷款'] },
+  reasonTag: { label: '投诉原因标签', type: 'select', options: ['全部', '提前还款争议', '年费告知争议', '到账时效争议', '风险揭示不足', '服务态度', '收费争议', '规则告知', '额度调整争议'] },
+  org: { label: '被投诉机构', type: 'select', options: rzReportOrgOptions }
+};
+
+const rzReportSheetDefs = [
+  { key: '处理状态明细表', kind: 'detail', note: '当前账号数据权限范围内除草稿外的全部工单；按行内工单编号去重，工单状态取查询时点最新状态。', filters: [{ key: 'workOrderNo' }, { key: 'entryTime' }, { key: 'type' }, { key: 'channel' }, { key: 'status' }, { key: 'org' }], columns: [['id', '行内工单编号'], ['entryTime', '录入时间'], ['type', '工单类型'], ['channel', '投诉反映渠道'], ['level', '工单级别'], ['status', '工单状态'], ['complaintOrg', '被投诉机构'], ['handleOrg', '处理机构'], ['handler', '处理员'], ['deadline', '办理时限'], ['remain', '剩余处理时间'], ['overdue', '是否超期'], ['content', '投诉内容'], ['conclusion', '处理结论'], ['result', '处理结果'], ['replyPerson', '答复群众人员'], ['replyTime', '答复群众时间'], ['reprocess', '是否重办']] },
+  { key: '工单类型明细表', kind: 'detail', note: '当前账号数据权限范围内除草稿外的全部工单，按工单类型展示工单明细；同一工单按行内工单编号仅展示一次。', filters: [{ key: 'workOrderNo' }, { key: 'entryTime' }, { key: 'type' }, { key: 'channel' }, { key: 'status' }], columns: [['id', '行内工单编号'], ['entryTime', '录入时间'], ['type', '工单类型'], ['channel', '投诉反映渠道'], ['complainant', '投诉人姓名'], ['complaintOrg', '被投诉机构'], ['appeal', '投诉人诉求'], ['content', '投诉内容'], ['status', '工单状态'], ['overdue', '是否超期'], ['reprocess', '是否重办'], ['deadline', '办理时限'], ['replyTime', '答复群众时间']] },
+  { key: '投诉标签明细表', kind: 'detail', note: '当前账号数据权限范围内除草稿外的全部工单；展示工单当前确认生效的产品、业务类别和投诉原因标签。', filters: [{ key: 'workOrderNo' }, { key: 'entryTime' }, { key: 'productTag' }, { key: 'reasonTag' }, { key: 'org' }], columns: [['id', '行内工单编号'], ['entryTime', '录入时间'], ['type', '工单类型'], ['productTag', '投诉产品标签'], ['reasonTag', '投诉原因标签'], ['bizL1', '业务类别大类'], ['bizL2', '业务类别中类'], ['bizL3', '业务类别小类'], ['reasonL1', '投诉原因大类'], ['reasonL2', '投诉原因中类'], ['reasonL3', '投诉原因小类'], ['handleOrg', '处理机构'], ['status', '工单状态']] },
+  { key: '工单处理统计表', kind: 'stat', note: '当前账号数据权限范围内除草稿外的全部工单；按被投诉机构分组统计，同一工单按行内工单编号去重。', filters: [{ key: 'entryTime' }, { key: 'type' }, { key: 'channel' }, { key: 'org' }], columns: [['institution', '被投诉机构'], ['total', '工单总量'], ['dispatched', '已派发数量'], ['pending', '待处理数量'], ['processing', '处理中数量'], ['review', '待审核数量'], ['completed', '已办结数量'], ['unfinished', '未办结数量'], ['overdue', '超期工单量'], ['overdueRate', '超期率'], ['reprocess', '重办工单量'], ['avgDuration', '平均处理时长'], ['timely', '按时办结量'], ['timelyRate', '按时办结率'], ['returnVisit', '已回访数量']] },
+  { key: '客服系统统计表', kind: 'stat', note: '当前账号数据权限范围内工单来源为“客服工单”且非草稿的工单；按被投诉机构分组统计，按行内工单编号去重。', filters: [{ key: 'entryTime' }, { key: 'channel' }, { key: 'org' }], columns: [['institution', '被投诉机构'], ['total', '工单总量'], ['dispatched', '已派发数量'], ['pending', '待处理数量'], ['processing', '处理中数量'], ['review', '待审核数量'], ['completed', '已办结数量'], ['unfinished', '未办结数量'], ['overdue', '超期工单量'], ['overdueRate', '超期率'], ['timely', '按时办结量'], ['timelyRate', '按时办结率'], ['overdueClosed', '超时办结量'], ['overdueClosedRate', '超时办结率']] },
+  { key: '监管转办统计表', kind: 'stat', note: '当前账号数据权限范围内投诉反映渠道为国家局、省监管局或市监管局且非草稿的工单；按被投诉机构分组统计，按行内工单编号去重。', filters: [{ key: 'entryTime' }, { key: 'channel' }, { key: 'org' }], columns: [['institution', '被投诉机构'], ['total', '工单总量'], ['dispatched', '已派发数量'], ['pending', '待处理数量'], ['processing', '处理中数量'], ['review', '待审核数量'], ['completed', '已办结数量'], ['unfinished', '未办结数量'], ['timely', '按时办结量'], ['timelyRate', '按时办结率'], ['overdueClosed', '超时办结量'], ['overdueClosedRate', '超时办结率']] },
+  { key: '未办结工单表', kind: 'detail', note: '当前账号数据权限范围内除草稿外，当前状态为已派发、待处理、处理中或待审核的未办结工单；按行内工单编号去重。', filters: [{ key: 'workOrderNo' }, { key: 'entryTime' }, { key: 'type' }, { key: 'channel' }, { key: 'status' }, { key: 'org', label: '处理机构' }], columns: [['id', '行内工单编号'], ['entryTime', '录入时间'], ['type', '工单类型'], ['channel', '投诉反映渠道'], ['status', '工单状态'], ['handleOrg', '处理机构'], ['handler', '处理人'], ['level', '工单级别'], ['deadline', '办理时限'], ['remain', '剩余处理时间'], ['overdue', '是否超期'], ['complaintOrg', '被投诉机构'], ['content', '投诉内容'], ['reprocess', '是否重办']] }
+];
+
+const rzReportDetailRows = [
+  { id: 'WD202607150052861800001', entryTime: '2026-07-15 09:18:21', type: '投诉', channel: '网点现场投诉', level: '普通', status: '待处理', complaintOrg: '东港支行', handleOrg: '东港支行零售金融部', handler: '张经理', deadline: '2026-07-18 17:30', remain: '剩余 2 天 8 小时', overdue: '否', content: '客户反映贷款提前还款过程中利息计算口径不清晰，要求银行核实费用明细并反馈处理结果。', conclusion: '待处理', result: '待处理', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '王女士', appeal: '返还财产', productTag: '个人贷款', reasonTag: '提前还款争议', bizL1: '贷款业务', bizL2: '个人住房贷款', bizL3: '办理问题', reasonL1: '提前还款争议', reasonL2: '提前还款流程', reasonL3: '利息计收' },
+  { id: 'ETMS2026071403352861800001', entryTime: '2026-07-14 10:57:52', type: '投诉', channel: '监管转办投诉', level: '普通', status: '已办结', complaintOrg: '信用卡中心', handleOrg: '信用卡中心投诉处理组', handler: '李经理', deadline: '2026-07-17 17:30', remain: '-', overdue: '否', content: '客户反映信用卡年费收取规则告知不清晰，要求核实并退还年费。', conclusion: '已处理', result: '已达成一致', replyPerson: '王芳', replyTime: '2026-07-16 15:20', reprocess: '否', complainant: '李女士', appeal: '金钱赔偿', productTag: '信用卡', reasonTag: '年费告知争议', bizL1: '信用卡业务', bizL2: '信用卡', bizL3: '年费及收费', reasonL1: '年费告知争议', reasonL2: '年费收取', reasonL3: '规则告知' },
+  { id: 'ETMS2026071302352860100001', entryTime: '2026-07-13 11:17:13', type: '咨询', channel: '监管转办投诉', level: '普通', status: '待处理', complaintOrg: '青岛分行', handleOrg: '青岛分行运营管理部', handler: '刘经理', deadline: '2026-07-16 17:30', remain: '剩余 1 天 6 小时', overdue: '否', content: '客户咨询转账到账时效，对系统提示与实际到账时间不一致提出疑问。', conclusion: '待处理', result: '待处理', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '周先生', appeal: '其他', productTag: '支付结算', reasonTag: '到账时效争议', bizL1: '支付结算业务', bizL2: '转账汇款', bizL3: '到账时效', reasonL1: '到账时效争议', reasonL2: '到账延迟', reasonL3: '资金占用' },
+  { id: 'ETMS2026071201352860100002', entryTime: '2026-07-12 18:55:38', type: '投诉', channel: '监管转办投诉', level: '普通', status: '待审核', complaintOrg: '岚山支行', handleOrg: '岚山支行财富管理部', handler: '王经理', deadline: '2026-07-15 17:30', remain: '剩余 5 小时 20 分', overdue: '否', content: '客户反映理财产品风险揭示不充分，购买时未充分告知产品风险等级。', conclusion: '已提交审核', result: '待审核', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '陈女士', appeal: '赔礼道歉', productTag: '理财产品', reasonTag: '风险揭示不足', bizL1: '理财业务', bizL2: '理财产品', bizL3: '风险揭示', reasonL1: '风险揭示不足', reasonL2: '风险等级', reasonL3: '销售规范' },
+  { id: 'ETMS2026071101352860100001', entryTime: '2026-07-11 17:41:41', type: '投诉', channel: '客服热线投诉', level: '重点', status: '处理中', complaintOrg: '开发区支行', handleOrg: '开发区支行运营管理部', handler: '赵经理', deadline: '2026-07-14 17:30', remain: '已超期 1 天', overdue: '是', content: '客户反映借记卡服务过程中柜员服务态度不佳，要求核实并改进服务。', conclusion: '处理中', result: '处理中', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '孙先生', appeal: '其他', productTag: '借记卡', reasonTag: '服务态度', bizL1: '个人账户业务', bizL2: '借记卡', bizL3: '柜面服务', reasonL1: '服务态度', reasonL2: '柜面服务', reasonL3: '服务体验' },
+  { id: 'WD202607100032861020003', entryTime: '2026-07-10 14:22:05', type: '建议', channel: '政务热线', level: '普通', status: '已办结', complaintOrg: '日照分行', handleOrg: '日照分行运营管理部', handler: '孙经理', deadline: '2026-07-15 17:30', remain: '-', overdue: '否', content: '客户建议优化手机银行转账限额设置流程，简化操作步骤。', conclusion: '已处理', result: '已达成一致', replyPerson: '张伟', replyTime: '2026-07-14 10:05', reprocess: '否', complainant: '钱女士', appeal: '其他', productTag: '手机银行', reasonTag: '规则告知', bizL1: '电子银行业务', bizL2: '手机银行', bizL3: '限额设置', reasonL1: '规则告知', reasonL2: '限额调整', reasonL3: '流程优化' },
+  { id: 'WD202607090032861020011', entryTime: '2026-07-09 09:12:30', type: '举报', channel: '银行协会', level: '普通', status: '待审核', complaintOrg: '莒县支行', handleOrg: '莒县支行营业部', handler: '郑经理', deadline: '2026-07-14 17:30', remain: '剩余 1 天 10 小时', overdue: '否', content: '客户举报网点理财销售过程中存在误导性表述，要求核查处理。', conclusion: '已提交审核', result: '待审核', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '吴先生', appeal: '金钱赔偿', productTag: '理财产品', reasonTag: '风险揭示不足', bizL1: '理财业务', bizL2: '理财产品', bizL3: '销售规范', reasonL1: '风险揭示不足', reasonL2: '销售误导', reasonL3: '销售话术' },
+  { id: 'WD202607080032861020020', entryTime: '2026-07-08 16:40:11', type: '抱怨', channel: '网点现场投诉', level: '普通', status: '已派发', complaintOrg: '五莲支行', handleOrg: '五莲支行零售金融部', handler: '郑经理', deadline: '2026-07-11 17:30', remain: '剩余 4 小时 30 分', overdue: '否', content: '客户抱怨贷款审批进度查询渠道不畅，多次致电未得到明确答复。', conclusion: '待处理', result: '待处理', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '杨女士', appeal: '其他', productTag: '消费贷款', reasonTag: '办理时效', bizL1: '贷款业务', bizL2: '消费贷款', bizL3: '办理问题', reasonL1: '办理时效', reasonL2: '审批进度', reasonL3: '查询渠道' },
+  { id: 'WD202607070032861020033', entryTime: '2026-07-07 11:25:47', type: '投诉', channel: '客服热线投诉', level: '普通', status: '已办结', complaintOrg: '东港支行', handleOrg: '东港支行零售金融部', handler: '张经理', deadline: '2026-07-10 17:30', remain: '-', overdue: '否', content: '客户反映信用卡账单分期手续费计算与宣传不一致，要求核实退差。', conclusion: '已处理', result: '已达成一致', replyPerson: '李娜', replyTime: '2026-07-09 16:32', reprocess: '是', complainant: '刘女士', appeal: '返还财产', productTag: '信用卡', reasonTag: '收费争议', bizL1: '信用卡业务', bizL2: '信用卡', bizL3: '息费及定价', reasonL1: '收费争议', reasonL2: '分期手续费', reasonL3: '息费计算' },
+  { id: 'ETMS2026070601352860100009', entryTime: '2026-07-06 10:08:19', type: '投诉', channel: '国家局', level: '重要', status: '处理中', complaintOrg: '青岛分行', handleOrg: '青岛分行运营管理部', handler: '刘经理', deadline: '2026-07-08 17:30', remain: '已超期 2 天', overdue: '是', content: '客户投诉支付结算业务到账延迟造成资金占用，要求赔偿损失。', conclusion: '处理中', result: '处理中', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '马先生', appeal: '金钱赔偿', productTag: '支付结算', reasonTag: '到账时效争议', bizL1: '支付结算业务', bizL2: '转账汇款', bizL3: '到账时效', reasonL1: '到账时效争议', reasonL2: '资金占用', reasonL3: '赔偿损失' },
+  { id: 'WD202607050032861020041', entryTime: '2026-07-05 15:30:02', type: '咨询', channel: '国家局', level: '普通', status: '待处理', complaintOrg: '信用卡中心', handleOrg: '信用卡中心投诉处理组', handler: '李经理', deadline: '2026-07-08 17:30', remain: '剩余 3 小时 15 分', overdue: '否', content: '客户咨询信用卡额度调整规则及生效时间。', conclusion: '待处理', result: '待处理', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '高女士', appeal: '其他', productTag: '信用卡', reasonTag: '额度调整争议', bizL1: '信用卡业务', bizL2: '信用卡', bizL3: '额度调整', reasonL1: '额度调整争议', reasonL2: '生效时间', reasonL3: '规则告知' },
+  { id: 'WD202607040032861020055', entryTime: '2026-07-04 13:45:26', type: '投诉', channel: '省监管局', level: '普通', status: '已办结', complaintOrg: '岚山支行', handleOrg: '岚山支行财富管理部', handler: '王经理', deadline: '2026-07-07 17:30', remain: '-', overdue: '否', content: '客户投诉存款产品利率宣传与实际不符，要求按宣传利率补息。', conclusion: '已处理', result: '已达成一致', replyPerson: '陈涛', replyTime: '2026-07-06 09:18', reprocess: '否', complainant: '赵先生', appeal: '返还财产', productTag: '存款业务', reasonTag: '收费争议', bizL1: '存款业务', bizL2: '定期存款', bizL3: '息费及定价', reasonL1: '收费争议', reasonL2: '利率宣传', reasonL3: '补息' },
+  { id: 'ETMS2026070301352860100012', entryTime: '2026-07-03 09:20:33', type: '投诉', channel: '市监管局', level: '普通', status: '已派发', complaintOrg: '开发区支行', handleOrg: '开发区支行运营管理部', handler: '赵经理', deadline: '2026-07-08 17:30', remain: '剩余 1 天 2 小时', overdue: '否', content: '客户反映借记卡跨行取款手续费未提前告知，要求退还手续费。', conclusion: '待处理', result: '待处理', replyPerson: '-', replyTime: '-', reprocess: '否', complainant: '许女士', appeal: '返还财产', productTag: '借记卡', reasonTag: '收费争议', bizL1: '个人账户业务', bizL2: '借记卡', bizL3: '息费及定价', reasonL1: '收费争议', reasonL2: '跨行取现', reasonL3: '手续费' },
+  { id: 'WD202607020032861020067', entryTime: '2026-07-02 17:05:44', type: '建议', channel: '政务热线', level: '普通', status: '已办结', complaintOrg: '日照分行', handleOrg: '日照分行运营管理部', handler: '孙经理', deadline: '2026-07-07 17:30', remain: '-', overdue: '否', content: '客户建议营业网点增设老年人服务专窗并优化叫号规则。', conclusion: '已处理', result: '已达成一致', replyPerson: '王强', replyTime: '2026-07-05 14:40', reprocess: '否', complainant: '冯先生', appeal: '其他', productTag: '存款业务', reasonTag: '服务态度', bizL1: '个人账户业务', bizL2: '柜面服务', bizL3: '服务体验', reasonL1: '服务态度', reasonL2: '适老服务', reasonL3: '叫号规则' }
+];
+
+function rzReportFilterField(props) {
+  const { item, draft, setDraft } = props;
+  const meta = rzReportFilterMeta[item.key];
+  const label = item.label || meta.label;
+  if (meta.type === 'text') {
+    return /*#__PURE__*/_jsxs("label", { className: "w-[200px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: label }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { value: draft[item.key] || '', onChange: e => setDraft({ ...draft, [item.key]: e.target.value }), placeholder: "请输入行内工单编号" }) })] });
+  }
+  if (meta.type === 'dateRange') {
+    return /*#__PURE__*/_jsxs("label", { className: "w-[320px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: label }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box w-[135px]", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "至" }), /*#__PURE__*/_jsx("div", { className: "field-box w-[135px]", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] })] });
+  }
+  return /*#__PURE__*/_jsxs("label", { className: "w-[170px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: label }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft[item.key] || '全部', onChange: e => setDraft({ ...draft, [item.key]: e.target.value }), children: meta.options.map(opt => /*#__PURE__*/_jsx("option", { value: opt, children: opt }, opt)) }) })] });
+}
+
+function rzReportCellClass(key, row) {
+  if (key === 'id' || key === 'institution') return 'whitespace-nowrap px-4 py-4 font-black text-rizhao';
+  if (String(key).toLowerCase().includes('rate')) return 'whitespace-nowrap px-4 py-4 font-black text-emerald-600';
+  if (key === 'overdue' || key === 'overdueClosed' || key === 'overdueCount') return 'whitespace-nowrap px-4 py-4 font-bold text-rose-500';
+  if (key === 'total') return 'whitespace-nowrap px-4 py-4 font-black text-slate-800';
+  return 'whitespace-nowrap px-4 py-4 text-slate-600';
+}
+
 function SimplifiedWorkOrderProcessingReport() {
-  const reportTypes = workOrderReportTabs;
-  const statisticTypes = ['全量工单', '客服工单', '自建工单'];
-  const initialFilter = { org: '全行', start: '2026-07-01', end: '2026-07-15' };
+  const reportTypes = rzReportSheetDefs.map(s => s.key);
+  const initialFilter = { workOrderNo: '', start: '2026-07-01', end: '2026-07-15', type: '全部', channel: '全部', status: '全部', productTag: '全部', reasonTag: '全部', org: '全行' };
   const [activeType, setActiveType] = useState(reportTypes[0]);
-  const [statisticType, setStatisticType] = useState(statisticTypes[0]);
   const [draft, setDraft] = useState(initialFilter);
   const [applied, setApplied] = useState(initialFilter);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
-  const factor = activeType === '工单处理统计报表' && statisticType === '客服工单' ? 0.42 : activeType === '工单处理统计报表' && statisticType === '自建工单' ? 0.58 : 1;
-  const allRows = workOrderReportRows
-    .filter(row => applied.org === '全行' || row.institution === applied.org)
-    .map((row, index) => {
-      const total = Math.round(row.total * factor);
-      const pending = Math.round(row.pending * factor);
-      const processing = Math.round(row.processing * factor);
-      const supplement = Math.round((row.supplement ?? 0) * factor);
-      const returned = Math.round((row.returned ?? 0) * factor);
-      const completed = Math.round((row.completed ?? Math.max(0, total - pending - processing - supplement)) * factor);
-      const timely = Math.round((row.timely ?? Math.max(0, completed - (row.overdue ?? 0))) * factor);
-      const overdue = Math.round((row.overdue ?? 0) * factor);
-      const repeatCount = Math.round((row.repeat ?? row.repeatCount ?? 0) * factor);
-      const returnVisitCount = Math.round((row.evaluated ?? row.returnVisitCount ?? 0) * factor);
-      const satisfiedCount = Math.round((row.satisfied ?? row.satisfiedCount ?? 0) * factor);
-      const dissatisfiedCount = Math.round((row.dissatisfied ?? row.dissatisfiedCount ?? 0) * factor);
-      return {
-        ...row,
-        total,
-        complaintCount: total,
-        pending,
-        processing,
-        supplement,
-        completed,
-        returned,
-        completionRate: total ? `${(completed / total * 100).toFixed(1)}%` : '0.0%',
-        timely,
-        overdue,
-        overdueCount: overdue,
-        timelyRate: completed ? `${(timely / completed * 100).toFixed(1)}%` : '0.0%',
-        maxDuration: row.longest,
-        repeatCount,
-        returnVisitCount,
-        satisfiedCount,
-        dissatisfiedCount,
-        satisfactionRate: returnVisitCount ? `${(satisfiedCount / returnVisitCount * 100).toFixed(1)}%` : '0.0%',
-        channelSource: reportChannelSources[index % reportChannelSources.length]
-      };
-    });
+  const sheet = rzReportSheetDefs.find(s => s.key === activeType) || rzReportSheetDefs[0];
+  const factor = activeType === '客服系统统计表' ? 0.42 : activeType === '监管转办统计表' ? 0.18 : 1;
+  const detailRows = rzReportDetailRows.filter(row => {
+    const entryDate = row.entryTime.slice(0, 10);
+    return (!applied.workOrderNo || row.id.includes(applied.workOrderNo)) &&
+      (!applied.start || entryDate >= applied.start) &&
+      (!applied.end || entryDate <= applied.end) &&
+      (applied.type === '全部' || row.type === applied.type) &&
+      (applied.channel === '全部' || row.channel === applied.channel) &&
+      (applied.status === '全部' || row.status === applied.status) &&
+      (applied.productTag === '全部' || row.productTag === applied.productTag) &&
+      (applied.reasonTag === '全部' || row.reasonTag === applied.reasonTag) &&
+      (applied.org === '全行' || row.complaintOrg.includes(applied.org) || row.handleOrg.includes(applied.org)) &&
+      (activeType !== '未办结工单表' || ['已派发', '待处理', '处理中', '待审核'].includes(row.status));
+  });
+  const statRows = workOrderReportRows.filter(row => applied.org === '全行' || row.institution.includes(applied.org)).map(row => {
+    const dispatched = Math.max(0, Math.round(row.pending * 0.4));
+    const review = row.supplement ?? 0;
+    const pending = row.pending;
+    const processing = row.processing;
+    const completed = row.completed;
+    const total = row.total;
+    const unfinished = dispatched + pending + processing + review;
+    const scaledTotal = Math.round(total * factor);
+    const scaledCompleted = Math.round(completed * factor);
+    const overdue = Math.round((row.overdue ?? 0) * factor);
+    const overdueRate = scaledTotal ? `${(overdue / scaledTotal * 100).toFixed(1)}%` : '0.0%';
+    const timely = Math.round((row.timely ?? 0) * factor);
+    const timelyRate = scaledCompleted ? `${(timely / scaledCompleted * 100).toFixed(1)}%` : '0.0%';
+    const overdueClosed = Math.max(0, scaledCompleted - timely);
+    const overdueClosedRate = scaledCompleted ? `${(overdueClosed / scaledCompleted * 100).toFixed(1)}%` : '0.0%';
+    return {
+      institution: row.institution,
+      total: scaledTotal,
+      dispatched: Math.round(dispatched * factor),
+      pending: Math.round(pending * factor),
+      processing: Math.round(processing * factor),
+      review: Math.round(review * factor),
+      completed: scaledCompleted,
+      unfinished: Math.round(unfinished * factor),
+      overdue,
+      overdueRate,
+      reprocess: Math.round((row.repeat ?? row.repeatCount ?? 0) * factor),
+      avgDuration: row.avgDuration,
+      timely,
+      timelyRate,
+      overdueClosed,
+      overdueClosedRate,
+      returnVisit: Math.round((row.evaluated ?? row.returnVisitCount ?? 0) * factor)
+    };
+  });
+  const allRows = sheet.kind === 'detail' ? detailRows : statRows;
   const rows = allRows.slice((page - 1) * pageSize, page * pageSize);
-  const columns = workOrderReportConfigs[activeType].columns;
+  const columns = sheet.columns;
   const exportReport = () => {
     if (!allRows.length) { window.alert('当前查询条件下暂无可导出的报表数据。'); return; }
     window.alert('报表已导出。');
   };
   return /*#__PURE__*/_jsxs("div", { className: "flex min-h-full flex-col space-y-5", children: [
-    /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 text-xs text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "首页" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { children: "报表管理" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { className: "text-slate-600", children: "工单处理报表" })] }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: "工单处理报表" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: "按机构、时间查询处理状态、处理时效、标签、满意度和渠道来源统计结果" })] }),
+    /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2 text-xs text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "首页" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { children: "报表管理" }), /*#__PURE__*/_jsx("span", { children: "/" }), /*#__PURE__*/_jsx("span", { className: "text-slate-600", children: "报表详情" })] }), /*#__PURE__*/_jsx("h2", { className: "mt-3 text-2xl font-black text-ink", children: "报表详情" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm text-slate-500", children: sheet.note })] }),
     /*#__PURE__*/_jsx("div", { className: "overflow-x-auto border-b border-slate-200", children: /*#__PURE__*/_jsx("div", { className: "flex min-w-max gap-7 px-1", children: reportTypes.map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setActiveType(name); setPage(1); }, className: `border-b-2 px-1 pb-3 pt-1 text-sm font-black transition ${activeType === name ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-500 hover:text-ink'}`, children: name }, name)) }) }),
-    activeType === '工单处理统计报表' && /*#__PURE__*/_jsx("div", { className: "flex flex-wrap gap-3", children: statisticTypes.map(name => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setStatisticType(name); setPage(1); }, className: `min-w-[132px] rounded-lg border px-5 py-3 text-sm font-black transition ${statisticType === name ? 'border-rizhao bg-orange-50 text-rizhao' : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:text-ink'}`, children: name }, name)) }),
     /*#__PURE__*/_jsxs("section", { className: "rounded-lg border border-slate-200 bg-white p-5 shadow-low", children: [
       /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-end gap-4", children: [
-        /*#__PURE__*/_jsxs("label", { className: "w-[240px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "查询机构" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("select", { value: draft.org, onChange: e => setDraft({ ...draft, org: e.target.value }), children: rzUnifiedOrgFilterOptions.map(item => /*#__PURE__*/_jsx("option", { value: item, children: item }, item)) }) })] }),
-        /*#__PURE__*/_jsxs("label", { className: "min-w-[380px]", children: [/*#__PURE__*/_jsx("div", { className: "mb-2 text-xs font-bold text-slate-500", children: "查询时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box w-[170px]", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.start, onChange: e => setDraft({ ...draft, start: e.target.value }) }) }), /*#__PURE__*/_jsx("span", { className: "text-sm text-slate-400", children: "至" }), /*#__PURE__*/_jsx("div", { className: "field-box w-[170px]", children: /*#__PURE__*/_jsx("input", { type: "date", value: draft.end, onChange: e => setDraft({ ...draft, end: e.target.value }) }) })] })] }),
+        sheet.filters.map(item => /*#__PURE__*/_jsx(rzReportFilterField, { item: item, draft: draft, setDraft: setDraft }, item.key)),
         /*#__PURE__*/_jsxs("div", { className: "flex gap-2", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setDraft(initialFilter); setApplied(initialFilter); setPage(1); }, className: "h-11 rounded-lg border border-slate-200 px-5 text-xs font-black text-slate-500 hover:bg-slate-50", children: "重置" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setApplied(draft); setPage(1); }, className: "h-11 rounded-lg bg-rizhao px-6 text-xs font-black text-white hover:bg-[#D86D00]", children: "查询" })] })
       ] }),
-      /*#__PURE__*/_jsxs("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: ["统计范围：", applied.org, "｜", applied.start, " 至 ", applied.end] })
+      /*#__PURE__*/_jsxs("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: ["统计范围：", applied.org, "｜", applied.start, " 至 ", applied.end, "｜数据更新时间：2026-07-15 12:00"] })
     ] }),
-    /*#__PURE__*/_jsxs("section", { className: "overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
-      /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeType, activeType === '工单处理统计报表' ? `｜${statisticType}` : '', "｜共 ", allRows.length, " 个机构统计结果"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: exportReport, className: "shrink-0 rounded-lg border border-rizhao bg-white px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
-      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[980px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-5 py-3 font-black", children: /*#__PURE__*/_jsx(ReportHeaderLabel, { label: label }) }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: `whitespace-nowrap px-5 py-4 ${key === 'institution' ? 'font-black text-rizhao' : key.toLowerCase().includes('rate') ? 'font-black text-emerald-600' : key === 'overdue' || key === 'overdueCount' || key === 'dissatisfiedCount' || key === 'abnormal' ? 'font-bold text-rose-500' : 'text-slate-600'}`, children: row[key] }, key)) }, `${activeType}-${row.institution}`)) })] }) }),
+    /*#__PURE__*/_jsxs("section", { className: "flex-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-low", children: [
+      /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "查询结果" }), /*#__PURE__*/_jsxs("p", { className: "mt-1 text-xs text-slate-400", children: [activeType, "｜共 ", allRows.length, " 条"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: exportReport, className: "shrink-0 rounded-lg border border-rizhao bg-white px-4 py-2 text-xs font-black text-rizhao hover:bg-orange-50", children: "导出报表" })] }),
+      /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[1080px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: columns.map(([, label]) => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map(row => /*#__PURE__*/_jsx("tr", { className: "hover:bg-orange-50/40", children: columns.map(([key]) => /*#__PURE__*/_jsx("td", { className: rzReportCellClass(key, row), children: row[key] }, key)) }, `${activeType}-${row.id || row.institution}`)) })] }) }),
       allRows.length === 0 && /*#__PURE__*/_jsx("div", { className: "py-16 text-center text-sm text-slate-400", children: "当前条件下暂无报表数据" }),
-      /*#__PURE__*/_jsx(ListPagination, { total: allRows.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } })
+      /*#__PURE__*/_jsx(ListPagination, { total: allRows.length, page: page, pageSize: pageSize, onPageChange: setPage })
     ] })
   ] });
 }
-
 function ReportManagementWorkspace() {
   return /*#__PURE__*/_jsx(SimplifiedWorkOrderProcessingReport, {});
 }
