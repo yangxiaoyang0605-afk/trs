@@ -1529,7 +1529,18 @@ const rzOverviewDueSoonData = [
   { id: 'TS202607150028', institution: '东港支行', status: '处理中', remaining: '3小时20分' },
   { id: 'TS202607150019', institution: '青岛分行', status: '待审核', remaining: '6小时45分' },
   { id: 'TS202607140061', institution: '信用卡中心', status: '处理中', remaining: '12小时10分' },
-  { id: 'TS202607140036', institution: '开发区支行', status: '待处理', remaining: '20小时30分' }
+  { id: 'TS202607140036', institution: '开发区支行', status: '待处理', remaining: '20小时30分' },
+  { id: 'TS202607150021', institution: '岚山支行', status: '处理中', remaining: '4小时50分' },
+  { id: 'TS202607150017', institution: '日照分行', status: '待处理', remaining: '7小时30分' },
+  { id: 'TS202607150012', institution: '莒县支行', status: '待审核', remaining: '9小时15分' },
+  { id: 'TS202607150004', institution: '五莲支行', status: '处理中', remaining: '13小时05分' },
+  { id: 'TS202607140059', institution: '东港支行', status: '待审核', remaining: '16小时40分' },
+  { id: 'TS202607140052', institution: '青岛分行', status: '处理中', remaining: '19小时20分' },
+  { id: 'TS202607140041', institution: '信用卡中心', status: '待处理', remaining: '21小时45分' },
+  { id: 'TS202607140033', institution: '开发区支行', status: '处理中', remaining: '23小时10分' },
+  { id: 'TS202607140027', institution: '岚山支行', status: '待审核', remaining: '2小时05分' },
+  { id: 'TS202607140022', institution: '日照分行', status: '待处理', remaining: '10小时25分' },
+  { id: 'TS202607140015', institution: '莒县支行', status: '处理中', remaining: '14小时35分' }
 ];
 const rzProductTop10 = [
   { name: '信用卡', value: 2486, rate: '19.9%', mom: '+12.8%', yoy: '+18.6%' },
@@ -1912,6 +1923,9 @@ function RzOverviewPage({ applied, onNavigate, compareMode = 'mom' }) {
   const overviewProductTop5 = rzOverviewDistribution['产品'].slice(0, 5);
   const overviewReasonTop5 = rzOverviewDistribution['原因'].slice(0, 5);
   const overdueMax = Math.max(...rzOverviewOverdueData.map(item => item.value), 1);
+  const [duePage, setDuePage] = useState(1);
+  const [duePageSize, setDuePageSize] = useState(5);
+  const duePageRows = rzOverviewDueSoonData.slice((duePage - 1) * duePageSize, duePage * duePageSize);
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
     /*#__PURE__*/_jsx("section", { className: "grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-7", children: rzOverviewMetrics.map(card => /*#__PURE__*/_jsx(RzOverviewMetricCard, { card: card, compareMode: compareMode }, card.title)) }),
     /*#__PURE__*/_jsx(RzOverviewTrend, { applied: applied }),
@@ -1922,7 +1936,8 @@ function RzOverviewPage({ applied, onNavigate, compareMode = 'mom' }) {
       ] }),
       /*#__PURE__*/_jsxs("div", { className: "rounded-2xl border border-slate-200 bg-white shadow-low", children: [
         /*#__PURE__*/_jsxs("div", { className: "flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-base font-black text-ink", children: "临期预警｜未来24小时到期" }) }), /*#__PURE__*/_jsxs("span", { className: "rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-rizhao", children: [rzOverviewDueSoonData.length, "件待关注"] })] }),
-        /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['工单编号', '处理机构', '状态', '剩余时间', '操作'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rzOverviewDueSoonData.map(row => /*#__PURE__*/_jsxs("tr", { className: "hover:bg-orange-50/50", children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-rizhao", children: row.id }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 text-slate-600", children: row.institution }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: /*#__PURE__*/_jsx("span", { className: "rounded bg-slate-100 px-2 py-1 font-bold text-slate-600", children: row.status }) }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-danger", children: row.remaining }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: /*#__PURE__*/_jsx("button", { type: "button", className: "font-black text-rizhao hover:underline", children: "查看工单" }) })] }, row.id)) })] }) })
+        /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['工单编号', '处理机构', '状态', '剩余时间', '操作'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: duePageRows.map(row => /*#__PURE__*/_jsxs("tr", { className: "hover:bg-orange-50/50", children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-rizhao", children: row.id }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 text-slate-600", children: row.institution }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: /*#__PURE__*/_jsx("span", { className: "rounded bg-slate-100 px-2 py-1 font-bold text-slate-600", children: row.status }) }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-danger", children: row.remaining }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: /*#__PURE__*/_jsx("button", { type: "button", className: "font-black text-rizhao hover:underline", children: "查看工单" }) })] }, row.id)) })] }) }),
+        /*#__PURE__*/_jsx(ListPagination, { total: rzOverviewDueSoonData.length, page: duePage, pageSize: duePageSize, onPageChange: setDuePage, onPageSizeChange: size => { setDuePageSize(size); setDuePage(1); } })
       ] })
     ] }),
     /*#__PURE__*/_jsxs("section", { children: [/*#__PURE__*/_jsx("div", { className: "mb-3 flex items-end justify-between", children: /*#__PURE__*/_jsx("div", { children: /*#__PURE__*/_jsx("h3", { className: "text-lg font-black text-ink", children: "重点分布" }) }) }), /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-1 gap-5 xl:grid-cols-2", children: [
