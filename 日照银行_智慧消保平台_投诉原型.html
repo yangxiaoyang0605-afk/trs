@@ -2934,11 +2934,6 @@ const rzChannelAnalysisRows = [
 function RzChannelTrendPanel({ selectedChannel, applied, compareMode = 'mom' }) {
   const [granularity, setGranularity] = useState('日');
   const channel = rzChannelAnalysisRows.find(item => item.name === selectedChannel) || rzChannelAnalysisRows[0];
-  const [channelPage, setChannelPage] = useState(1);
-  const [channelPageSize, setChannelPageSize] = useState(5);
-  const channelTotalPages = Math.max(1, Math.ceil(rzChannelAnalysisRows.length / channelPageSize));
-  const channelSafePage = Math.min(channelPage, channelTotalPages);
-  const channelPageRows = rzChannelAnalysisRows.slice((channelSafePage - 1) * channelPageSize, channelSafePage * channelPageSize);
   const baseData = rzProductTrendSets[granularity];
   const scale = Math.max(channel.value / rzChannelAnalysisRows[0].value, 0.35);
   const data = baseData.map((item,index) => ({ ...item, count: Math.max(1, Math.round(item.count * scale * (granularity === '日' ? 0.12 : granularity === '周' ? 0.18 : 0.2))), growth: rzCompareTrendGrowth(Math.max(1, item.growth + (rzCompareValue(channel, compareMode, index).startsWith('-') ? -4 : index % 2)), compareMode, index) }));
@@ -2961,6 +2956,11 @@ function RzChannelTrendPanel({ selectedChannel, applied, compareMode = 'mom' }) 
 
 function RzChannelEfficiencyPanel({ selectedChannel, onSelect }) {
   const channel = rzChannelAnalysisRows.find(item => item.name === selectedChannel) || rzChannelAnalysisRows[0];
+  const [channelPage, setChannelPage] = useState(1);
+  const [channelPageSize, setChannelPageSize] = useState(5);
+  const channelTotalPages = Math.max(1, Math.ceil(rzChannelAnalysisRows.length / channelPageSize));
+  const channelSafePage = Math.min(channelPage, channelTotalPages);
+  const channelPageRows = rzChannelAnalysisRows.slice((channelSafePage - 1) * channelPageSize, channelSafePage * channelPageSize);
   const closeRate = (channel.closed / channel.value * 100).toFixed(1);
   const metrics = [
     { label: '渠道投诉量', value: channel.value, unit: '件', sub: channel.type, tone: 'orange' },
@@ -10907,5 +10907,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/_jsx(Ap
   </script>
 </body>
 </html>
-
 
