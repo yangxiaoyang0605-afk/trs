@@ -4485,6 +4485,9 @@ function ProcessingDetail({
     label: '工单级别',
     value: row.level
   }, {
+    label: '业务归属条线',
+    value: formatBusinessLines(row.businessLines)
+  }, {
     label: '工单状态',
     value: row.status
   }, {
@@ -5700,6 +5703,9 @@ function ReadOnlyComplaintDetail({
     label: '工单级别',
     value: row.level
   }, {
+    label: '业务归属条线',
+    value: formatBusinessLines(row.businessLines)
+  }, {
     label: '工单状态',
     value: row.status
   }, {
@@ -6054,6 +6060,33 @@ function ReadOnlySection({
     }), children]
   });
 }
+const businessLineOptions = [
+  '驻行纪检监察组',
+  '党群工作部',
+  '发展规划部(董事会办公室)',
+  '人力资源部',
+  '计划财务部',
+  '营运管理部',
+  '风险管理部',
+  '资产保全部',
+  '法律合规部',
+  '审计部',
+  '公司业务部',
+  '小企业金融部（普惠金融部）',
+  '零售金融部',
+  '乡村振兴金融部',
+  '网络金融部',
+  '科技部',
+  '数字银行部',
+  '行政管理部',
+  '安全保卫部',
+  '小企业信贷中心',
+  '供应链金融中心',
+  '票据中心',
+  '场景金融运营中心'
+];
+const defaultBusinessLines = ['零售金融部', '网络金融部'];
+const formatBusinessLines = lines => (Array.isArray(lines) && lines.length ? lines : defaultBusinessLines).join('、');
 function StandardComplaintForm({
   content,
   setContent,
@@ -6097,6 +6130,7 @@ function StandardComplaintForm({
   const [complaintOrg, setComplaintOrg] = useState(recognizedData?.org || '');
   const [complaintDemand, setComplaintDemand] = useState(recognizedData?.demand || '');
   const [complaintText, setComplaintText] = useState(recognizedData?.content || content || '');
+  const [businessLines, setBusinessLines] = useState(recognizedData?.businessLines || defaultBusinessLines);
   const isRegulatoryRequired = complaintChannel === '国家局' || complaintChannel === '省监管局';
   const isChannelDetailRequired = complaintChannel === '其它';
   const [bizL1, setBizL1] = useState('');
@@ -6399,6 +6433,13 @@ function StandardComplaintForm({
             options: ['普通', '重要', '紧急'],
             value: orderLevel,
             setValue: setOrderLevel
+          }), /*#__PURE__*/_jsx(Field, {
+            label: "业务归属条线",
+            type: "multi-select",
+            options: businessLineOptions,
+            value: businessLines,
+            setValue: setBusinessLines,
+            placeholder: "请选择业务归属条线"
           }), /*#__PURE__*/_jsx(Field, {
             label: "办理时限",
             value: deadline || "派发时间 + 3 个工作日（系统自动计算）",
@@ -7107,7 +7148,7 @@ function HistoryComplaintModal({ row, onClose }) {
     ['来电时间', row.incomingTime], ['投诉时间', row.complaintDate], ['来电人姓名', row.caller], ['来电人称谓', '先生'],
     ['联系电话', row.phone], ['来电Email', 'wangxx@example.com'], ['来电人邮编', '276800'],
     ['联系地址', '山东省日照市东港区××路××号'], ['工单类型', row.type], ['工单子类型', '产品投诉'],
-    ['工单所属机构', row.org], ['业务类型', row.business], ['工单级别', row.ticketLevel],
+    ['工单所属机构', row.org], ['业务类型', row.business], ['工单级别', row.ticketLevel], ['业务归属条线', formatBusinessLines(row.businessLines)],
     ['来电业务类型', '个人业务'], ['处理方式', '协同处理'], ['处理时限', '48小时'],
     ['进件渠道', row.channel], ['是否需要回访', '否'], ['处理人', row.handlerName],
     ['剩余时间', row.currentStatus === '已结案' ? '0小时' : '12小时'], ['当前位置', row.currentLocation],
@@ -7116,7 +7157,7 @@ function HistoryComplaintModal({ row, onClose }) {
   ] : [
     ['行内工单编号', row.workNo], ['标题', row.title], ['录入时间', row.time], ['投诉时间', row.complaintDate],
     ['工单类型', '投诉'], ['投诉反映渠道', row.channel], ['渠道细分', '人工客服'],
-    ['监管工单编号', row.regulatoryNo], ['工单级别', row.ticketLevel], ['工单状态', row.currentStatus], ['办理时限', row.processingDeadline],
+    ['监管工单编号', row.regulatoryNo], ['工单级别', row.ticketLevel], ['业务归属条线', formatBusinessLines(row.businessLines)], ['工单状态', row.currentStatus], ['办理时限', row.processingDeadline],
     ['是否重办', '否'], ['是否现场', row.onsite], ['投诉人姓名', row.caller],
     ['性别', '男'], ['身份证号码', '37************12'], ['联系电话', row.phone],
     ['卡号', '6228********1234'], ['被投诉机构', row.org], ['投诉人诉求', '核实并说明'],
@@ -7406,10 +7447,10 @@ function BatchImport({
     { no: 'DR202607020015', title: '对公开户咨询', channel: '政务热线', customer: '许女士', status: '待确认', checked: false, errors: null }
   ];
   const recognizedSamples = [
-    { entryTime: '2026-07-02 09:18', orderType: '投诉', channelDetail: '监管转办平台', regulatoryNo: 'RJ202607020001', level: '重要', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '男', idNo: '371102********0919', phone: '138****0919', cardNo: '6228********1234', org: '东港支行', demand: '金钱赔偿', complaintDate: '2026-07-01', content: '客户反映其消费贷款提前还款后，对剩余本金计息和费用收取存在疑问，要求核实计息规则并退还多收费用。' },
-    { entryTime: '2026-07-02 09:24', orderType: '投诉', channelDetail: '市局转办', regulatoryNo: 'RJ202607020002', level: '普通', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '女', idNo: '371103********2816', phone: '156****2816', cardNo: '6228********5678', org: '信用卡中心', demand: '其他', complaintDate: '2026-07-01', content: '客户反映信用卡逾期后曾申请协商还款，认为沟通反馈不及时，要求明确还款方案和后续处理安排。' },
-    { entryTime: '2026-07-02 09:36', orderType: '投诉', channelDetail: '12345热线', regulatoryNo: '', level: '普通', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '女', idNo: '371102********7735', phone: '139****7735', cardNo: '6228********7735', org: '岚山支行', demand: '赔礼道歉', complaintDate: '2026-07-01', content: '客户反映账户业务咨询过程中，多次到网点仍未一次性了解所需材料，要求说明办理口径并改进服务。' },
-    { entryTime: '2026-07-02 09:48', orderType: '投诉', channelDetail: '总局转办', regulatoryNo: 'RJ202607020004', level: '重要', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '男', idNo: '371121********6620', phone: '187****6620', cardNo: '6228********6620', org: '五莲支行', demand: '其他', complaintDate: '2026-07-01', content: '客户反映经营贷申请资料已补充完整，但办理进度长时间未反馈，要求尽快告知审批结果。' }
+    { entryTime: '2026-07-02 09:18', orderType: '投诉', channelDetail: '监管转办平台', regulatoryNo: 'RJ202607020001', level: '重要', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '男', idNo: '371102********0919', phone: '138****0919', cardNo: '6228********1234', org: '东港支行', demand: '金钱赔偿', complaintDate: '2026-07-01', businessLines: ['零售金融部', '风险管理部'], content: '客户反映其消费贷款提前还款后，对剩余本金计息和费用收取存在疑问，要求核实计息规则并退还多收费用。' },
+    { entryTime: '2026-07-02 09:24', orderType: '投诉', channelDetail: '市局转办', regulatoryNo: 'RJ202607020002', level: '普通', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '女', idNo: '371103********2816', phone: '156****2816', cardNo: '6228********5678', org: '信用卡中心', demand: '其他', complaintDate: '2026-07-01', businessLines: ['网络金融部', '营运管理部'], content: '客户反映信用卡逾期后曾申请协商还款，认为沟通反馈不及时，要求明确还款方案和后续处理安排。' },
+    { entryTime: '2026-07-02 09:36', orderType: '投诉', channelDetail: '12345热线', regulatoryNo: '', level: '普通', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '女', idNo: '371102********7735', phone: '139****7735', cardNo: '6228********7735', org: '岚山支行', demand: '赔礼道歉', complaintDate: '2026-07-01', businessLines: ['营运管理部', '行政管理部'], content: '客户反映账户业务咨询过程中，多次到网点仍未一次性了解所需材料，要求说明办理口径并改进服务。' },
+    { entryTime: '2026-07-02 09:48', orderType: '投诉', channelDetail: '总局转办', regulatoryNo: 'RJ202607020004', level: '重要', deadline: '2026-07-07 18:00', isRedo: '否', isOnsite: '否', gender: '男', idNo: '371121********6620', phone: '187****6620', cardNo: '6228********6620', org: '五莲支行', demand: '其他', complaintDate: '2026-07-01', businessLines: ['公司业务部', '小企业金融部（普惠金融部）'], content: '客户反映经营贷申请资料已补充完整，但办理进度长时间未反馈，要求尽快告知审批结果。' }
   ];
   const buildRecognizedRow = (row, index) => ({ ...recognizedSamples[index % recognizedSamples.length], ...row, innerNo: row.no });
 
@@ -7981,6 +8022,9 @@ function ReturnVisitPage({
     label: '工单级别',
     value: row.level || '普通'
   }, {
+    label: '业务归属条线',
+    value: formatBusinessLines(row.businessLines)
+  }, {
     label: '工单状态',
     value: row.status
   }, {
@@ -8249,6 +8293,9 @@ function LedgerEditPage({
       }, {
         label: '工单级别',
         value: row.level
+      }, {
+        label: '业务归属条线',
+        value: formatBusinessLines(row.businessLines)
       }, {
         label: '工单状态',
         value: row.status
@@ -9048,6 +9095,12 @@ function Field({
   isReq = false
 }) {
   const displayLabel = isReq ? '* ' + label : label;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const selectedValues = Array.isArray(value) ? value : [];
+  const toggleMultiValue = option => {
+    if (!setValue) return;
+    setValue(selectedValues.includes(option) ? selectedValues.filter(item => item !== option) : [...selectedValues, option]);
+  };
   return /*#__PURE__*/_jsxs("label", {
     className: disabled ? "block opacity-60" : "block",
     children: [/*#__PURE__*/_jsx("div", {
@@ -9058,6 +9111,43 @@ function Field({
       children: disabled ? /*#__PURE__*/_jsx("div", {
         className: "py-2 text-sm text-slate-600",
         children: value || placeholder || '—'
+      }) : type === 'multi-select' ? /*#__PURE__*/_jsxs("div", {
+        className: "relative w-full",
+        children: [/*#__PURE__*/_jsxs("button", {
+          type: "button",
+          onClick: event => {
+            event.preventDefault();
+            setDropdownOpen(open => !open);
+          },
+          className: `flex h-full min-h-[46px] w-full items-center justify-between gap-3 text-left text-base ${selectedValues.length ? 'text-ink' : 'text-slate-400'}`,
+          children: [/*#__PURE__*/_jsx("span", {
+            className: "min-w-0 flex-1 truncate",
+            children: selectedValues.length ? selectedValues.join('、') : placeholder || '请选择'
+          }), /*#__PURE__*/_jsx("span", {
+            className: "shrink-0 text-lg text-slate-500",
+            children: dropdownOpen ? "⌃" : "⌄"
+          })]
+        }), dropdownOpen && /*#__PURE__*/_jsx("div", {
+          className: "absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-64 overflow-y-auto rounded-xl border border-line-divider bg-white p-2 shadow-high",
+          children: options.map(option => {
+            const checked = selectedValues.includes(option);
+            return /*#__PURE__*/_jsxs("button", {
+              type: "button",
+              onClick: event => {
+                event.preventDefault();
+                toggleMultiValue(option);
+              },
+              className: `flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-bold transition ${checked ? 'bg-orange-50 text-rizhao' : 'text-slate-600 hover:bg-slate-50 hover:text-ink'}`,
+              children: [/*#__PURE__*/_jsx("span", {
+                className: "pr-3",
+                children: option
+              }), /*#__PURE__*/_jsx("span", {
+                className: checked ? "text-rizhao" : "text-slate-300",
+                children: checked ? "✓" : ""
+              })]
+            }, option);
+          })
+        })]
       }) : type === 'select' ? /*#__PURE__*/_jsxs("select", {
         defaultValue: value === undefined ? "" : undefined,
         value: value !== undefined ? value : undefined,
