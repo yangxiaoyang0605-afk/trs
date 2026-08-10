@@ -920,12 +920,14 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       box-shadow: none !important;
     }
     .rz-message-popover {
-      height: auto;
+      height: 560px;
       max-height: none;
-      display: block;
+      display: flex;
+      flex-direction: column;
     }
     .rz-message-list {
-      max-height: 420px;
+      flex: 1;
+      max-height: none;
       overflow-y: auto !important;
     }
     .bg-rizhao:hover { background-color: #B06F15 !important; }
@@ -3362,6 +3364,7 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
   const [messageModule, setMessageModule] = useState('投诉');
   const [messageReadTab, setMessageReadTab] = useState('未读');
   const [readMessageNos, setReadMessageNos] = useState([]);
+  const [messagePage, setMessagePage] = useState(1);
   const [departments, setDepartments] = useState([
     { id: 'org-main', orgName: '总行消保中心', type: '所属机构', isDefault: true, roleKey: 'org_admin', complaintRole: '工单派发员', reviewRole: '' },
     { id: 'org-dg', orgName: '东港支行', type: '所属机构', isDefault: false, roleKey: 'complaint_handler', complaintRole: '投诉处理员', reviewRole: '' },
@@ -3382,17 +3385,40 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
     setDepartments(list => list.map(item => ({ ...item, isDefault: item.id === id })));
   };
   const oaMessages = [
-    { no: 'TS202607020002', scene: '工单派发提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', template: '【投诉工单】工单编号：TS202607020002。该工单已派发至您，请至“我的待办”查看并及时处理。' },
-    { no: 'TS202607020003', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', template: '【投诉工单】工单编号：TS202607020003。该工单已提交关单审核，请至“我的待办”查看并及时审核。' },
-    { no: 'TS202607020006', scene: '工单收回提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'list', template: '【投诉工单】工单编号：TS202607020006。工单处理人已提交收回申请，请至“我的待办”查看并及时处理。' },
-    { no: 'TS202607020010', scene: '工单收回提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'none', template: '【投诉工单】工单编号：TS202607020010。该工单已被收回，等待重新分配，请至“我的待办”查看并及时处理。' },
-    { no: 'TS202607020008', scene: '超期提醒', receiver: '工单派发员 / 投诉处理员', roles: ['org_admin', 'complaint_handler'], jump: 'detail', template: '工单编号：TS202607020008。该工单已超过办理时限，请至“我的待办”查看并尽快处理。' }
+    { no: 'TS202607020002', title: '信用卡账单分期费用争议', scene: '工单派发提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', template: '工单编号：TS202607020002。工单标题：信用卡账单分期费用争议。您有一笔新工单待处理，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607020011', title: '借记卡挂失补卡排队时间较长', scene: '工单派发提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', template: '工单编号：TS202607020011。工单标题：借记卡挂失补卡排队时间较长。您有一笔新工单待处理，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607020003', title: '个人贷款提前还款手续费咨询', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', template: '工单编号：TS202607020003。工单标题：个人贷款提前还款手续费咨询。该工单已提交关单审核，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607020012', title: '理财产品赎回到账时效疑问', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', template: '工单编号：TS202607020012。工单标题：理财产品赎回到账时效疑问。该工单已提交关单审核，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607020006', title: '电子银行转账限额说明不清', scene: '工单收回提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'list', template: '工单编号：TS202607020006。工单标题：电子银行转账限额说明不清。该工单已提交收回申请，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607020010', title: '网点服务态度投诉', scene: '工单收回提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'none', template: '工单编号：TS202607020010。工单标题：网点服务态度投诉。该工单已被收回，等待重新分配，请知悉。' },
+    { no: 'TS202607020008', title: '账户解冻办理进度咨询', scene: '超期提醒', receiver: '工单派发员 / 投诉处理员', roles: ['org_admin', 'complaint_handler'], jump: 'detail', template: '工单编号：TS202607020008。工单标题：账户解冻办理进度咨询。该工单已超过办理时限，请至“工单处理-我的待办”查看并尽快处理。' },
+    { no: 'TS202607020013', title: '短信通知服务收费争议', scene: '短信审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', template: '工单编号：TS202607020013。工单标题：短信通知服务收费争议。该短信审核内容已提交至审核，请至“短信审核”查看并及时处理。' },
+    { no: 'TS202607020014', title: '客户联系短信审核结果', scene: '短信审核提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', template: '工单编号：TS202607020014。工单标题：客户联系短信审核结果。该短信审核已完毕，请至“工单处理-我的待办”查看并及时处理。' }
+  ];
+  const readArchiveMessages = [
+    { no: 'TS202607310018', title: '银行卡年费减免政策咨询', scene: '工单派发提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-31 16:20', template: '工单编号：TS202607310018。工单标题：银行卡年费减免政策咨询。您有一笔新工单待处理，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607300026', title: '手机银行登录异常反馈', scene: '工单派发提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-30 09:35', template: '工单编号：TS202607300026。工单标题：手机银行登录异常反馈。您有一笔新工单待处理，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607290014', title: '大额存单利率展示疑问', scene: '工单收回提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'none', time: '2026-07-29 13:12', template: '工单编号：TS202607290014。工单标题：大额存单利率展示疑问。该工单已被收回，等待重新分配，请知悉。' },
+    { no: 'TS202607280041', title: '贷款还款日扣款失败争议', scene: '超期提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-28 18:05', template: '工单编号：TS202607280041。工单标题：贷款还款日扣款失败争议。该工单已超过办理时限，请至“工单处理-我的待办”查看并尽快处理。' },
+    { no: 'TS202607260009', title: '借记卡盗刷处理进度咨询', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-26 11:50', template: '工单编号：TS202607260009。工单标题：借记卡盗刷处理进度咨询。该工单已提交关单审核，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607250033', title: '网点排队叫号秩序投诉', scene: '工单收回提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'list', time: '2026-07-25 15:26', template: '工单编号：TS202607250033。工单标题：网点排队叫号秩序投诉。该工单已提交收回申请，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607230021', title: '对公账户开户材料补充说明', scene: '短信审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-23 10:08', template: '工单编号：TS202607230021。工单标题：对公账户开户材料补充说明。该短信审核内容已提交至审核，请至“短信审核”查看并及时处理。' },
+    { no: 'TS202607210017', title: '信用卡临时额度调整咨询', scene: '短信审核提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-21 17:42', template: '工单编号：TS202607210017。工单标题：信用卡临时额度调整咨询。该短信审核已完毕，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607180005', title: '理财风险等级匹配异议', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-18 14:14', template: '工单编号：TS202607180005。工单标题：理财风险等级匹配异议。该工单已提交关单审核，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607150030', title: '个人贷款征信异议处理', scene: '超期提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-15 08:56', template: '工单编号：TS202607150030。工单标题：个人贷款征信异议处理。该工单已超过办理时限，请至“工单处理-我的待办”查看并尽快处理。' }
   ];
   const complaintMessages = oaMessages.filter(message => message.roles.includes(role));
   const reviewMessages = [];
   const moduleMessages = messageModule === '投诉' ? complaintMessages : reviewMessages;
   const unreadComplaintCount = complaintMessages.filter(message => !readMessageNos.includes(message.no)).length;
-  const visibleMessages = moduleMessages.filter(message => messageReadTab === '未读' ? !readMessageNos.includes(message.no) : readMessageNos.includes(message.no));
+  const readArchiveForRole = (messageModule === '投诉' ? readArchiveMessages : []).filter(message => message.roles.includes(role));
+  const clickedReadMessages = moduleMessages.filter(message => readMessageNos.includes(message.no));
+  const readMessages = [...clickedReadMessages, ...readArchiveForRole.filter(item => !clickedReadMessages.some(message => message.no === item.no))];
+  const visibleMessages = messageReadTab === '未读' ? moduleMessages.filter(message => !readMessageNos.includes(message.no)) : readMessages;
+  const messagePageSize = 4;
+  const messagePageCount = Math.max(1, Math.ceil(visibleMessages.length / messagePageSize));
+  const effectiveMessagePage = Math.min(messagePage, messagePageCount);
+  const pagedMessages = messageReadTab === '已读' ? visibleMessages.slice((effectiveMessagePage - 1) * messagePageSize, effectiveMessagePage * messagePageSize) : visibleMessages;
   const openMessageDetail = message => {
     setSelectedMessage(message);
     setReadMessageNos(list => list.includes(message.no) ? list : [...list, message.no]);
@@ -3422,12 +3448,12 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
         children: [/*#__PURE__*/_jsxs("div", {
           className: "relative",
           children: [/*#__PURE__*/_jsxs("button", {
-            onClick: () => { setShowMessages(!showMessages); setSelectedMessage(null); setMessageReadTab('未读'); },
+            onClick: () => { setShowMessages(!showMessages); setSelectedMessage(null); setMessageReadTab('未读'); setMessagePage(1); },
             className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700",
             children: [/*#__PURE__*/_jsx("span", { children: "消息提醒" }), /*#__PURE__*/_jsx("span", { className: "ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[11px] font-black leading-none text-white", children: unreadComplaintCount })]
           }), showMessages && /*#__PURE__*/_jsxs("div", {
             className: "rz-message-popover absolute right-0 top-full z-50 mt-2 w-[520px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-high",
-            children: [/*#__PURE__*/_jsxs("div", { className: "rz-message-header flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { className: "rz-message-title-row flex items-center gap-3", children: [/*#__PURE__*/_jsx("div", { className: "text-base font-black text-ink", children: selectedMessage ? "消息详情" : "消息提醒" }), !selectedMessage && /*#__PURE__*/_jsx("div", { className: "rz-message-read-tabs rounded-full bg-slate-100 p-1", children: ['未读', '已读'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setMessageReadTab(tab), className: `rounded-full px-3 py-1.5 text-xs font-black transition ${messageReadTab === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsx("button", { className: "text-sm font-bold text-rizhao", onClick: () => setSelectedMessage(null), children: "返回列表" }) : /*#__PURE__*/_jsx("div", { className: "rz-message-module-tabs rounded-xl bg-slate-100 p-1", children: ['投诉', '审查'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setMessageModule(tab); setSelectedMessage(null); setMessageReadTab('未读'); }, className: `rounded-lg px-4 py-2 text-xs font-black transition ${messageModule === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsxs("div", { className: "rz-message-list space-y-5 p-5", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-2xl bg-red-50 p-5", children: [/*#__PURE__*/_jsx("span", { className: "inline-block rounded-full bg-white px-3 py-1 text-xs font-black text-rizhao", children: "已读" }), /*#__PURE__*/_jsx("div", { className: "mt-5 text-sm font-bold text-slate-400", children: selectedMessage.scene }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-xl font-black text-ink", children: selectedMessage.no }), /*#__PURE__*/_jsx("div", { className: "mt-5 leading-8 text-slate-600", children: selectedMessage.template })] }), selectedMessage.jump !== 'none' && /*#__PURE__*/_jsx("button", { className: "w-full rounded-xl bg-rizhao px-4 py-3 font-black text-white", onClick: jumpToWorkOrder, children: "查看对应工单" })] }) : /*#__PURE__*/_jsx("div", { className: "rz-message-list overflow-auto p-3", children: visibleMessages.length ? visibleMessages.map(message => /*#__PURE__*/_jsxs("button", { onClick: () => openMessageDetail(message), className: "mb-2 block w-full rounded-2xl border border-slate-100 bg-white p-4 text-left transition hover:border-rizhao hover:bg-orange-50", children: [/*#__PURE__*/_jsxs("div", { className: "mb-2 flex items-center gap-2", children: [messageReadTab === '未读' && /*#__PURE__*/_jsx("span", { className: "h-2.5 w-2.5 rounded-full bg-red-600" }), /*#__PURE__*/_jsx("span", { className: "text-sm font-black text-ink", children: message.scene })] }), /*#__PURE__*/_jsx("div", { className: "text-sm leading-6 text-slate-600", children: message.template })] }, message.no)) : /*#__PURE__*/_jsx("div", { className: "py-10 text-center text-sm font-bold text-slate-400", children: messageModule === '审查' ? "审查消息暂无模板" : messageReadTab === '未读' ? "暂无未读消息" : "暂无已读消息" }) })]
+            children: [/*#__PURE__*/_jsxs("div", { className: "rz-message-header flex items-center justify-between border-b border-slate-100 px-5 py-4", children: [/*#__PURE__*/_jsxs("div", { className: "rz-message-title-row flex items-center gap-3", children: [/*#__PURE__*/_jsx("div", { className: "text-base font-black text-ink", children: selectedMessage ? "消息详情" : "消息提醒" }), !selectedMessage && /*#__PURE__*/_jsx("div", { className: "rz-message-read-tabs rounded-full bg-slate-100 p-1", children: ['未读', '已读'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setMessageReadTab(tab); setMessagePage(1); }, className: `rounded-full px-3 py-1.5 text-xs font-black transition ${messageReadTab === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsx("button", { className: "text-sm font-bold text-rizhao", onClick: () => setSelectedMessage(null), children: "返回列表" }) : /*#__PURE__*/_jsx("div", { className: "rz-message-module-tabs rounded-xl bg-slate-100 p-1", children: ['投诉', '审查'].map(tab => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setMessageModule(tab); setSelectedMessage(null); setMessageReadTab('未读'); setMessagePage(1); }, className: `rounded-lg px-4 py-2 text-xs font-black transition ${messageModule === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500 hover:text-ink'}`, children: tab }, tab)) })] }), selectedMessage ? /*#__PURE__*/_jsxs("div", { className: "rz-message-list space-y-3 p-4", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-xl bg-red-50 p-4", children: [/*#__PURE__*/_jsx("span", { className: "inline-block rounded-full bg-white px-2.5 py-1 text-xs font-black text-rizhao", children: "已读" }), /*#__PURE__*/_jsx("div", { className: "mt-4 text-xs font-bold text-slate-400", children: selectedMessage.scene }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-lg font-black text-ink", children: selectedMessage.no }), /*#__PURE__*/_jsx("div", { className: "mt-3 text-sm leading-6 text-slate-600", children: selectedMessage.template })] }), selectedMessage.jump !== 'none' && /*#__PURE__*/_jsx("button", { className: "w-full rounded-xl bg-rizhao px-4 py-3 font-black text-white", onClick: jumpToWorkOrder, children: "查看对应工单" })] }) : /*#__PURE__*/_jsxs("div", { className: "rz-message-list flex flex-col overflow-auto p-3", children: [/*#__PURE__*/_jsx("div", { className: "flex-1", children: visibleMessages.length ? pagedMessages.map(message => /*#__PURE__*/_jsxs("button", { onClick: () => openMessageDetail(message), className: "mb-2 block w-full rounded-xl border border-slate-100 bg-white p-3 text-left transition hover:border-rizhao hover:bg-orange-50", children: [/*#__PURE__*/_jsxs("div", { className: "mb-1.5 flex items-center justify-between gap-2", children: [/*#__PURE__*/_jsxs("span", { className: "flex min-w-0 items-center gap-2", children: [messageReadTab === '未读' && /*#__PURE__*/_jsx("span", { className: "h-2 w-2 shrink-0 rounded-full bg-red-600" }), /*#__PURE__*/_jsx("span", { className: "truncate text-sm font-black text-ink", children: message.scene })] }), message.time && /*#__PURE__*/_jsx("span", { className: "shrink-0 text-[11px] font-bold text-slate-400", children: message.time.slice(5) })] }), /*#__PURE__*/_jsx("div", { className: "line-clamp-2 text-xs leading-5 text-slate-600", children: message.template })] }, message.no)) : /*#__PURE__*/_jsx("div", { className: "py-10 text-center text-sm font-bold text-slate-400", children: messageModule === '审查' ? "审查消息暂无模板" : messageReadTab === '未读' ? "暂无未读消息" : "暂无已读消息" }) }), messageReadTab === '已读' && visibleMessages.length > 0 && /*#__PURE__*/_jsxs("div", { className: "mt-2 flex items-center justify-between border-t border-slate-100 pt-3 text-xs font-bold text-slate-500", children: [/*#__PURE__*/_jsxs("span", { children: ["共 ", visibleMessages.length, " 条，一个月内工单消息"] }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("button", { type: "button", disabled: effectiveMessagePage === 1, onClick: () => setMessagePage(page => Math.max(1, page - 1)), className: `rounded-lg border px-2.5 py-1 ${effectiveMessagePage === 1 ? 'border-slate-100 text-slate-300' : 'border-slate-200 text-slate-600 hover:border-rizhao hover:text-rizhao'}`, children: "上一页" }), /*#__PURE__*/_jsxs("span", { className: "min-w-[44px] text-center", children: [effectiveMessagePage, " / ", messagePageCount] }), /*#__PURE__*/_jsx("button", { type: "button", disabled: effectiveMessagePage === messagePageCount, onClick: () => setMessagePage(page => Math.min(messagePageCount, page + 1)), className: `rounded-lg border px-2.5 py-1 ${effectiveMessagePage === messagePageCount ? 'border-slate-100 text-slate-300' : 'border-slate-200 text-slate-600 hover:border-rizhao hover:text-rizhao'}`, children: "下一页" })] })] })] })]
           })]
         }), /*#__PURE__*/_jsxs("div", {
           className: "relative",
@@ -10907,4 +10933,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/_jsx(Ap
   </script>
 </body>
 </html>
-
