@@ -564,9 +564,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     .role-list-table td:nth-child(8) { white-space: nowrap; }
     .rz-action-grid {
       display: grid;
-      grid-template-columns: repeat(3, 36px);
+      grid-template-columns: repeat(4, max-content);
       align-items: center;
-      column-gap: 10px;
+      column-gap: 12px;
       white-space: nowrap;
     }
     .rz-action-grid button {
@@ -1142,7 +1142,7 @@ const menus = [{
 }, {
   name: '智能预警', active: false, desc: ''
 }];
-const channels = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'];
+const channels = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'];
 const govChannels = ['政务热线'];
 const analyticsTabs = ['投诉总览', '机构分析', '产品分析', '原因分析', '渠道分析'];
 const analyticsTrend = [
@@ -2598,7 +2598,7 @@ const workOrderReportRows = [
   { institution: '开发区支行', customers: '6.8万', outlets: 8, previous: 48, total: 52, accepted: 58, valid: 52, invalid: 6, regulatory: 6, repeat: 4, pending: 3, processing: 5, supplement: 1, completed: 43, returned: 4, completionRate: '82.7%', avgDuration: '2.1天', timely: 37, overdue: 6, timelyRate: '86.0%', longest: '5.8天', topProduct: '借记卡 16件', productShare: '30.8%', topReason: '服务态度 13件', reasonShare: '25.0%', abnormal: 1, evaluated: 39, satisfied: 30, basic: 6, dissatisfied: 3, satisfactionRate: '92.3%', agreementRate: '88.5%', due24h: 3, avgAge: '2.0天' },
   { institution: '运营管理部', customers: '5.2万', outlets: 6, previous: 44, total: 46, accepted: 49, valid: 46, invalid: 3, regulatory: 4, repeat: 2, pending: 1, processing: 1, supplement: 0, completed: 44, returned: 2, completionRate: '95.7%', avgDuration: '1.2天', timely: 43, overdue: 1, timelyRate: '97.7%', longest: '3.1天', topProduct: '存款业务 15件', productShare: '32.6%', topReason: '规则告知 12件', reasonShare: '26.1%', abnormal: 0, evaluated: 42, satisfied: 37, basic: 4, dissatisfied: 1, satisfactionRate: '97.6%', agreementRate: '95.7%', due24h: 0, avgAge: '0.8天' }
 ];
-const reportChannelSources = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'];
+const reportChannelSources = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'];
 const reportFormulaTips = {
   '工单总量': '工单总量 = COUNT(DISTINCT 工单ID)，按查询机构和查询时间范围统计。',
   '投诉量': '投诉量 = COUNT(DISTINCT 工单ID WHERE 投诉有效性=有效)，按机构、时间和对应分类口径统计。',
@@ -2780,7 +2780,7 @@ const rzReportFilterMeta = {
   workOrderNo: { label: '行内工单编号', type: 'text' },
   entryTime: { label: '录入时间', type: 'dateRange' },
   type: { label: '工单类型', type: 'select', options: ['全部', '投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访'] },
-  channel: { label: '投诉反映渠道', type: 'select', options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] },
+  channel: { label: '投诉反映渠道', type: 'select', options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] },
   status: { label: '工单状态', type: 'select', options: ['全部', '已派发', '待处理', '处理中', '待审核', '已办结'] },
   productTag: { label: '投诉产品标签', type: 'select', options: ['全部', '信用卡', '个人贷款', '借记卡', '支付结算', '理财产品', '手机银行', '存款业务', '消费贷款'] },
   reasonTag: { label: '投诉原因标签', type: 'select', options: ['全部', '提前还款争议', '年费告知争议', '到账时效争议', '风险揭示不足', '服务态度', '收费争议', '规则告知', '额度调整争议'] },
@@ -3079,6 +3079,42 @@ function App() {
     status: '已拦截',
     interceptReason: '短信表述不够规范，存在引导客户默认确认的风险。'
   }]);
+  const [delayApprovalRows, setDelayApprovalRows] = useState([{
+    id: 'DELAY202607240001',
+    workOrderNo: 'TS202607020002',
+    workOrderStatus: '待处理',
+    handler: '张经理',
+    applyTime: '2026-07-24 10:18',
+    content: '客户补充材料尚未提供完整，需延长2个工作日完成核实和反馈。',
+    status: '待审批'
+  }, {
+    id: 'DELAY202607230002',
+    workOrderNo: 'TS202607020008',
+    workOrderStatus: '处理中',
+    handler: '李经理',
+    applyTime: '2026-07-23 16:42',
+    content: '涉及跨部门调阅交易流水，申请延期1个工作日完成核查。',
+    status: '待审批'
+  }, {
+    id: 'DELAY202607220003',
+    workOrderNo: 'TS202607020011',
+    workOrderStatus: '处理中',
+    handler: '王经理',
+    applyTime: '2026-07-22 09:35',
+    auditTime: '2026-07-22 11:10',
+    content: '需等待客户确认补卡网点和领取时间，申请延期至2026-07-25。',
+    status: '已同意'
+  }, {
+    id: 'DELAY202607210004',
+    workOrderNo: 'TS202607020006',
+    workOrderStatus: '待处理',
+    handler: '赵经理',
+    applyTime: '2026-07-21 14:08',
+    auditTime: '2026-07-21 15:26',
+    content: '申请延期原因不充分，当前材料可支持按原时限处理。',
+    status: '不同意',
+    rejectReason: '延期理由不充分，当前材料可支持按原办理时限继续处理。'
+  }]);
   const isSuperAdmin = true; // 原型中默认超管，后续接入 SSO 权限判断
 
   // 模拟智能打标：原型里先体现“可自动生成、可人工修改”的交互。
@@ -3099,6 +3135,15 @@ function App() {
       ...record
     }, ...prev]);
     setMainTab('短信审核');
+  };
+  const handleSubmitDelayApproval = record => {
+    setDelayApprovalRows(prev => [{
+      id: `DELAY${Date.now()}`,
+      status: '待审批',
+      applyTime: getCurrentContactTime(),
+      ...record
+    }, ...prev]);
+    setMainTab('延期审批');
   };
   return /*#__PURE__*/_jsx("div", {
     className: "rz-shell min-h-screen text-ink",
@@ -3146,7 +3191,11 @@ function App() {
                 productTag: productTag || '个人贷款 / 消费贷款',
                 reasonTag: reasonTag || '业务办理 / 还款与征信异议',
                 smsAuditRows: smsAuditRows,
-                onSubmitSmsAudit: handleSubmitSmsAudit
+                onSubmitSmsAudit: handleSubmitSmsAudit,
+                onSubmitDelayApproval: handleSubmitDelayApproval
+              }) : mainTab === '延期审批' ? /*#__PURE__*/_jsx(DelayApprovalWorkspace, {
+                rows: delayApprovalRows,
+                setRows: setDelayApprovalRows
               }) : mainTab === '短信审核' ? /*#__PURE__*/_jsx(SmsAuditWorkspace, {
                 rows: smsAuditRows,
                 setRows: setSmsAuditRows,
@@ -3182,7 +3231,7 @@ function Sidebar({
   setReviewTab,
   isSuperAdmin
 }) {
-  const subMenus = ['录入工单', '处理工单', '短信审核', '台账导出'];
+  const subMenus = ['录入工单', '处理工单'];
   const reportSubMenus = ['工单处理报表'];
   const analyticsSubMenus = ['投诉总览', '机构分析', '产品分析', '原因分析', '渠道分析'];
   const reviewSubMenus = ['申请中心', '审批中心', '统计中心'];
@@ -3231,7 +3280,7 @@ function Sidebar({
     setExpandedComplaintMenu(current => ({ ...current, [name]: !current[name] }));
   };
   const isPrimaryActive = name => name === '投诉管理'
-    ? ['录入工单', '处理工单', '短信审核', '台账导出', '报表管理', '统计分析'].includes(mainTab)
+    ? ['录入工单', '处理工单', '延期审批', '短信审核', '台账导出', '报表管理', '统计分析'].includes(mainTab)
     : name === '后台管理' ? mainTab === '后台管理' : name === '消保审查' ? mainTab === '消保审查' : mainTab === name;
   return /*#__PURE__*/_jsx("aside", {
     className: "rz-sidebar shrink-0",
@@ -3296,6 +3345,30 @@ function Sidebar({
               className: `rz-nav-secondary ${mainTab === name ? 'active' : ''}`,
               children: name
             }, name)), /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: () => {
+                toggleComplaintMenu('申请处理');
+                setMainTab('延期审批');
+              },
+              className: `rz-nav-secondary ${['延期审批', '短信审核'].includes(mainTab) ? 'active' : ''}`,
+              children: "申请处理"
+            }), /*#__PURE__*/_jsx("div", {
+              className: `rz-nav-accordion ${expandedComplaintMenu['申请处理'] || ['延期审批', '短信审核'].includes(mainTab) ? 'open' : ''}`,
+              children: /*#__PURE__*/_jsx("div", {
+                className: "rz-nav-accordion-inner rz-nav-nested space-y-1",
+                children: ['延期审批', '短信审核'].map(name => /*#__PURE__*/_jsx("button", {
+                  type: "button",
+                  onClick: () => openSubMenu(name),
+                  className: `rz-nav-tertiary ${mainTab === name ? 'active' : ''}`,
+                  children: name
+                }, name))
+              })
+            }), /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: () => openSubMenu('台账导出'),
+              className: `rz-nav-secondary ${mainTab === '台账导出' ? 'active' : ''}`,
+              children: "台账导出"
+            }), /*#__PURE__*/_jsx("button", {
               type: "button",
               onClick: () => {
                 setMainTab('报表管理');
@@ -3392,6 +3465,8 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
     { no: 'TS202607020006', title: '电子银行转账限额说明不清', scene: '工单收回提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'list', template: '工单编号：TS202607020006。工单标题：电子银行转账限额说明不清。该工单已提交收回申请，请至“工单处理-我的待办”查看并及时处理。' },
     { no: 'TS202607020010', title: '网点服务态度投诉', scene: '工单收回提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'none', template: '工单编号：TS202607020010。工单标题：网点服务态度投诉。该工单已被收回，等待重新分配，请知悉。' },
     { no: 'TS202607020008', title: '账户解冻办理进度咨询', scene: '超期提醒', receiver: '工单派发员 / 投诉处理员', roles: ['org_admin', 'complaint_handler'], jump: 'detail', template: '工单编号：TS202607020008。工单标题：账户解冻办理进度咨询。该工单已超过办理时限，请至“工单处理-我的待办”查看并尽快处理。' },
+    { no: 'TS202607020015', title: '贷款合同补充材料核实', scene: '延期审批提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'delayApproval', targetTab: '延期审批', template: '工单编号：TS202607020015。工单标题：贷款合同补充材料核实。该工单已提交延期申请，请至“延期审批”查看并及时处理。' },
+    { no: 'TS202607020016', title: '银行卡交易流水调阅说明', scene: '延期审批结果提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', template: '工单编号：TS202607020016。工单标题：银行卡交易流水调阅说明。该延期申请已审批完毕，请至“工单处理-我的待办”查看并及时处理。' },
     { no: 'TS202607020013', title: '短信通知服务收费争议', scene: '短信审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', template: '工单编号：TS202607020013。工单标题：短信通知服务收费争议。该短信审核内容已提交至审核，请至“短信审核”查看并及时处理。' },
     { no: 'TS202607020014', title: '客户联系短信审核结果', scene: '短信审核提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', template: '工单编号：TS202607020014。工单标题：客户联系短信审核结果。该短信审核已完毕，请至“工单处理-我的待办”查看并及时处理。' }
   ];
@@ -3402,6 +3477,8 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
     { no: 'TS202607280041', title: '贷款还款日扣款失败争议', scene: '超期提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-28 18:05', template: '工单编号：TS202607280041。工单标题：贷款还款日扣款失败争议。该工单已超过办理时限，请至“工单处理-我的待办”查看并尽快处理。' },
     { no: 'TS202607260009', title: '借记卡盗刷处理进度咨询', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-26 11:50', template: '工单编号：TS202607260009。工单标题：借记卡盗刷处理进度咨询。该工单已提交关单审核，请至“工单处理-我的待办”查看并及时处理。' },
     { no: 'TS202607250033', title: '网点排队叫号秩序投诉', scene: '工单收回提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'list', time: '2026-07-25 15:26', template: '工单编号：TS202607250033。工单标题：网点排队叫号秩序投诉。该工单已提交收回申请，请至“工单处理-我的待办”查看并及时处理。' },
+    { no: 'TS202607240019', title: '助农贷款材料补充核验', scene: '延期审批提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'delayApproval', targetTab: '延期审批', time: '2026-07-24 10:18', template: '工单编号：TS202607240019。工单标题：助农贷款材料补充核验。该工单已提交延期申请，请至“延期审批”查看并及时处理。' },
+    { no: 'TS202607240020', title: '信用卡账单争议补充沟通', scene: '延期审批结果提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-24 11:10', template: '工单编号：TS202607240020。工单标题：信用卡账单争议补充沟通。该延期申请已审批完毕，请至“工单处理-我的待办”查看并及时处理。' },
     { no: 'TS202607230021', title: '对公账户开户材料补充说明', scene: '短信审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-23 10:08', template: '工单编号：TS202607230021。工单标题：对公账户开户材料补充说明。该短信审核内容已提交至审核，请至“短信审核”查看并及时处理。' },
     { no: 'TS202607210017', title: '信用卡临时额度调整咨询', scene: '短信审核提醒', receiver: '投诉处理员', roles: ['complaint_handler'], jump: 'detail', time: '2026-07-21 17:42', template: '工单编号：TS202607210017。工单标题：信用卡临时额度调整咨询。该短信审核已完毕，请至“工单处理-我的待办”查看并及时处理。' },
     { no: 'TS202607180005', title: '理财风险等级匹配异议', scene: '关单审核提醒', receiver: '工单派发员', roles: ['org_admin'], jump: 'detail', time: '2026-07-18 14:14', template: '工单编号：TS202607180005。工单标题：理财风险等级匹配异议。该工单已提交关单审核，请至“工单处理-我的待办”查看并及时处理。' },
@@ -3424,8 +3501,12 @@ function Topbar({ mainTab, role, setRole, setMainTab, setPendingMessageWorkOrder
     setReadMessageNos(list => list.includes(message.no) ? list : [...list, message.no]);
   };
   const jumpToWorkOrder = () => {
-    if (selectedMessage) setPendingMessageWorkOrder && setPendingMessageWorkOrder({ no: selectedMessage.no, jump: selectedMessage.jump });
-    setMainTab && setMainTab('处理工单');
+    if (selectedMessage?.targetTab === '延期审批') {
+      setMainTab && setMainTab('延期审批');
+    } else {
+      if (selectedMessage) setPendingMessageWorkOrder && setPendingMessageWorkOrder({ no: selectedMessage.no, jump: selectedMessage.jump });
+      setMainTab && setMainTab('处理工单');
+    }
     setShowMessages(false);
     setSelectedMessage(null);
   };
@@ -3556,7 +3637,8 @@ function ProcessingWorkspace({
   productTag,
   reasonTag,
   smsAuditRows = [],
-  onSubmitSmsAudit
+  onSubmitSmsAudit,
+  onSubmitDelayApproval
 }) {
   const [scope, setScope] = useState('我的待办');
   const [page, setPage] = useState(1);
@@ -3569,6 +3651,7 @@ function ProcessingWorkspace({
   const [recallRow, setRecallRow] = useState(null);
   const [recallMode, setRecallMode] = useState('recall');
   const [transferRow, setTransferRow] = useState(null);
+  const [delayApplyRow, setDelayApplyRow] = useState(null);
   const myRows = [{
     no: 'TS202607020002',
     title: '信用卡还款协商',
@@ -3806,6 +3889,16 @@ function ProcessingWorkspace({
     }
   }, [pendingMessageWorkOrder]);
   const canOperateRow = row => row.owner || row.handler === currentOperator;
+  const submitDelayApply = (row, payload) => {
+    onSubmitDelayApproval && onSubmitDelayApproval({
+      workOrderNo: row.no,
+      workOrderStatus: row.status,
+      handler: row.handler || currentOperator,
+      content: `申请延期时间：${payload.delayDate}。申请延期理由：${payload.reason}`
+    });
+    setDelayApplyRow(null);
+    window.alert('延期申请已提交审批。');
+  };
   if (detailRow) {
     return /*#__PURE__*/_jsxs("div", {
       className: "space-y-5",
@@ -3827,6 +3920,7 @@ function ProcessingWorkspace({
         reasonTag: reasonTag || '业务办理 / 还款与征信异议',
         smsAuditRows: smsAuditRows,
         onSubmitSmsAudit: onSubmitSmsAudit,
+        onSubmitDelayApproval: onSubmitDelayApproval,
         contactRecords: contactRecordsByNo[detailRow.no],
         onContactRecordsChange: records => setContactRecordsByNo(prev => ({ ...prev, [detailRow.no]: records }))
       })]
@@ -3863,7 +3957,7 @@ function ProcessingWorkspace({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 lg:grid-cols-4",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人姓名", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人姓名", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-4 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -3972,6 +4066,10 @@ function ProcessingWorkspace({
                     className: "font-bold text-rizhao",
                     children: "处理"
                   }) : /*#__PURE__*/_jsx("span", {}), canOperate && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
+                    onClick: () => setDelayApplyRow(row),
+                    className: "font-bold text-rizhao",
+                    children: "申请延期"
+                  }) : /*#__PURE__*/_jsx("span", {}), canOperate && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
                     onClick: () => { setRecallMode('apply'); setRecallRow(row); },
                     className: "font-bold text-orange-500",
                     children: "申请收回"
@@ -3992,6 +4090,10 @@ function ProcessingWorkspace({
       mode: recallMode,
       onClose: () => setRecallRow(null),
       onSave: () => { setRecallRow(null); }
+    }), delayApplyRow && /*#__PURE__*/_jsx(DelayApplyModal, {
+      row: delayApplyRow,
+      onClose: () => setDelayApplyRow(null),
+      onSave: payload => submitDelayApply(delayApplyRow, payload)
     }), transferRow && /*#__PURE__*/_jsx(TransferModal, {
       row: transferRow,
       currentHandler: transferRow.handler,
@@ -4001,6 +4103,191 @@ function ProcessingWorkspace({
         setTransferRow(null);
       }
     })]
+  });
+}
+function DelayApprovalWorkspace({
+  rows,
+  setRows
+}) {
+  const [approvalTab, setApprovalTab] = useState('待审批');
+  const [rejectRow, setRejectRow] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const pendingRows = rows.filter(row => row.status === '待审批');
+  const historyRows = rows.filter(row => row.status !== '待审批');
+  const visibleRows = approvalTab === '待审批' ? pendingRows : historyRows;
+  const totalPages = Math.max(1, Math.ceil(visibleRows.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pageRows = visibleRows.slice((safePage - 1) * pageSize, safePage * pageSize);
+  const updateApproval = (row, status, rejectReason = '') => {
+    setRows(list => list.map(item => item.id === row.id ? {
+      ...item,
+      status,
+      auditTime: getCurrentContactTime(),
+      rejectReason
+    } : item));
+    window.alert(status === '已同意' ? '已同意延期申请。' : '已不同意延期申请。');
+  };
+  const statusClass = status => status === '待审批' ? 'bg-orange-50 text-rizhao' : status === '已同意' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600';
+  const heads = approvalTab === '待审批' ? ['工单编号', '工单状态', '处理人', '申请时间', '内容', '操作'] : ['工单编号', '工单状态', '处理人', '申请时间', '审批时间', '内容', '审批结果', '不同意理由'];
+  return /*#__PURE__*/_jsxs("div", {
+    className: "flex min-h-full flex-col space-y-5",
+    children: [/*#__PURE__*/_jsxs("div", {
+      children: [/*#__PURE__*/_jsx("h2", {
+        className: "text-2xl font-black text-ink",
+        children: "延期审批"
+      }), /*#__PURE__*/_jsx("p", {
+        className: "mt-1 text-sm font-bold text-slate-500",
+        children: "展示工单处理人提交的延期处理申请，可直接同意或不同意。"
+      })]
+    }), /*#__PURE__*/_jsxs("section", {
+      className: "flex-none overflow-hidden rounded-2xl border border-slate-200 bg-white",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex items-center justify-between border-b border-slate-100 px-5 py-4",
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "text-lg font-black text-ink",
+          children: "延期申请列表"
+        }), /*#__PURE__*/_jsxs("div", {
+          className: "flex items-center gap-3",
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "rounded-2xl bg-slate-100 p-1",
+            children: ['待审批', '历史记录'].map(tab => /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: () => {
+                setApprovalTab(tab);
+                setPage(1);
+              },
+              className: `rounded-xl px-4 py-2 text-sm font-black transition ${approvalTab === tab ? 'bg-white text-rizhao shadow-low' : 'text-slate-500'}`,
+              children: tab
+            }, tab))
+          }), /*#__PURE__*/_jsxs("div", {
+            className: "text-sm font-bold text-slate-500",
+            children: [approvalTab, " ", visibleRows.length, " 条"]
+          })]
+        })]
+      }), /*#__PURE__*/_jsx("div", {
+        className: "overflow-x-auto",
+        children: /*#__PURE__*/_jsxs("table", {
+          className: "w-full min-w-[980px] text-left text-sm",
+          children: [/*#__PURE__*/_jsx("thead", {
+            className: "bg-slate-50 text-slate-600",
+            children: /*#__PURE__*/_jsx("tr", {
+              children: heads.map(head => /*#__PURE__*/_jsx("th", {
+                className: "px-5 py-4 font-black",
+                children: head
+              }, head))
+            })
+          }), /*#__PURE__*/_jsx("tbody", {
+            className: "divide-y divide-slate-100",
+            children: pageRows.length === 0 ? /*#__PURE__*/_jsx("tr", {
+              children: /*#__PURE__*/_jsx("td", {
+                colSpan: heads.length,
+                className: "px-5 py-10 text-center text-slate-400",
+                children: approvalTab === '待审批' ? "暂无待审批延期申请" : "暂无历史记录"
+              })
+            }) : pageRows.map(row => /*#__PURE__*/_jsxs("tr", {
+              className: "align-top hover:bg-slate-50/70",
+              children: [/*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4 font-black text-rizhao",
+                children: row.workOrderNo
+              }), /*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4",
+                children: /*#__PURE__*/_jsx("span", {
+                  className: `rounded-full px-3 py-1 text-xs font-black ${row.workOrderStatus === '处理中' ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-rizhao'}`,
+                  children: row.workOrderStatus || "待处理"
+                })
+              }), /*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4",
+                children: row.handler
+              }), /*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4 text-slate-500",
+                children: row.applyTime
+              }), approvalTab === '历史记录' ? /*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4 text-slate-500",
+                children: row.auditTime || "-"
+              }) : null, /*#__PURE__*/_jsx("td", {
+                className: "max-w-[420px] px-5 py-4 leading-6 text-slate-700",
+                children: row.content
+              }), approvalTab === '历史记录' ? /*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4",
+                children: /*#__PURE__*/_jsx("span", {
+                  className: `rounded-full px-3 py-1 text-xs font-black ${statusClass(row.status)}`,
+                  children: row.status
+                })
+              }) : /*#__PURE__*/_jsx("td", {
+                className: "whitespace-nowrap px-5 py-4",
+                children: /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-4",
+                  children: [/*#__PURE__*/_jsx("button", {
+                    type: "button",
+                    onClick: () => updateApproval(row, '已同意'),
+                    className: "font-black text-green-700",
+                    children: "同意"
+                  }), /*#__PURE__*/_jsx("button", {
+                    type: "button",
+                    onClick: () => setRejectRow(row),
+                    className: "font-black text-red-600",
+                    children: "不同意"
+                  })]
+                })
+              }), approvalTab === '历史记录' ? /*#__PURE__*/_jsx("td", {
+                className: "max-w-[260px] px-5 py-4 leading-6 text-slate-500",
+                children: row.status === '不同意' ? row.rejectReason || "申请理由不充分，暂不支持延期。" : "-"
+              }) : null]
+            }, row.id))
+          })]
+        })
+      }), /*#__PURE__*/_jsx(ListPagination, { total: visibleRows.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } })]
+    }), rejectRow && /*#__PURE__*/_jsx(DelayRejectReasonModal, {
+      row: rejectRow,
+      onClose: () => setRejectRow(null),
+      onSave: reason => {
+        updateApproval(rejectRow, '不同意', reason);
+        setRejectRow(null);
+      }
+    })]
+  });
+}
+function DelayRejectReasonModal({ row, onClose, onSave }) {
+  const [reason, setReason] = useState('');
+  const canSave = reason.trim();
+  return /*#__PURE__*/_jsx("div", {
+    className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
+    children: /*#__PURE__*/_jsxs("div", {
+      className: "w-full max-w-xl overflow-hidden rounded-3xl bg-white shadow-2xl",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "text-xl font-black text-ink",
+          children: "不同意延期申请"
+        }), /*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: onClose,
+          className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-line-divider hover:text-rizhao",
+          children: "关闭"
+        })]
+      }), /*#__PURE__*/_jsx("div", {
+        className: "px-6 py-5",
+        children: /*#__PURE__*/_jsx(TextArea, {
+          label: "* 不同意理由",
+          placeholder: "请输入不同意延期申请的原因，例如：延期理由不充分，当前材料可支持按原办理时限处理。",
+          value: reason,
+          setValue: setReason,
+          maxLength: 200
+        })
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-5",
+        children: [/*#__PURE__*/_jsx("button", {
+          onClick: onClose,
+          className: "rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-500",
+          children: "取消"
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: canSave ? () => onSave(reason.trim().slice(0, 200)) : undefined,
+          className: `rounded-xl px-6 py-3 text-sm font-black text-white shadow-mid ${canSave ? 'bg-rizhao' : 'cursor-not-allowed bg-slate-300'}`,
+          children: "确认不同意"
+        })]
+      })]
+    })
   });
 }
 function SmsAuditWorkspace({
@@ -4384,6 +4671,7 @@ function ProcessingDetail({
   reasonTag,
   smsAuditRows = [],
   onSubmitSmsAudit,
+  onSubmitDelayApproval,
   contactRecords,
   onContactRecordsChange
 }) {
@@ -4423,6 +4711,7 @@ function ProcessingDetail({
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showApproveConfirm, setShowApproveConfirm] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showDelayApply, setShowDelayApply] = useState(false);
   const [showOrgAssignModal, setShowOrgAssignModal] = useState(false);
   const [showOrgRecallModal, setShowOrgRecallModal] = useState(false);
   const [toast, setToast] = useState(null);
@@ -4740,6 +5029,10 @@ function ProcessingDetail({
       children: [/*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap gap-3",
         children: [/*#__PURE__*/_jsx("button", {
+          onClick: () => setShowDelayApply(true),
+          className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
+          children: "延期申请"
+        }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowSubmitConfirm(true),
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
           children: "提交审核"
@@ -4754,6 +5047,19 @@ function ProcessingDetail({
         onSubmitSmsAudit && onSubmitSmsAudit({ ...rec, returnTo: 'detail' });
         setShowSendSms(false);
         showToast('短信已提交审核');
+      }
+    }), showDelayApply && /*#__PURE__*/_jsx(DelayApplyModal, {
+      row: row,
+      onClose: () => setShowDelayApply(false),
+      onSave: payload => {
+        onSubmitDelayApproval && onSubmitDelayApproval({
+          workOrderNo: row.no,
+          workOrderStatus: row.status,
+          handler: row.handler || '当前处理人',
+          content: `申请延期时间：${payload.delayDate}。申请延期理由：${payload.reason}`
+        });
+        setShowDelayApply(false);
+        showToast('延期申请已提交审批');
       }
     }), showRecordingModal && /*#__PURE__*/_jsx(RecordingFileModal, {
       customerPhone: customerPhone,
@@ -4796,6 +5102,59 @@ function ProcessingDetail({
       className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
       children: toast
     })]
+  });
+}
+function DelayApplyModal({ row, onClose, onSave }) {
+  const [delayDate, setDelayDate] = useState('');
+  const [reason, setReason] = useState('');
+  const handleSave = () => {
+    const trimmed = reason.trim();
+    if (!delayDate || !trimmed) return;
+    onSave({ delayDate, reason: trimmed.slice(0, 200) });
+  };
+  return /*#__PURE__*/_jsx("div", {
+    className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
+    children: /*#__PURE__*/_jsxs("div", {
+      className: "w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl",
+      children: [/*#__PURE__*/_jsxs("div", {
+        className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
+        children: [/*#__PURE__*/_jsx("div", {
+          className: "text-xl font-black text-ink",
+          children: "延期申请"
+        }), /*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: onClose,
+          className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-line-divider hover:text-rizhao",
+          children: "关闭"
+        })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "space-y-4 px-6 py-5",
+        children: [/*#__PURE__*/_jsx(Field, {
+          label: "申请延期时间",
+          type: "date",
+          value: delayDate,
+          setValue: setDelayDate,
+          isReq: true
+        }), /*#__PURE__*/_jsx(TextArea, {
+          label: "* 申请延期理由",
+          placeholder: "",
+          value: reason,
+          setValue: setReason
+        })]
+      }), /*#__PURE__*/_jsxs("div", {
+        className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-5",
+        children: [/*#__PURE__*/_jsx("button", {
+          onClick: onClose,
+          className: "rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-500",
+          children: "取消"
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: handleSave,
+          disabled: !delayDate || !reason.trim(),
+          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid disabled:cursor-not-allowed disabled:opacity-40",
+          children: "提交申请"
+        })]
+      })]
+    })
   });
 }
 function RecordingFileModal({ customerPhone, onClose, onSave, resultLabel = "* 联系结果", resultOptions = CONTACT_RESULT_OPTIONS, contentLabel = "* 联系内容", contentPlaceholder = "请输入本次电话联系内容、客户反馈或未联系原因", saveText = "保存并生成联系记录" }) {
@@ -5563,7 +5922,7 @@ function EntryMethodList({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: `grid grid-cols-1 gap-4 ${listTab === '草稿箱' && draftTab === '批量录入' ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`,
-        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -6412,7 +6771,7 @@ function StandardComplaintForm({
           }), /*#__PURE__*/_jsx(Field, {
           label: "* 投诉反映渠道",
           type: "select",
-          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'],
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'],
           value: complaintChannel,
           setValue: setComplaintChannel
           }), /*#__PURE__*/_jsx(Field, {
@@ -7750,7 +8109,7 @@ function LedgerExportWorkspace() {
     no: `TS20260705${String(index + 1).padStart(4, '0')}`,
     superviseNo: `JG20260705${String(index + 1).padStart(4, '0')}`,
     title: ['贷款利息争议处理', '信用卡还款协商', '账户服务咨询投诉', '网点服务体验投诉', '征信异议处理'][index % 5],
-    channel: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它'][index % 6],
+    channel: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'][index % 7],
     customer: ['王先生', '李女士', '张女士', '陈女士', '刘先生'][index % 5],
     phone: ['138****0919', '156****2816', '139****7735', '187****6620', '135****0821'][index % 5],
     org: ['东港支行', '信用卡中心', '岚山支行', '五莲支行', '营业部'][index % 5],
@@ -7812,7 +8171,7 @@ function LedgerExportWorkspace() {
         }), /*#__PURE__*/_jsx(Field, {
           label: "投诉反映渠道",
           type: "select",
-          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '其它']
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它']
         }), /*#__PURE__*/_jsx(Field, {
           label: "工单状态",
           type: "select",
