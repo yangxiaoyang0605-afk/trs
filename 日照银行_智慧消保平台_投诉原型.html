@@ -3918,6 +3918,7 @@ function ProcessingWorkspace({
     }
   }, [pendingMessageWorkOrder]);
   const canOperateRow = row => row.owner || row.handler === currentOperator;
+  const getWorkOrderSource = row => row.source || (row.no.endsWith('2') || row.no.endsWith('6') ? '客服工单' : '自建工单');
   const submitDelayApply = (row, payload) => {
     onSubmitDelayApproval && onSubmitDelayApproval({
       workOrderNo: row.no,
@@ -4012,11 +4013,11 @@ function ProcessingWorkspace({
       }), /*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "rz-processing-table w-full min-w-[1080px] text-left text-sm whitespace-nowrap",
+          className: "rz-processing-table w-full min-w-[1180px] text-left text-sm whitespace-nowrap",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-slate-100 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-              children: ['行内工单编号', '标题', '投诉反映渠道', '投诉人姓名', '处理机构', '工单级别', '工单状态', '剩余处理时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+              children: ['行内工单编号', '工单来源', '标题', '投诉反映渠道', '投诉人姓名', '处理机构', '工单级别', '工单状态', '剩余处理时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                 className: "whitespace-nowrap px-5 py-4 font-black",
                 children: head
               }, head))
@@ -4030,6 +4031,9 @@ function ProcessingWorkspace({
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4",
+                children: getWorkOrderSource(row)
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
                 children: row.title
@@ -5914,10 +5918,15 @@ function EntryMethodList({
       { no: 'DR202607250106', title: '贷款资料补充说明', channel: '市监管局', customer: '孙女士', status: '待确认', checked: false, errors: null }
     ]
   }];
-  const [draftTab, setDraftTab] = useState('单笔录入');
-  const currentRows = (listTab === '已派发工单' ? dispatchedRows : draftTab === '单笔录入' ? draftRows : batchDraftRows).map(row => ({
+  const serviceDraftRows = draftRows.map(row => ({
     ...row,
-    channel: ({ '12378': '市监管局', '12378监管热线': '市监管局', '12345政务热线': '政务热线', '客服中心': '银行协会' })[row.channel] || row.channel
+    source: '客服工单'
+  }));
+  const [draftTab, setDraftTab] = useState('单笔录入');
+  const currentRows = (listTab === '已派发工单' ? dispatchedRows : draftTab === '单笔录入' ? draftRows : draftTab === '客服工单' ? serviceDraftRows : batchDraftRows).map(row => ({
+    ...row,
+    channel: ({ '12378': '市监管局', '12378监管热线': '市监管局', '12345政务热线': '政务热线', '客服中心': '银行协会' })[row.channel] || row.channel,
+    source: row.source || '自建工单'
   }));
   const openDetail = (row, shouldFocusFlow = false) => {
     setFocusFlow(shouldFocusFlow);
@@ -5958,21 +5967,21 @@ function EntryMethodList({
         children: ['已派发工单', '草稿箱'].map(tab => /*#__PURE__*/_jsx("button", {
           onClick: () => setListTab(tab),
           className: `px-5 py-3 text-sm font-bold transition border-b-2 ${listTab === tab ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-500 hover:text-ink'}`,
-          children: `${tab}（${(tab === '已派发工单' ? dispatchedRows.length : draftRows.length + batchDraftRows.length)}）`
+          children: `${tab}（${(tab === '已派发工单' ? dispatchedRows.length : draftRows.length + batchDraftRows.length + serviceDraftRows.length)}）`
         }, tab))
       }), listTab === '草稿箱' && /*#__PURE__*/_jsx("div", {
         className: "flex gap-0 border-b border-slate-100",
-        children: ['单笔录入', '批量录入'].map(sub => /*#__PURE__*/_jsx("button", {
+        children: ['单笔录入', '批量录入', '客服工单'].map(sub => /*#__PURE__*/_jsx("button", {
           onClick: () => setDraftTab(sub),
           className: `px-4 py-2 text-xs font-bold transition border-b-2 ${draftTab === sub ? 'border-rizhao text-rizhao' : 'border-transparent text-slate-400 hover:text-ink'}`,
-          children: `${sub}（${(sub === '单笔录入' ? draftRows : batchDraftRows).length}）`
+          children: `${sub}（${(sub === '单笔录入' ? draftRows : sub === '客服工单' ? serviceDraftRows : batchDraftRows).length}）`
         }, sub))
       })]
     }), /*#__PURE__*/_jsxs("section", {
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
-        className: `grid grid-cols-1 gap-4 ${listTab === '草稿箱' && draftTab === '批量录入' ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`,
-        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        className: `grid grid-cols-1 gap-4 ${listTab === '草稿箱' && draftTab === '批量录入' ? 'lg:grid-cols-4' : listTab === '草稿箱' && draftTab === '客服工单' ? 'lg:grid-cols-3' : 'lg:grid-cols-5'}`,
+        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : listTab === '草稿箱' && draftTab === '客服工单' ? [/*#__PURE__*/_jsx(Field, { label: "工单编号", placeholder: "请输入工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -5980,13 +5989,13 @@ function EntryMethodList({
     }), /*#__PURE__*/_jsxs("section", {
       className: "overflow-visible rounded-2xl border border-slate-200 bg-white",
       children: [/*#__PURE__*/_jsx("div", {
-        className: "overflow-x-auto",
+        className: "max-h-[560px] overflow-auto",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full min-w-[980px] text-left text-sm",
+          className: "w-full min-w-[1380px] text-left text-sm whitespace-nowrap",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-mist/60 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-                children: (listTab === '草稿箱' && draftTab === '批量录入' ? ['批次编号', '导入文件', '工单数量', '已派发/草稿箱', '状态', '录入时间', '操作'] : ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作']).map(head => /*#__PURE__*/_jsx("th", {
+                children: (listTab === '草稿箱' && draftTab === '批量录入' ? ['批次编号', '导入文件', '工单数量', '已派发/草稿箱', '状态', '录入时间', '操作'] : listTab === '已派发工单' ? ['行内工单编号', '工单来源', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作'] : ['行内工单编号', '标题', '投诉反映渠道', '投诉人', '处理机构', '工单级别', '状态', '录入时间', '操作']).map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-5 py-4 font-bold",
                 children: head
               }, head))
@@ -6029,6 +6038,9 @@ function EntryMethodList({
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
+              }), listTab === '已派发工单' && /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4",
+                children: row.source
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
                 children: row.title
