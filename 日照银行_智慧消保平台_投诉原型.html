@@ -3086,8 +3086,7 @@ function App() {
     handler: '张经理',
     applyTime: '2026-07-24 10:18',
     originalDeadline: '2026-07-24 18:00',
-    newDeadline: '2026-07-28 18:00',
-    delayWorkdays: '2个工作日',
+    newDeadline: '2026-08-14 18:00',
     content: '客户补充材料尚未提供完整，需延长时间完成核实和反馈。',
     status: '待审批'
   }, {
@@ -3097,8 +3096,7 @@ function App() {
     handler: '李经理',
     applyTime: '2026-07-23 16:42',
     originalDeadline: '2026-07-23 18:00',
-    newDeadline: '2026-07-24 18:00',
-    delayWorkdays: '1个工作日',
+    newDeadline: '2026-08-13 18:00',
     content: '涉及跨部门调阅交易流水，需延长时间完成核查。',
     status: '待审批'
   }, {
@@ -3109,8 +3107,7 @@ function App() {
     applyTime: '2026-07-22 09:35',
     auditTime: '2026-07-22 11:10',
     originalDeadline: '2026-07-22 18:00',
-    newDeadline: '2026-07-27 18:00',
-    delayWorkdays: '3个工作日',
+    newDeadline: '2026-08-12 18:00',
     content: '需等待客户确认补卡网点和领取时间。',
     status: '已同意'
   }, {
@@ -3121,8 +3118,7 @@ function App() {
     applyTime: '2026-07-21 14:08',
     auditTime: '2026-07-21 15:26',
     originalDeadline: '2026-07-21 18:00',
-    newDeadline: '2026-07-23 18:00',
-    delayWorkdays: '2个工作日',
+    newDeadline: '2026-08-11 18:00',
     content: '申请延期原因不充分，当前材料可支持按原时限处理。',
     status: '不同意',
     rejectReason: '延期理由不充分，当前材料可支持按原办理时限继续处理。'
@@ -3452,9 +3448,10 @@ const parseDeadlineDateTime = value => {
   if (!match) return new Date(2026, 6, 4, 18, 0);
   return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), Number(match[4] || 18), Number(match[5] || 0));
 };
-const addWorkdaysToDeadline = (deadline, workdays) => {
+const DELAY_WORKDAYS = 15;
+const addWorkdaysToDeadline = (deadline, workdays = DELAY_WORKDAYS) => {
   const date = parseDeadlineDateTime(deadline);
-  let remaining = Math.max(0, Number(workdays) || 0);
+  let remaining = Number(workdays || 0);
   while (remaining > 0) {
     date.setDate(date.getDate() + 1);
     const day = date.getDay();
@@ -3929,7 +3926,6 @@ function ProcessingWorkspace({
       handler: row.handler || currentOperator,
       originalDeadline: payload.originalDeadline,
       newDeadline: payload.newDeadline,
-      delayWorkdays: `${payload.workdays}个工作日`,
       content: payload.reason
     });
     setDelayApplyRow(null);
@@ -4165,7 +4161,7 @@ function DelayApprovalWorkspace({
     window.alert(status === '已同意' ? '已同意延期申请。' : '已不同意延期申请。');
   };
   const statusClass = status => status === '待审批' ? 'bg-orange-50 text-rizhao' : status === '已同意' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600';
-  const heads = approvalTab === '待审批' ? ['工单编号', '工单状态', '处理人', '申请时间', '原办理时限', '新办理时限', '延期工作日时长', '申请理由', '操作'] : ['工单编号', '工单状态', '处理人', '申请时间', '原办理时限', '新办理时限', '延期工作日时长', '审批时间', '申请理由', '审批结果', '不同意理由'];
+  const heads = approvalTab === '待审批' ? ['工单编号', '工单状态', '处理人', '申请时间', '原处理时限', '最新处理时限', '申请理由', '操作'] : ['工单编号', '工单状态', '处理人', '申请时间', '原处理时限', '最新处理时限', '审批时间', '申请理由', '审批结果', '不同意理由'];
   return /*#__PURE__*/_jsxs("div", {
     className: "flex min-h-full flex-col space-y-5",
     children: [/*#__PURE__*/_jsxs("div", {
@@ -4204,7 +4200,7 @@ function DelayApprovalWorkspace({
       }), /*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full min-w-[1380px] text-left text-sm",
+          className: "w-full min-w-[1240px] text-left text-sm",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-slate-50 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
@@ -4244,9 +4240,6 @@ function DelayApprovalWorkspace({
               }), /*#__PURE__*/_jsx("td", {
                 className: "whitespace-nowrap px-5 py-4 font-bold text-ink",
                 children: row.newDeadline || "-"
-              }), /*#__PURE__*/_jsx("td", {
-                className: "whitespace-nowrap px-5 py-4 text-slate-700",
-                children: row.delayWorkdays || "-"
               }), approvalTab === '历史记录' ? /*#__PURE__*/_jsx("td", {
                 className: "whitespace-nowrap px-5 py-4 text-slate-500",
                 children: row.auditTime || "-"
@@ -5103,7 +5096,6 @@ function ProcessingDetail({
           handler: row.handler || '当前处理人',
           originalDeadline: payload.originalDeadline,
           newDeadline: payload.newDeadline,
-          delayWorkdays: `${payload.workdays}个工作日`,
           content: payload.reason
         });
         setShowDelayApply(false);
@@ -5154,16 +5146,13 @@ function ProcessingDetail({
 }
 function DelayApplyModal({ row, onClose, onSave }) {
   const originalDeadline = getOriginalDeadline(row);
-  const [workdays, setWorkdays] = useState('');
   const [reason, setReason] = useState('');
-  const normalizedWorkdays = String(workdays).replace(/[^\d]/g, '');
-  const newDeadline = normalizedWorkdays ? addWorkdaysToDeadline(originalDeadline, Number(normalizedWorkdays)) : '';
+  const newDeadline = addWorkdaysToDeadline(originalDeadline);
   const handleSave = () => {
     const trimmed = reason.trim();
-    if (!normalizedWorkdays || Number(normalizedWorkdays) <= 0 || !trimmed) return;
+    if (!trimmed) return;
     onSave({
       originalDeadline,
-      workdays: normalizedWorkdays,
       newDeadline,
       reason: trimmed.slice(0, 200)
     });
@@ -5186,20 +5175,17 @@ function DelayApplyModal({ row, onClose, onSave }) {
       }), /*#__PURE__*/_jsxs("div", {
         className: "space-y-4 px-6 py-5",
         children: [/*#__PURE__*/_jsx(Field, {
-          label: "原办理时限",
+          label: "原处理时限",
           value: originalDeadline,
           disabled: true
         }), /*#__PURE__*/_jsx(Field, {
-          label: "申请延期工作日",
-          placeholder: "请输入工作日天数",
-          value: workdays,
-          setValue: value => setWorkdays(String(value).replace(/[^\d]/g, '')),
-          isReq: true
+          label: "延长时间",
+          value: `${DELAY_WORKDAYS}个工作日`,
+          disabled: true
         }), /*#__PURE__*/_jsx(Field, {
-          label: "新办理时限",
-          value: newDeadline || "-",
-          disabled: true,
-          isReq: true
+          label: "最新处理时限",
+          value: newDeadline,
+          disabled: true
         }), /*#__PURE__*/_jsx(TextArea, {
           label: "* 申请延期理由",
           placeholder: "",
@@ -5214,7 +5200,7 @@ function DelayApplyModal({ row, onClose, onSave }) {
           children: "取消"
         }), /*#__PURE__*/_jsx("button", {
           onClick: handleSave,
-          disabled: !normalizedWorkdays || Number(normalizedWorkdays) <= 0 || !reason.trim(),
+          disabled: !reason.trim(),
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid disabled:cursor-not-allowed disabled:opacity-40",
           children: "提交申请"
         })]
