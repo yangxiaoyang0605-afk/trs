@@ -2972,11 +2972,10 @@ function RzChannelEfficiencyPanel({ selectedChannel, onSelect }) {
   ];
   return /*#__PURE__*/_jsx(RzReasonPanel, { title: `处理效率｜${selectedChannel}办理质效`, note: "展示办结率、超期情况、临期预警和平均处理时长", info: [{ label: '办结率', text: '已办结工单量除以当前渠道投诉量。' }, { label: '超期口径', text: '尚未办结且已超过办理时限，或办结时间晚于应办结时间。' }, { label: '平均时长', text: '当前渠道已办结工单从受理到办结的平均耗时。' }], children: /*#__PURE__*/_jsxs("div", { children: [
     /*#__PURE__*/_jsx("section", { className: "mb-5 grid grid-cols-2 gap-4 xl:grid-cols-4", children: metrics.map(item => /*#__PURE__*/_jsx(RzAnalyticsMetricCard, { item: item }, item.label)) }),
-    /*#__PURE__*/_jsx("div", { className: "overflow-x-auto rounded-lg border border-slate-200", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[760px] text-left text-xs", children: [
-      /*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['渠道','渠道类型','投诉量','已办结','办结率','超期','24小时临期','平均处理时长'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }),
+    /*#__PURE__*/_jsx("div", { className: "overflow-x-auto rounded-lg border border-slate-200", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[680px] text-left text-xs", children: [
+      /*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['渠道','投诉量','已办结','办结率','超期','24小时临期','平均处理时长'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }),
       /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: channelPageRows.map(item => { const active = item.name === selectedChannel; return /*#__PURE__*/_jsxs("tr", { onClick: () => onSelect(item.name), className: `cursor-pointer ${active ? 'bg-orange-50' : 'hover:bg-slate-50'}`, children: [
         /*#__PURE__*/_jsx("td", { className: `px-4 py-3 font-black ${active ? 'text-rizhao' : 'text-slate-700'}`, children: item.name }),
-        /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: item.type }),
         /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-600", children: item.value }),
         /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-600", children: item.closed }),
         /*#__PURE__*/_jsxs("td", { className: "px-4 py-3 font-bold text-success", children: [(item.closed / item.value * 100).toFixed(1), "%"] }),
