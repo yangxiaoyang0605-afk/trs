@@ -4051,7 +4051,7 @@ function ProcessingWorkspace({
                 className: "px-5 py-4",
                 children: /*#__PURE__*/_jsx("span", {
                   className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
-                  children: row.status
+                  children: formatWorkOrderStatus(row.status)
                 })
               }), /*#__PURE__*/_jsx("td", {
                 className: `px-5 py-4 ${row.status !== '已办结' && row.status !== '已关单' && row.remain?.includes('已超期') ? 'text-red-500 font-bold' : row.status !== '已办结' && row.status !== '已关单' && row.remain?.includes('即将超期') ? 'text-orange-500 font-bold' : 'text-slate-500'}`,
@@ -4251,7 +4251,7 @@ function DelayApprovalWorkspace({
                 className: "whitespace-nowrap px-5 py-4",
                 children: /*#__PURE__*/_jsx("span", {
                   className: `rounded-full px-3 py-1 text-xs font-black ${statusClass(row.status)}`,
-                  children: row.status
+                  children: formatWorkOrderStatus(row.status)
                 })
               }) : /*#__PURE__*/_jsx("td", {
                 className: "whitespace-nowrap px-5 py-4",
@@ -4474,7 +4474,7 @@ function SmsAuditWorkspace({
                 className: "whitespace-nowrap px-5 py-4",
                 children: /*#__PURE__*/_jsx("span", {
                   className: `rounded-full px-3 py-1 text-xs font-black ${row.status === '待审核' ? 'bg-orange-50 text-rizhao' : row.status === '已同意' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`,
-                  children: row.status
+                  children: formatWorkOrderStatus(row.status)
                 })
               }), auditTab === '历史记录' ? /*#__PURE__*/_jsx("td", {
                 className: "max-w-[240px] px-5 py-4 leading-6 text-slate-600",
@@ -4797,6 +4797,7 @@ function ProcessingDetail({
     interceptReason: ''
   }] : [];
 
+  const workOrderTimeline = getWorkOrderTimeline(row);
   const detailFields = [{
     label: '行内工单编号',
     value: row.no
@@ -4817,14 +4818,14 @@ function ProcessingDetail({
     value: formatBusinessLines(row.businessLines)
   }, {
     label: '工单状态',
-    value: row.status
+    value: formatWorkOrderStatus(row.status)
   }, {
     label: '剩余处理时间',
     value: isClosedStage ? '已办结' : row.remain
   }, {
     label: '是否重办',
     value: '否'
-  }];
+  }].concat(getWorkOrderTimeFields(workOrderTimeline));
   const customerFields = [{
     label: '投诉人姓名',
     value: row.customer
@@ -5979,7 +5980,7 @@ function EntryMethodList({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: `grid grid-cols-1 gap-4 ${listTab === '草稿箱' && draftTab === '批量录入' ? 'lg:grid-cols-4' : listTab === '草稿箱' && draftTab === '客服工单' ? 'lg:grid-cols-3' : 'lg:grid-cols-5'}`,
-        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : listTab === '草稿箱' && draftTab === '客服工单' ? [/*#__PURE__*/_jsx(Field, { label: "工单编号", placeholder: "请输入工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已关单'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : listTab === '草稿箱' && draftTab === '客服工单' ? [/*#__PURE__*/_jsx(Field, { label: "工单编号", placeholder: "请输入工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已办结'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -6018,7 +6019,7 @@ function EntryMethodList({
                 className: "px-5 py-4",
                 children: /*#__PURE__*/_jsx("span", {
                   className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
-                  children: row.status
+        children: formatWorkOrderStatus(row.status)
                 })
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 text-slate-500",
@@ -6058,7 +6059,7 @@ function EntryMethodList({
                 className: "px-5 py-4",
                 children: /*#__PURE__*/_jsx("span", {
                   className: "rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
-                  children: row.status
+                  children: formatWorkOrderStatus(row.status)
                 })
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 text-slate-500",
@@ -6106,6 +6107,7 @@ function ReadOnlyComplaintDetail({
 }) {
   const isDraftOrder = row.status === '草稿';
   const [previewFile, setPreviewFile] = useState(null);
+  const workOrderTimeline = getWorkOrderTimeline(row);
   const detailFields = [{
     label: '行内工单编号',
     value: row.no
@@ -6126,14 +6128,14 @@ function ReadOnlyComplaintDetail({
     value: formatBusinessLines(row.businessLines)
   }, {
     label: '工单状态',
-    value: row.status
+    value: formatWorkOrderStatus(row.status)
   }, {
     label: '剩余处理时间',
-    value: row.status === '已办结' || row.status === '已关单' ? '已办结' : row.remain || '剩余 4 天'
+    value: isCompletedWorkOrder(row.status) ? '已办结' : row.remain || '剩余 4 天'
   }, {
     label: '是否重办',
     value: '否'
-  }];
+  }].concat(getWorkOrderTimeFields(workOrderTimeline));
   const customerFields = [{
     label: '投诉人姓名',
     value: row.customer
@@ -6182,7 +6184,7 @@ function ReadOnlyComplaintDetail({
     label: '处理人',
     value: '张经理'
   }];
-  const hasReturnVisit = row.status === '已办结' || row.status === '已关单';
+  const hasReturnVisit = isCompletedWorkOrder(row.status);
   const returnVisitRecords = [{
     recordNo: 2,
     time: '2026-07-04 09:20',
@@ -6210,7 +6212,7 @@ function ReadOnlyComplaintDetail({
           })]
         }), /*#__PURE__*/_jsx("span", {
           className: "rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700",
-          children: row.status
+          children: formatWorkOrderStatus(row.status)
         })]
       })]
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
@@ -6506,6 +6508,50 @@ const businessLineOptions = [
 ];
 const defaultBusinessLines = ['零售金融部', '网络金融部'];
 const formatBusinessLines = lines => (Array.isArray(lines) && lines.length ? lines : defaultBusinessLines).join('、');
+const formatWorkOrderTime = value => value || '-';
+const formatWorkOrderStatus = status => status === '已关单' ? '已办结' : status || '-';
+const isCompletedWorkOrder = status => status === '已办结' || status === '已关单';
+const getWorkOrderDateSeed = row => {
+  const directDate = String(row.time || row.entryTime || row.acceptedTime || '').match(/20\d{2}[-/]\d{2}[-/]\d{2}/);
+  if (directDate) return directDate[0].replace(/\//g, '-');
+  const noDate = String(row.no || row.workNo || '').match(/20\d{6}/);
+  if (noDate) return `${noDate[0].slice(0, 4)}-${noDate[0].slice(4, 6)}-${noDate[0].slice(6, 8)}`;
+  return '2026-07-02';
+};
+const addWorkOrderDays = (dateText, days) => {
+  const [year, month, day] = dateText.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day + days));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
+};
+const getWorkOrderTimeline = row => {
+  const date = getWorkOrderDateSeed(row);
+  const noSeed = Number(String(row.no || row.workNo || '').slice(-2)) || 0;
+  const entryMinute = String(18 + noSeed % 30).padStart(2, '0');
+  const acceptedMinute = String(8 + noSeed % 40).padStart(2, '0');
+  const completedMinute = String(10 + noSeed % 35).padStart(2, '0');
+  const returnVisitMinute = String(20 + noSeed % 30).padStart(2, '0');
+  const completed = row.completedTime || row.finishTime || row.closeTime || row.closedTime || (isCompletedWorkOrder(row.status) ? `${addWorkOrderDays(date, 2)} 16:${completedMinute}` : '');
+  const returnVisit = row.returnVisitTime || row.visitTime || row.returnTime || (row.visitStatus === '是' ? `${addWorkOrderDays(date, 3)} 09:${returnVisitMinute}` : '');
+  return {
+    entry: row.time || row.entryTime || row.createdTime || `${date} 09:${entryMinute}`,
+    accepted: row.acceptedTime || row.accepted || row.acceptTime || `${date} 10:${acceptedMinute}`,
+    completed,
+    returnVisit
+  };
+};
+const getWorkOrderTimeFields = timeline => [{
+  label: '录入时间',
+  value: formatWorkOrderTime(timeline.entry)
+}, {
+  label: '受理时间',
+  value: formatWorkOrderTime(timeline.accepted)
+}, {
+  label: '办结时间',
+  value: formatWorkOrderTime(timeline.completed)
+}, {
+  label: '回访时间',
+  value: formatWorkOrderTime(timeline.returnVisit)
+}];
 function StandardComplaintForm({
   content,
   setContent,
@@ -8177,6 +8223,9 @@ function LedgerExportWorkspace() {
     status: index % 2 === 1 ? '已关单' : ['待处理', '处理中', '待审核'][index % 3],
     visitStatus: index % 2 === 1 ? '是' : '否',
     time: `2026-07-${String(index + 1).padStart(2, '0')} 09:${String(18 + index).padStart(2, '0')}`,
+    acceptedTime: `2026-07-${String(index + 1).padStart(2, '0')} 10:${String(8 + index).padStart(2, '0')}`,
+    completedTime: index % 2 === 1 ? `2026-07-${String(index + 2).padStart(2, '0')} 16:${String(10 + index).padStart(2, '0')}` : '',
+    returnVisitTime: index % 2 === 1 ? `2026-07-${String(index + 3).padStart(2, '0')} 09:${String(20 + index).padStart(2, '0')}` : '',
     content: '客户反映相关业务办理问题，要求银行核实后反馈处理结果。'
   }));
   const [pageSize, setPageSize] = useState(10);
@@ -8235,7 +8284,7 @@ function LedgerExportWorkspace() {
         }), /*#__PURE__*/_jsx(Field, {
           label: "工单状态",
           type: "select",
-          options: ['待处理', '处理中', '待审核', '已关单']
+          options: ['待处理', '处理中', '待审核', '已办结']
         }), /*#__PURE__*/_jsx(Field, {
           label: "投诉人",
           placeholder: "请输入投诉人姓名"
@@ -8295,11 +8344,11 @@ function LedgerExportWorkspace() {
       }), /*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full min-w-[1380px] text-left text-sm",
+          className: "w-full min-w-[1680px] text-left text-sm",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-slate-100 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-              children: [/*#__PURE__*/_jsx("th", { className: "px-5 py-4", title: "全选本页台账", children: /*#__PURE__*/_jsx("input", { type: "checkbox", checked: allVisibleSelected, onChange: toggleVisibleSelected, "aria-label": "全选本页台账" }) }, "select"), /*#__PURE__*/_jsx("th", { className: "px-3 py-4 text-center text-xs font-black whitespace-nowrap", children: "导出附件" }, "attachment"), ['行内工单编号', '监管工单编号', '标题', '投诉反映渠道', '投诉人', '被投诉机构', '状态', '是否回访', '录入时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+              children: [/*#__PURE__*/_jsx("th", { className: "px-5 py-4", title: "全选本页台账", children: /*#__PURE__*/_jsx("input", { type: "checkbox", checked: allVisibleSelected, onChange: toggleVisibleSelected, "aria-label": "全选本页台账" }) }, "select"), /*#__PURE__*/_jsx("th", { className: "px-3 py-4 text-center text-xs font-black whitespace-nowrap", children: "导出附件" }, "attachment"), ['行内工单编号', '监管工单编号', '标题', '投诉反映渠道', '投诉人', '被投诉机构', '状态', '是否回访', '录入时间', '受理时间', '办结时间', '回访时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                 className: "px-5 py-4 font-black whitespace-nowrap",
                 children: head
               }, head))]
@@ -8330,7 +8379,7 @@ function LedgerExportWorkspace() {
                 className: "px-5 py-4 whitespace-nowrap",
                 children: /*#__PURE__*/_jsx("span", {
                   className: "inline-flex whitespace-nowrap rounded-full bg-mist px-3 py-1 text-xs font-bold text-rizhao",
-                  children: row.status
+                  children: formatWorkOrderStatus(row.status)
                 })
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 whitespace-nowrap",
@@ -8340,7 +8389,16 @@ function LedgerExportWorkspace() {
                 })
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 text-slate-500",
-                children: row.time
+                children: formatWorkOrderTime(row.time)
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 text-slate-500",
+                children: formatWorkOrderTime(row.acceptedTime)
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 text-slate-500",
+                children: formatWorkOrderTime(row.completedTime)
+              }), /*#__PURE__*/_jsx("td", {
+                className: "px-5 py-4 text-slate-500",
+                children: formatWorkOrderTime(row.returnVisitTime)
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 whitespace-nowrap",
                 children: /*#__PURE__*/_jsxs("div", {
@@ -8425,6 +8483,7 @@ function ReturnVisitPage({
     interceptReason: item.interceptReason || ''
   }));
   const displayCommRecords = commRecords.concat(auditedSmsRecords).map((record, index) => ({ ...record, recordNo: index + 1 }));
+  const workOrderTimeline = getWorkOrderTimeline(row);
   const visitOrderFields = [{
     label: '行内工单编号',
     value: row.no
@@ -8445,14 +8504,14 @@ function ReturnVisitPage({
     value: formatBusinessLines(row.businessLines)
   }, {
     label: '工单状态',
-    value: row.status
+    value: formatWorkOrderStatus(row.status)
   }, {
     label: '剩余处理时间',
-    value: row.status === '已办结' || row.status === '已关单' ? '已办结' : row.remain || '已办结'
+    value: isCompletedWorkOrder(row.status) ? '已办结' : row.remain || '已办结'
   }, {
     label: '是否重办',
     value: '否'
-  }];
+  }].concat(getWorkOrderTimeFields(workOrderTimeline));
   const customerFields = [{
     label: '投诉人姓名',
     value: row.customer
@@ -8693,6 +8752,7 @@ function LedgerEditPage({
   const [phone, setPhone] = useState(row.phone);
   const [appeal, setAppeal] = useState('协商处理');
   const [previewFile, setPreviewFile] = useState(null);
+  const workOrderTimeline = getWorkOrderTimeline(row);
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
     children: [/*#__PURE__*/_jsx(ReadOnlySection, {
@@ -8717,14 +8777,14 @@ function LedgerEditPage({
         value: formatBusinessLines(row.businessLines)
       }, {
         label: '工单状态',
-        value: row.status
+        value: formatWorkOrderStatus(row.status)
       }, {
         label: '剩余处理时间',
-        value: row.status === '已办结' || row.status === '已关单' ? '已办结' : row.remain || '剩余 4 天'
+        value: isCompletedWorkOrder(row.status) ? '已办结' : row.remain || '剩余 4 天'
       }, {
         label: '是否重办',
         value: '否'
-      }]
+      }].concat(getWorkOrderTimeFields(workOrderTimeline))
     }), /*#__PURE__*/_jsxs(StandardSection, {
       title: "投诉人信息",
       children: [/*#__PURE__*/_jsxs("div", {
