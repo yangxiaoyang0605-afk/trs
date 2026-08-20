@@ -4884,14 +4884,7 @@ function ProcessingDetail({
       fields: customerFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "投诉信息",
-      fields: complaintFields,
-      children: /*#__PURE__*/_jsx("div", {
-        className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
-        children: /*#__PURE__*/_jsx("div", {
-          className: "text-sm leading-7 text-slate-700",
-          children: row.content
-        })
-      })
+      fields: complaintFields
     }), showAssignInfo && /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: assignFields
@@ -6223,17 +6216,7 @@ function ReadOnlyComplaintDetail({
       fields: customerFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "投诉信息",
-      fields: complaintFields,
-      children: /*#__PURE__*/_jsxs("div", {
-        className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "field-label mb-2",
-          children: "投诉内容"
-        }), /*#__PURE__*/_jsx("div", {
-          className: "text-sm leading-7 text-slate-700",
-          children: "客户反映业务办理过程中存在沟通不充分、办理进度不清晰等问题，要求银行核实并反馈处理结果。"
-        })]
-      })
+      fields: complaintFields
     }), !isDraftOrder && /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: assignFields
@@ -8571,17 +8554,7 @@ function ReturnVisitPage({
       fields: customerFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "投诉信息",
-      fields: complaintFields,
-      children: /*#__PURE__*/_jsxs("div", {
-        className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "field-label mb-2",
-          children: "投诉内容"
-        }), /*#__PURE__*/_jsx("div", {
-          className: "text-sm leading-7 text-slate-700",
-          children: row.content || '客户反映业务办理过程中存在沟通不充分、办理进度不清晰等问题，要求银行核实并反馈处理结果。'
-        })]
-      })
+      fields: complaintFields
     }), showAssignInfo && /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "指派处理",
       fields: assignFields
@@ -8845,17 +8818,7 @@ function LedgerEditPage({
       }, {
         label: '投诉原因标签',
         value: '业务办理 / 还款与征信异议'
-      }],
-      children: /*#__PURE__*/_jsxs("div", {
-        className: "mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "field-label mb-2",
-          children: "投诉内容"
-        }), /*#__PURE__*/_jsx("div", {
-          className: "text-sm leading-7 text-slate-700",
-          children: row.content
-        })]
-      })
+      }]
     }), /*#__PURE__*/_jsx(StandardSection, {
       title: "录入附件",
       children: /*#__PURE__*/_jsx(AttachmentTable, {
