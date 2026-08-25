@@ -1142,7 +1142,7 @@ const menus = [{
 }, {
   name: '智能预警', active: false, desc: ''
 }];
-const channels = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它'];
+const channels = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'];
 const govChannels = ['政务热线'];
 const analyticsTabs = ['投诉总览', '机构分析', '产品分析', '原因分析', '渠道分析'];
 const analyticsTrend = [
@@ -1227,7 +1227,7 @@ function AnalyticsWorkspace() {
     { title: '超期风险', value: '5', desc: '重点关注', tone: 'red' }
   ];
   const renderPanel = () => {
-    if (tab === '投诉总览') return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [/*#__PURE__*/_jsx("div", { className: "grid grid-cols-4 gap-4", children: metrics.map(card => /*#__PURE__*/_jsx(AnalyticsMetricCard, { ...card }, card.title)) }), /*#__PURE__*/_jsx(AnalyticsFilterBar, {}), /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[1.25fr_0.75fr] gap-5", children: [/*#__PURE__*/_jsx(AnalyticsLineChart, { data: analyticsTrend }), /*#__PURE__*/_jsx(AnalyticsBarList, { title: "投诉反映渠道分布", data: channels.map((name, index) => ({ name, count: [28, 24, 20, 18, 15, 9, 7, 5][index] })) })] }), /*#__PURE__*/_jsx(AnalyticsSimpleTable, { title: "重点风险提示", columns: [{ key: 'risk', label: '风险点', strong: true }, { key: 'source', label: '主要来源' }, { key: 'count', label: '工单量' }, { key: 'suggest', label: '处置建议' }], rows: [{ risk: '利息计收争议', source: '个人贷款 / 省监管局', count: '29', suggest: '核查计息口径并统一答复模板' }, { risk: '办理时效', source: '网点服务 / 政务热线', count: '21', suggest: '关注剩余处理时间和回访结果' }, { risk: '信用卡还款协商', source: '信用卡中心 / 银行协会', count: '16', suggest: '加强分期和协商政策解释' }] })] });
+    if (tab === '投诉总览') return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [/*#__PURE__*/_jsx("div", { className: "grid grid-cols-4 gap-4", children: metrics.map(card => /*#__PURE__*/_jsx(AnalyticsMetricCard, { ...card }, card.title)) }), /*#__PURE__*/_jsx(AnalyticsFilterBar, {}), /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[1.25fr_0.75fr] gap-5", children: [/*#__PURE__*/_jsx(AnalyticsLineChart, { data: analyticsTrend }), /*#__PURE__*/_jsx(AnalyticsBarList, { title: "投诉反映渠道分布", data: channels.map((name, index) => ({ name, count: [28, 24, 20, 18, 15, 9, 7, 6, 5][index] })) })] }), /*#__PURE__*/_jsx(AnalyticsSimpleTable, { title: "重点风险提示", columns: [{ key: 'risk', label: '风险点', strong: true }, { key: 'source', label: '主要来源' }, { key: 'count', label: '工单量' }, { key: 'suggest', label: '处置建议' }], rows: [{ risk: '利息计收争议', source: '个人贷款 / 省监管局', count: '29', suggest: '核查计息口径并统一答复模板' }, { risk: '办理时效', source: '网点服务 / 政务热线', count: '21', suggest: '关注剩余处理时间和回访结果' }, { risk: '信用卡还款协商', source: '信用卡中心 / 银行协会', count: '16', suggest: '加强分期和协商政策解释' }] })] });
     if (tab === '机构分析') return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[0.9fr_1.1fr] gap-5", children: [/*#__PURE__*/_jsx(AnalyticsBarList, { title: "机构投诉排行", data: analyticsInstitutions }), /*#__PURE__*/_jsx(AnalyticsSimpleTable, { title: "机构办理质效", columns: [{ key: 'name', label: '机构', strong: true }, { key: 'count', label: '投诉量' }, { key: 'closed', label: '已办结' }, { key: 'overdue', label: '超期风险' }], rows: analyticsInstitutions })] });
     if (tab === '产品分析') return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[0.9fr_1.1fr] gap-5", children: [/*#__PURE__*/_jsx(AnalyticsBarList, { title: "产品投诉分布", data: analyticsProducts, extraKey: "rate" }), /*#__PURE__*/_jsx(AnalyticsSimpleTable, { title: "高频产品问题", columns: [{ key: 'product', label: '产品标签', strong: true }, { key: 'reason', label: '主要原因' }, { key: 'channel', label: '高频渠道' }, { key: 'trend', label: '趋势' }], rows: [{ product: '个人贷款', reason: '利息计收争议', channel: '省监管局', trend: '上升' }, { product: '信用卡', reason: '还款协商', channel: '银行协会', trend: '平稳' }, { product: '银行卡', reason: '账户服务', channel: '政务热线', trend: '下降' }] })] });
     if (tab === '原因分析') return /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-[0.9fr_1.1fr] gap-5", children: [/*#__PURE__*/_jsx(AnalyticsBarList, { title: "投诉原因排行", data: analyticsReasons }), /*#__PURE__*/_jsx(AnalyticsSimpleTable, { title: "原因归因明细", columns: [{ key: 'name', label: '投诉原因', strong: true }, { key: 'count', label: '工单量' }, { key: 'level', label: '关注等级' }, { key: 'action', label: '优化方向' }], rows: analyticsReasons.map(item => ({ ...item, action: item.name === '利息计收争议' ? '统一核算解释口径' : '优化服务流程与客户告知' })) })] });
@@ -2598,7 +2598,7 @@ const workOrderReportRows = [
   { institution: '开发区支行', customers: '6.8万', outlets: 8, previous: 48, total: 52, accepted: 58, valid: 52, invalid: 6, regulatory: 6, repeat: 4, pending: 3, processing: 5, supplement: 1, completed: 43, returned: 4, completionRate: '82.7%', avgDuration: '2.1天', timely: 37, overdue: 6, timelyRate: '86.0%', longest: '5.8天', topProduct: '借记卡 16件', productShare: '30.8%', topReason: '服务态度 13件', reasonShare: '25.0%', abnormal: 1, evaluated: 39, satisfied: 30, basic: 6, dissatisfied: 3, satisfactionRate: '92.3%', agreementRate: '88.5%', due24h: 3, avgAge: '2.0天' },
   { institution: '运营管理部', customers: '5.2万', outlets: 6, previous: 44, total: 46, accepted: 49, valid: 46, invalid: 3, regulatory: 4, repeat: 2, pending: 1, processing: 1, supplement: 0, completed: 44, returned: 2, completionRate: '95.7%', avgDuration: '1.2天', timely: 43, overdue: 1, timelyRate: '97.7%', longest: '3.1天', topProduct: '存款业务 15件', productShare: '32.6%', topReason: '规则告知 12件', reasonShare: '26.1%', abnormal: 0, evaluated: 42, satisfied: 37, basic: 4, dissatisfied: 1, satisfactionRate: '97.6%', agreementRate: '95.7%', due24h: 0, avgAge: '0.8天' }
 ];
-const reportChannelSources = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它'];
+const reportChannelSources = ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'];
 const reportFormulaTips = {
   '工单总量': '工单总量 = COUNT(DISTINCT 工单ID)，按查询机构和查询时间范围统计。',
   '投诉量': '投诉量 = COUNT(DISTINCT 工单ID WHERE 投诉有效性=有效)，按机构、时间和对应分类口径统计。',
@@ -2779,7 +2779,7 @@ const rzReportFilterMeta = {
   workOrderNo: { label: '行内工单编号', type: 'text' },
   entryTime: { label: '录入时间', type: 'dateRange' },
   type: { label: '工单类型', type: 'select', options: ['全部', '投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访'] },
-  channel: { label: '投诉反映渠道', type: 'select', options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] },
+  channel: { label: '投诉反映渠道', type: 'select', options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'] },
   status: { label: '工单状态', type: 'select', options: ['全部', '已派发', '待处理', '处理中', '待审核', '已办结'] },
   productTag: { label: '投诉产品标签', type: 'select', options: ['全部', '信用卡', '个人贷款', '借记卡', '支付结算', '理财产品', '手机银行', '存款业务', '消费贷款'] },
   reasonTag: { label: '投诉原因标签', type: 'select', options: ['全部', '提前还款争议', '年费告知争议', '到账时效争议', '风险揭示不足', '服务态度', '收费争议', '规则告知', '额度调整争议'] },
@@ -3989,7 +3989,7 @@ function ProcessingWorkspace({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 lg:grid-cols-4",
-        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人姓名", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
+        children: [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['全部', '国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "投诉人姓名", placeholder: "请输入" }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: ['全部', '待处理', '处理中', '待审核', '审核中', '已办结'] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-4 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -4983,7 +4983,8 @@ function ProcessingDetail({
             label: "* 处理结果",
             placeholder: "请输入核实情况、处理过程、客户沟通情况及最终处理意见",
             value: processResult,
-            setValue: setProcessResult
+            setValue: setProcessResult,
+            maxLength: 1000
           })
         })]
       }), /*#__PURE__*/_jsxs("div", {
@@ -5975,7 +5976,7 @@ function EntryMethodList({
       className: "rounded-2xl border border-slate-200 bg-white p-5",
       children: [/*#__PURE__*/_jsxs("div", {
         className: `grid grid-cols-1 gap-4 ${listTab === '草稿箱' && draftTab === '批量录入' ? 'lg:grid-cols-4' : listTab === '草稿箱' && draftTab === '客服工单' ? 'lg:grid-cols-3' : 'lg:grid-cols-5'}`,
-        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : listTab === '草稿箱' && draftTab === '客服工单' ? [/*#__PURE__*/_jsx(Field, { label: "工单编号", placeholder: "请输入工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已办结'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
+        children: listTab === '草稿箱' && draftTab === '批量录入' ? [/*#__PURE__*/_jsx(Field, { label: "批次编号", placeholder: "请输入批次编号" }), /*#__PURE__*/_jsx(Field, { label: "文件名", placeholder: "请输入导入文件名" }), /*#__PURE__*/_jsxs("div", { className: "lg:col-span-2", children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间范围" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : listTab === '草稿箱' && draftTab === '客服工单' ? [/*#__PURE__*/_jsx(Field, { label: "工单编号", placeholder: "请输入工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })] : [/*#__PURE__*/_jsx(Field, { label: "行内工单编号", placeholder: "请输入行内工单编号" }), /*#__PURE__*/_jsx(Field, { label: "监管工单编号", placeholder: "请输入监管工单编号" }), /*#__PURE__*/_jsx(Field, { label: "投诉反映渠道", type: "select", options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'] }), /*#__PURE__*/_jsx(Field, { label: "工单状态", type: "select", options: listTab === '已派发工单' ? ['待处理', '处理中', '待审核', '已办结'] : ['草稿'] }), /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "录入时间" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-1", children: [/*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "开始日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) }), /*#__PURE__*/_jsx("span", { className: "text-slate-300 shrink-0", children: "—" }), /*#__PURE__*/_jsx("div", { className: "field-box flex-1 px-2", children: /*#__PURE__*/_jsx("input", { type: "text", placeholder: "结束日期", className: "text-xs", onFocus: e => e.target.type = 'date', onBlur: e => { if (!e.target.value) e.target.type = 'text'; } }) })] })] })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700", children: "重置" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-ink px-5 py-2.5 text-sm font-bold text-white", children: "查询" })]
@@ -6593,6 +6594,20 @@ function StandardComplaintForm({
   const [businessLines, setBusinessLines] = useState(recognizedData?.businessLines || defaultBusinessLines);
   const isRegulatoryRequired = complaintChannel === '国家局' || complaintChannel === '省监管局';
   const isChannelDetailRequired = complaintChannel === '其它';
+  const customerServiceExtensionFields = [
+    ['来电人Email', 'wangxiansheng@example.com'],
+    ['来电人邮编', '276800'],
+    ['联系地址', '山东省日照市东港区海曲中路'],
+    ['业务类型', '投诉建议'],
+    ['工单子类型', '客户来电投诉'],
+    ['来电业务类型', '个人贷款咨询'],
+    ['处理方式', '转工单处理'],
+    ['是否需要回访', '是'],
+    ['来电人称谓', '先生'],
+    ['工单类型', '客服投诉工单'],
+    ['进件渠道', '客服热线'],
+    ['工单级别', '普通']
+  ];
   const [bizL1, setBizL1] = useState('');
   const [bizL2, setBizL2] = useState('');
   const [bizL3, setBizL3] = useState('');
@@ -6912,7 +6927,7 @@ function StandardComplaintForm({
           }), /*#__PURE__*/_jsx(Field, {
           label: "* 投诉反映渠道",
           type: "select",
-          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它'],
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'],
           value: complaintChannel,
           setValue: setComplaintChannel
           }), /*#__PURE__*/_jsx(Field, {
@@ -6962,17 +6977,19 @@ function StandardComplaintForm({
         title: "客户信息",
         children: /*#__PURE__*/_jsxs("div", {
           className: "space-y-4",
-          children: [/*#__PURE__*/_jsxs("div", {
-            className: "flex flex-wrap items-center justify-between gap-3",
-            children: [/*#__PURE__*/_jsx("div", {
-              className: "text-sm text-slate-500",
-              children: "可按姓名、电话、证件号辅助核查客户历史投诉"
-            }), /*#__PURE__*/_jsx("button", {
+          children: [/*#__PURE__*/_jsx("div", {
+            className: "flex flex-wrap items-center justify-end gap-3",
+            children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3", children: [/*#__PURE__*/_jsx("button", {
               type: "button",
               onClick: handleHistorySearch,
               className: "rounded-xl border border-line-divider bg-mist px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
               children: showHistory ? "收起历史投诉" : "查询历史投诉"
-            })]
+            }), /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: handleLoanSearch,
+              className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low hover:bg-orange-600",
+              children: "查询贷款"
+            })] })
           }), /*#__PURE__*/_jsxs("div", {
             className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
             children: [/*#__PURE__*/_jsx(Field, {
@@ -6987,7 +7004,7 @@ function StandardComplaintForm({
               value: gender,
               setValue: setGender
             }), /*#__PURE__*/_jsxs("div", {
-              children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "身份证号码" }), /*#__PURE__*/_jsxs("div", { className: "field-box gap-3", children: [/*#__PURE__*/_jsx("input", { placeholder: "选填，若提供则填写", value: idNo, onChange: e => setIdNo(e.target.value) }), /*#__PURE__*/_jsx("button", { type: "button", onClick: handleLoanSearch, className: "shrink-0 rounded-lg bg-rizhao px-3 py-1.5 text-xs font-black text-white", children: "查询贷款" })] })]
+              children: [/*#__PURE__*/_jsx("div", { className: "field-label mb-2", children: "身份证号码" }), /*#__PURE__*/_jsx("div", { className: "field-box", children: /*#__PURE__*/_jsx("input", { placeholder: "选填，若提供则填写", value: idNo, onChange: e => setIdNo(e.target.value) }) })]
             }), /*#__PURE__*/_jsx(SearchField, {
               label: "* 联系电话",
               placeholder: "请输入联系电话",
@@ -7030,6 +7047,12 @@ function StandardComplaintForm({
               })
             })]
           })]
+        })
+      }), complaintChannel === '客服热线' && /*#__PURE__*/_jsx(StandardSection, {
+        title: "客服扩展信息",
+        children: /*#__PURE__*/_jsx("div", {
+          className: "grid grid-cols-1 gap-4 xl:grid-cols-4",
+          children: customerServiceExtensionFields.map(([label, value]) => /*#__PURE__*/_jsxs("div", { className: "rounded-xl bg-mist px-4 py-3", children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: label }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm font-black text-ink", children: value || '-' })] }, label))
         })
       }), /*#__PURE__*/_jsx(StandardSection, {
         title: "投诉信息",
@@ -7530,7 +7553,7 @@ function LoanInfoModal({ loans, activeIndex, setActiveIndex, onClose }) {
       className: "flex max-h-[88vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
-        children: [/*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "text-xl font-black text-ink", children: "贷款信息查询结果" }), /*#__PURE__*/_jsxs("div", { className: "mt-1 text-sm font-bold text-slate-500", children: ["共查询到 ", loans.length, " 笔贷款，可切换查看明细"] })] }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onClose, className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-line-divider hover:text-rizhao", children: "关闭" })]
+        children: [/*#__PURE__*/_jsx("div", { className: "text-xl font-black text-ink", children: "贷款信息查询结果" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: onClose, className: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600 hover:border-line-divider hover:text-rizhao", children: "关闭" })]
       }), /*#__PURE__*/_jsx("div", {
         className: "border-b border-slate-100 px-6 py-3",
         children: /*#__PURE__*/_jsx("div", {
@@ -7539,15 +7562,15 @@ function LoanInfoModal({ loans, activeIndex, setActiveIndex, onClose }) {
             type: "button",
             onClick: () => setActiveIndex(index),
             className: `rounded-xl px-4 py-2 text-sm font-black transition ${activeIndex === index ? 'bg-rizhao text-white shadow-low' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`,
-            children: `贷款${index + 1} · ${loan.businessMinor}`
+            children: String(index + 1)
           }, loan.no))
         })
       }), /*#__PURE__*/_jsxs("div", {
         className: "min-h-0 flex-1 overflow-auto p-6",
-        children: [/*#__PURE__*/_jsx("div", {
+        children: /*#__PURE__*/_jsx("div", {
           className: "grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-4",
           children: fields.map(([label, value]) => /*#__PURE__*/_jsxs("div", { className: "rounded-xl bg-mist px-4 py-3", children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-bold text-slate-500", children: label }), /*#__PURE__*/_jsx("div", { className: "mt-1 text-sm font-black text-ink", children: value || '-' })] }, label))
-        }), /*#__PURE__*/_jsxs("div", { className: "mt-5 overflow-hidden rounded-2xl border border-slate-200", children: [/*#__PURE__*/_jsx("div", { className: "bg-slate-50 px-4 py-3 text-sm font-black text-slate-600", children: "贷款列表" }), /*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[1180px] text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-white text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['序号', '业务品种大类', '业务品种小类', '合同起始日期', '合同到期日期', '合同金额', '合同余额', '还款方式', '担保方式', '风险分类', '经办机构', '逾期天数', '欠息合计'].map(head => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap border-b border-slate-200 px-3 py-2 font-black", children: head }, head)) }) }), /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: loans.map((loan, index) => /*#__PURE__*/_jsxs("tr", { className: activeIndex === index ? "bg-orange-50/60" : "hover:bg-slate-50", children: [/*#__PURE__*/_jsx("td", { className: "px-3 py-2 font-black text-rizhao", children: loan.no }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.businessMajor }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.businessMinor }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.startDate }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.dueDate }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.contractAmount }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.contractBalance }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.repayMethod }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.guarantee }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2 font-bold text-amber-600", children: loan.riskClass }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.org }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.overdueDays }), /*#__PURE__*/_jsx("td", { className: "px-3 py-2", children: loan.totalArrears })] }, loan.no)) })] }) })] })]
+        })
       })]
     })
   });
@@ -8276,7 +8299,7 @@ function LedgerExportWorkspace() {
     no: `TS20260705${String(index + 1).padStart(4, '0')}`,
     superviseNo: `JG20260705${String(index + 1).padStart(4, '0')}`,
     title: ['贷款利息争议处理', '信用卡还款协商', '账户服务咨询投诉', '网点服务体验投诉', '征信异议处理'][index % 5],
-    channel: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它'][index % 8],
+    channel: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它'][index % 9],
     customer: ['王先生', '李女士', '张女士', '陈女士', '刘先生'][index % 5],
     phone: ['138****0919', '156****2816', '139****7735', '187****6620', '135****0821'][index % 5],
     org: ['东港支行', '信用卡中心', '岚山支行', '五莲支行', '营业部'][index % 5],
@@ -8341,7 +8364,7 @@ function LedgerExportWorkspace() {
         }), /*#__PURE__*/_jsx(Field, {
           label: "投诉反映渠道",
           type: "select",
-          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它']
+          options: ['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它']
         }), /*#__PURE__*/_jsx(Field, {
           label: "工单状态",
           type: "select",
@@ -9754,8 +9777,7 @@ function ParameterizedConfigManager() {
     { key: 'fieldMaintenance', no: 1, object: '字段维护', content: '录入页下拉字段统一维护', field: '字段名称 / 字段值', defaultValue: '录入页默认选项', range: '启用 / 停用', action: '新增 / 修改 / 禁用', rule: '除AI打标产品和原因标签外，工单录入页下拉选项统一在这里维护。' },
     { key: 'productTag', no: 2, object: '投诉产品标签', content: 'AI打标产品标签管理', field: '字段表', defaultValue: '第1级 / 第2级 / 第3级', range: '可维护多级产品标签', action: '新增 / 修改 / 删除', rule: '用于一键获取标签后的产品标签识别和人工修正。' },
     { key: 'reasonCascade', no: 3, object: '投诉原因标签', content: 'AI打标原因标签管理', field: '字段表', defaultValue: '第1级 / 第2级 / 第3级', range: '可维护多级原因标签', action: '新增 / 修改 / 删除', rule: '用于一键获取标签后的投诉原因识别和人工修正。' },
-    { key: 'notificationTemplate', no: 4, object: '短信模板', content: '短信模板内容维护', field: '模板名称 / 模板内容', defaultValue: '受理 / 回访', range: '启用 / 停用', action: '新增 / 修改 / 禁用', rule: '仅维护客户受理通知和回访提醒短信模板。' },
-    { key: 'holiday', no: 5, object: '节假日维护', content: '通过Excel导入节假日维护数据', field: '日期 / 是否为节假日', defaultValue: '按年度导入', range: '1 / 0', action: '导入Excel', rule: '工单办理时限按导入后的工作日历计算，节假日不计入工作日。' },
+    { key: 'holiday', no: 4, object: '节假日维护', content: '通过Excel导入节假日维护数据', field: '日期 / 是否为节假日', defaultValue: '按年度导入', range: '1 / 0', action: '导入Excel', rule: '工单办理时限按导入后的工作日历计算，节假日不计入工作日。' },
   ];
   const [activeKey, setActiveKey] = useState('fieldMaintenance');
   const [notificationTemplateRows, setNotificationTemplateRows] = useState([
@@ -9766,8 +9788,12 @@ function ParameterizedConfigManager() {
   const toFieldOptions = names => names.map(name => ({ name, status: '启用' }));
   const [fieldRows, setFieldRows] = useState([
     { key: 'orderType', name: '工单类型', module: '标准工单录入', desc: '工单基础信息中的工单类型下拉项', options: toFieldOptions(['投诉', '举报', '抱怨', '咨询', '建议', '求助', '信访']) },
-    { key: 'complaintChannel', name: '投诉反映渠道', module: '标准工单录入 / 监管转办', desc: '工单渠道来源下拉项', options: toFieldOptions(['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '其它']) },
-    { key: 'orderLevel', name: '工单级别', module: '标准工单录入', desc: '普通、重要、紧急等办理优先级', options: toFieldOptions(['普通', '重要', '紧急']) },
+    { key: 'complaintChannel', name: '投诉反映渠道', module: '标准工单录入 / 监管转办', desc: '工单渠道来源下拉项', options: toFieldOptions(['国家局', '省监管局', '市监管局', '政务热线', '银行协会', '人民银行', '宜当生活', '客服热线', '其它']) },
+    { key: 'orderLevel', name: '工单级别', module: '标准工单录入', desc: '普通、重要、紧急等办理优先级', options: [
+      { name: '普通', days: 3, status: '启用' },
+      { name: '重要', days: 3, status: '启用' },
+      { name: '紧急', days: 3, status: '启用' }
+    ] },
     { key: 'businessLines', name: '业务归属条线', module: '标准工单录入', desc: '可多选的归属部门条线', options: toFieldOptions(businessLineOptions) },
     { key: 'deadline', name: '自建单办理时限', module: '标准工单录入', desc: '按工单级别自动带出办理时限', options: toFieldOptions(['普通：3个工作日', '重要：3个工作日', '紧急：3个工作日']) },
     { key: 'isRedo', name: '是否重办', module: '标准工单录入', desc: '标记当前工单是否为重办工单', options: toFieldOptions(['否', '是']) },
@@ -9775,6 +9801,10 @@ function ParameterizedConfigManager() {
     { key: 'gender', name: '性别', module: '客户信息', desc: '投诉人性别下拉项', options: toFieldOptions(['男', '女']) },
     { key: 'complaintOrg', name: '被投诉机构', module: '投诉信息', desc: '工单录入时可选择的被投诉机构示例', options: toFieldOptions(['总行消保中心', '东港支行', '岚山支行', '五莲支行', '开发区支行', '青岛分行', '信用卡中心', '运营管理部']) },
     { key: 'complaintDemand', name: '投诉人诉求', module: '投诉信息', desc: '客户期望处理方式下拉项', options: toFieldOptions(['金钱赔偿', '赔礼道歉', '返还财产', '恢复原状', '其他']) },
+    { key: 'smsTemplateConfig', name: '短信模板配置', module: '字段维护', desc: '客户受理和回访短信模板', options: [
+      { name: '受理通知模板', content: '您好，您的工单${工单编号}已受理，办理时限为${办理时限}。', status: '启用' },
+      { name: '回访提醒模板', content: '您好，关于工单${工单编号}的处理结果需要与您确认。', status: '启用' }
+    ] },
     { key: 'businessCategory', name: '业务类别', module: '投诉信息', desc: '业务类别大中小类平铺维护，展示名称与父级标签', options: [
       { name: '贷款业务', parent: '-', status: '启用' },
       { name: '个人住房贷款', parent: '贷款业务', status: '启用' },
@@ -9884,7 +9914,9 @@ function ParameterizedConfigManager() {
       return;
     }
     const nextOption = { name: editDialog.name.trim(), status: editDialog.status || '启用' };
-    if (editDialog.parent !== undefined) nextOption.parent = editDialog.parent;
+    if (editDialog.parent !== undefined) nextOption.parent = editDialog.parent.trim() || '-';
+    if (editDialog.days !== undefined) nextOption.days = Math.min(30, Math.max(1, Number(editDialog.days) || 3));
+    if (editDialog.content !== undefined) nextOption.content = editDialog.content.trim();
     setFieldRows(rows => rows.map(row => {
       if (row.key !== editDialog.fieldKey) return row;
       const nextOptions = editDialog.index === -1
@@ -10031,11 +10063,20 @@ function ParameterizedConfigManager() {
       return true;
     });
     const showParentColumn = selectedOptions.some(item => item.parent !== undefined);
+    const showDeadlineColumn = selectedField.key === 'orderLevel';
+    const isSmsTemplateField = selectedField.key === 'smsTemplateConfig';
+    const openNewFieldOption = () => {
+      const draft = { type: 'fieldOption', fieldKey: selectedField.key, index: -1, name: '', status: '启用' };
+      if (showParentColumn || selectedField.key === 'businessCategory' || selectedField.key === 'reasonCategory') draft.parent = '-';
+      if (showDeadlineColumn) draft.days = 3;
+      if (isSmsTemplateField) draft.content = '';
+      setEditDialog(draft);
+    };
     return /*#__PURE__*/_jsxs("div", {
       className: "grid h-full min-h-0 grid-cols-[260px_minmax(0,1fr)] grid-rows-[auto_minmax(0,1fr)] gap-4",
       children: [/*#__PURE__*/_jsxs("div", {
-        className: "col-span-2 rounded-2xl border border-slate-200 bg-white p-4",
-        children: [/*#__PURE__*/_jsx("div", { className: "mb-3 text-sm font-black text-ink", children: "筛选条件" }), /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,420px)_auto]", children: [/*#__PURE__*/_jsx(Field, { label: "字段名称/字段值", value: fieldFilterName, setValue: setFieldFilterName, placeholder: "请输入名称或父级标签" }), /*#__PURE__*/_jsxs("div", { className: "flex items-end gap-2", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => {}, className: "h-[52px] rounded-xl bg-rizhao px-5 text-sm font-black text-white", children: "查询" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setFieldFilterName(''), className: "h-[52px] rounded-xl border border-slate-200 bg-white px-5 text-sm font-black text-slate-500", children: "重置" })] })] })]
+        className: "col-span-2 rounded-2xl border border-slate-200 bg-white p-3",
+        children: /*#__PURE__*/_jsxs("div", { className: "grid grid-cols-1 gap-2 md:grid-cols-[minmax(0,360px)_auto]", children: [/*#__PURE__*/_jsx(Field, { value: fieldFilterName, setValue: setFieldFilterName, placeholder: "请输入名称或父级标签" }), /*#__PURE__*/_jsxs("div", { className: "flex items-center gap-2", children: [/*#__PURE__*/_jsx("button", { type: "button", onClick: () => {}, className: "h-11 rounded-xl bg-rizhao px-5 text-sm font-black text-white", children: "查询" }), /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setFieldFilterName(''), className: "h-11 rounded-xl border border-slate-200 bg-white px-5 text-sm font-black text-slate-500", children: "重置" })] })] })
       }), /*#__PURE__*/_jsx("div", {
         className: "h-full min-h-0 overflow-auto rounded-2xl border border-slate-200 bg-slate-50 p-3",
         children: /*#__PURE__*/_jsx("div", {
@@ -10054,11 +10095,11 @@ function ParameterizedConfigManager() {
           children: [/*#__PURE__*/_jsx("div", {
             className: "text-lg font-black text-ink",
             children: selectedField.name
-          }), !showParentColumn && /*#__PURE__*/_jsx("button", {
+          }), /*#__PURE__*/_jsx("button", {
             type: "button",
-            onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: -1, name: '', status: '启用' }),
+            onClick: openNewFieldOption,
             className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
-            children: "新增字段值"
+            children: isSmsTemplateField ? "新增短信模板" : "新增字段值"
           })]
         }), /*#__PURE__*/_jsx("div", {
           className: "min-h-0 flex-1 overflow-auto rounded-2xl border border-slate-200",
@@ -10066,15 +10107,19 @@ function ParameterizedConfigManager() {
             className: "w-full text-left text-sm",
             children: [/*#__PURE__*/_jsx("thead", {
               className: "bg-slate-50 text-slate-500",
-              children: showParentColumn ? /*#__PURE__*/_jsxs("tr", {
+              children: isSmsTemplateField ? /*#__PURE__*/_jsxs("tr", {
+                children: [/*#__PURE__*/_jsx("th", { className: "w-44 px-4 py-3", children: "名称" }), /*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: "模板内容" }), /*#__PURE__*/_jsx("th", { className: "w-28 px-4 py-3", children: "状态" }), /*#__PURE__*/_jsx("th", { className: "w-36 px-4 py-3", children: "操作" })]
+              }) : showParentColumn ? /*#__PURE__*/_jsxs("tr", {
                 children: [/*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: "标签名称" }), /*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: "父级标签" }), /*#__PURE__*/_jsx("th", { className: "w-36 px-4 py-3", children: "操作" })]
+              }) : showDeadlineColumn ? /*#__PURE__*/_jsxs("tr", {
+                children: [/*#__PURE__*/_jsx("th", { className: "w-20 px-4 py-3", children: "序号" }), /*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: "字段值" }), /*#__PURE__*/_jsx("th", { className: "w-32 px-4 py-3", children: "办结时限" }), /*#__PURE__*/_jsx("th", { className: "w-28 px-4 py-3", children: "状态" }), /*#__PURE__*/_jsx("th", { className: "w-36 px-4 py-3", children: "操作" })]
               }) : /*#__PURE__*/_jsxs("tr", {
                 children: [/*#__PURE__*/_jsx("th", { className: "w-20 px-4 py-3", children: "序号" }), /*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: "字段值" }), /*#__PURE__*/_jsx("th", { className: "w-28 px-4 py-3", children: "状态" }), /*#__PURE__*/_jsx("th", { className: "w-36 px-4 py-3", children: "操作" })]
               })
             }), /*#__PURE__*/_jsx("tbody", {
               children: selectedOptions.map((item, index) => /*#__PURE__*/_jsxs("tr", {
                 className: "border-t border-slate-100",
-                children: showParentColumn ? [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: item.parent || '-' }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3 font-bold", children: [/*#__PURE__*/_jsx("button", { className: "text-rizhao", onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: selectedField.options.indexOf(item), ...item }), children: "编辑" }), /*#__PURE__*/_jsx("button", { className: item.status === '启用' ? "text-slate-500" : "text-green-600", onClick: () => toggleFieldOption(selectedField.key, selectedField.options.indexOf(item)), children: item.status === '启用' ? "禁用" : "启用" })] }) })] : [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-400", children: String(index + 1).padStart(2, '0') }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: renderStatus(item.status) }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3 font-bold", children: [/*#__PURE__*/_jsx("button", { className: "text-rizhao", onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: selectedField.options.indexOf(item), ...item }), children: "编辑" }), /*#__PURE__*/_jsx("button", { className: item.status === '启用' ? "text-slate-500" : "text-green-600", onClick: () => toggleFieldOption(selectedField.key, selectedField.options.indexOf(item)), children: item.status === '启用' ? "禁用" : "启用" })] }) })]
+                children: isSmsTemplateField ? [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: item.content || '-' }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: renderStatus(item.status) }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3 font-bold", children: [/*#__PURE__*/_jsx("button", { className: "text-rizhao", onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: selectedField.options.indexOf(item), ...item }), children: "编辑" }), /*#__PURE__*/_jsx("button", { className: item.status === '启用' ? "text-slate-500" : "text-green-600", onClick: () => toggleFieldOption(selectedField.key, selectedField.options.indexOf(item)), children: item.status === '启用' ? "禁用" : "启用" })] }) })] : showParentColumn ? [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: item.parent || '-' }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3 font-bold", children: [/*#__PURE__*/_jsx("button", { className: "text-rizhao", onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: selectedField.options.indexOf(item), ...item }), children: "编辑" }), /*#__PURE__*/_jsx("button", { className: item.status === '启用' ? "text-slate-500" : "text-green-600", onClick: () => toggleFieldOption(selectedField.key, selectedField.options.indexOf(item)), children: item.status === '启用' ? "禁用" : "启用" })] }) })] : showDeadlineColumn ? [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-400", children: String(index + 1).padStart(2, '0') }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-500", children: `${item.days || 3}个工作日` }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: renderStatus(item.status) }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3 font-bold", children: [/*#__PURE__*/_jsx("button", { className: "text-rizhao", onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: selectedField.options.indexOf(item), ...item }), children: "编辑" }), /*#__PURE__*/_jsx("button", { className: item.status === '启用' ? "text-slate-500" : "text-green-600", onClick: () => toggleFieldOption(selectedField.key, selectedField.options.indexOf(item)), children: item.status === '启用' ? "禁用" : "启用" })] }) })] : [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-400", children: String(index + 1).padStart(2, '0') }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-bold text-ink", children: item.name }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: renderStatus(item.status) }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3 font-bold", children: [/*#__PURE__*/_jsx("button", { className: "text-rizhao", onClick: () => setEditDialog({ type: 'fieldOption', fieldKey: selectedField.key, index: selectedField.options.indexOf(item), ...item }), children: "编辑" }), /*#__PURE__*/_jsx("button", { className: item.status === '启用' ? "text-slate-500" : "text-green-600", onClick: () => toggleFieldOption(selectedField.key, selectedField.options.indexOf(item)), children: item.status === '启用' ? "禁用" : "启用" })] }) })]
               }, `${selectedField.key}-${item.name}-${index}`))
             })]
           })
@@ -10231,7 +10276,7 @@ function ParameterizedConfigManager() {
         setShowHolidayImport(false);
         showToast('节假日Excel已导入');
       }
-    }), editDialog?.type === 'deadline' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[460px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: `编辑${editDialog.level}办理时限` }), /*#__PURE__*/_jsx("div", { className: "mt-5", children: /*#__PURE__*/_jsx(Field, { label: "办理时限（工作日）", value: editDialog.days, setValue: value => setEditDialog(data => ({ ...data, days: value })) }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveDeadline, children: "保存" })] })] }) }), editDialog?.type === 'notificationTemplateType' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[520px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: "新增短信模板" }), /*#__PURE__*/_jsx("div", { className: "mt-5", children: /*#__PURE__*/_jsx(Field, { label: "模板名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })), placeholder: "请输入模板名称" }) }), /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "模板说明", value: editDialog.desc, setValue: value => setEditDialog(data => ({ ...data, desc: value })), maxLength: 100 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveNotificationTemplateType, children: "保存" })] })] }) }), editDialog?.type === 'fieldOption' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[460px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: editDialog.index === -1 ? "新增字段值" : "编辑字段值" }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "字段值名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })), disabled: editDialog.index !== -1 }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['启用', '停用'], value: editDialog.status, setValue: value => setEditDialog(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveFieldOption, children: "保存" })] })] }) }), editDialog?.type === 'flat' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[560px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: editDialog.index === -1 ? "新增配置项" : "编辑配置项" }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })) }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['启用', '停用'], value: editDialog.status, setValue: value => setEditDialog(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: editDialog.key?.startsWith('sms') ? "模板内容" : "说明", value: editDialog.desc, setValue: value => setEditDialog(data => ({ ...data, desc: value })), maxLength: 200 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveFlatItem, children: "保存" })] })] }) }), editDialog?.type === 'cascade' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[520px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: `${editDialog.mode === 'add' ? '新增' : '编辑'}${['大类', '中类', '小类'][editDialog.level]}` }), (editDialog.cascadeType === 'productTag' || editDialog.cascadeType === 'reasonCascade' || editDialog.cascadeType === 'reasonCategory') && /*#__PURE__*/_jsx("div", { className: "mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-700", children: "此配置用于大模型打标。修改标签名称或层级关系会影响打标结果准确度，请确认业务口径并复核后再保存。" }), /*#__PURE__*/_jsx("div", { className: "mt-5", children: /*#__PURE__*/_jsx(Field, { label: "配置名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })), placeholder: `请输入${['大类', '中类', '小类'][editDialog.level]}名称` }) }), needsCascadeDescription(editDialog) && /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "描述", value: editDialog.desc || '', setValue: value => setEditDialog(data => ({ ...data, desc: value })), placeholder: getCascadeDescriptionExample(editDialog.cascadeType, editDialog.name), maxLength: 200 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveCascadeItem, children: "保存" })] })] }) }), editDialog?.type === 'holiday' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[600px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: editDialog.index === -1 ? "新增节假日" : "编辑节假日" }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "日期", type: "date", value: editDialog.date, setValue: value => setEditDialog(data => ({ ...data, date: value })) }), /*#__PURE__*/_jsx(Field, { label: "节假日名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })) }), /*#__PURE__*/_jsx(Field, { label: "日期类型", type: "select", options: ['法定节假日', '调休工作日'], value: editDialog.dayType, setValue: value => setEditDialog(data => ({ ...data, dayType: value })) }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['启用', '停用'], value: editDialog.status, setValue: value => setEditDialog(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveHoliday, children: "保存" })] })] }) })]
+    }), editDialog?.type === 'deadline' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[460px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: `编辑${editDialog.level}办理时限` }), /*#__PURE__*/_jsx("div", { className: "mt-5", children: /*#__PURE__*/_jsx(Field, { label: "办理时限（工作日）", value: editDialog.days, setValue: value => setEditDialog(data => ({ ...data, days: value })) }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveDeadline, children: "保存" })] })] }) }), editDialog?.type === 'notificationTemplateType' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[520px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: "新增短信模板" }), /*#__PURE__*/_jsx("div", { className: "mt-5", children: /*#__PURE__*/_jsx(Field, { label: "模板名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })), placeholder: "请输入模板名称" }) }), /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "模板说明", value: editDialog.desc, setValue: value => setEditDialog(data => ({ ...data, desc: value })), maxLength: 100 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveNotificationTemplateType, children: "保存" })] })] }) }), editDialog?.type === 'fieldOption' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[520px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: editDialog.content !== undefined ? editDialog.index === -1 ? "新增短信模板" : "编辑短信模板" : editDialog.index === -1 ? "新增字段值" : "编辑字段值" }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: editDialog.content !== undefined ? "模板名称" : "字段值名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })), disabled: editDialog.index !== -1 }), editDialog.parent !== undefined && /*#__PURE__*/_jsx(Field, { label: "父级标签", value: editDialog.parent, setValue: value => setEditDialog(data => ({ ...data, parent: value })), placeholder: "一级填写-" }), editDialog.days !== undefined && /*#__PURE__*/_jsx(Field, { label: "办结时限（工作日）", type: "number", value: editDialog.days, setValue: value => setEditDialog(data => ({ ...data, days: value })) }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['启用', '停用'], value: editDialog.status, setValue: value => setEditDialog(data => ({ ...data, status: value })) })] }), editDialog.content !== undefined && /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "模板内容", value: editDialog.content, setValue: value => setEditDialog(data => ({ ...data, content: value })), maxLength: 200 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveFieldOption, children: "保存" })] })] }) }), editDialog?.type === 'flat' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[560px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: editDialog.index === -1 ? "新增配置项" : "编辑配置项" }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })) }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['启用', '停用'], value: editDialog.status, setValue: value => setEditDialog(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: editDialog.key?.startsWith('sms') ? "模板内容" : "说明", value: editDialog.desc, setValue: value => setEditDialog(data => ({ ...data, desc: value })), maxLength: 200 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveFlatItem, children: "保存" })] })] }) }), editDialog?.type === 'cascade' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[520px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: `${editDialog.mode === 'add' ? '新增' : '编辑'}${['大类', '中类', '小类'][editDialog.level]}` }), (editDialog.cascadeType === 'productTag' || editDialog.cascadeType === 'reasonCascade' || editDialog.cascadeType === 'reasonCategory') && /*#__PURE__*/_jsx("div", { className: "mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-700", children: "此配置用于大模型打标。修改标签名称或层级关系会影响打标结果准确度，请确认业务口径并复核后再保存。" }), /*#__PURE__*/_jsx("div", { className: "mt-5", children: /*#__PURE__*/_jsx(Field, { label: "配置名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })), placeholder: `请输入${['大类', '中类', '小类'][editDialog.level]}名称` }) }), needsCascadeDescription(editDialog) && /*#__PURE__*/_jsx("div", { className: "mt-4", children: /*#__PURE__*/_jsx(TextArea, { label: "描述", value: editDialog.desc || '', setValue: value => setEditDialog(data => ({ ...data, desc: value })), placeholder: getCascadeDescriptionExample(editDialog.cascadeType, editDialog.name), maxLength: 200 }) }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveCascadeItem, children: "保存" })] })] }) }), editDialog?.type === 'holiday' && /*#__PURE__*/_jsx("div", { className: "fixed inset-0 z-40 flex items-center justify-center bg-black/35 p-6", children: /*#__PURE__*/_jsxs("div", { className: "w-[600px] rounded-2xl bg-white p-6 shadow-high", children: [/*#__PURE__*/_jsx("h3", { className: "text-lg font-black", children: editDialog.index === -1 ? "新增节假日" : "编辑节假日" }), /*#__PURE__*/_jsxs("div", { className: "mt-5 grid grid-cols-2 gap-4", children: [/*#__PURE__*/_jsx(Field, { label: "日期", type: "date", value: editDialog.date, setValue: value => setEditDialog(data => ({ ...data, date: value })) }), /*#__PURE__*/_jsx(Field, { label: "节假日名称", value: editDialog.name, setValue: value => setEditDialog(data => ({ ...data, name: value })) }), /*#__PURE__*/_jsx(Field, { label: "日期类型", type: "select", options: ['法定节假日', '调休工作日'], value: editDialog.dayType, setValue: value => setEditDialog(data => ({ ...data, dayType: value })) }), /*#__PURE__*/_jsx(Field, { label: "状态", type: "select", options: ['启用', '停用'], value: editDialog.status, setValue: value => setEditDialog(data => ({ ...data, status: value })) })] }), /*#__PURE__*/_jsxs("div", { className: "mt-6 flex justify-end gap-3", children: [/*#__PURE__*/_jsx("button", { className: "rounded-xl border border-slate-200 px-4 py-2 font-bold text-slate-500", onClick: () => setEditDialog(null), children: "取消" }), /*#__PURE__*/_jsx("button", { className: "rounded-xl bg-rizhao px-4 py-2 font-bold text-white", onClick: saveHoliday, children: "保存" })] })] }) })]
   });
 }
 
