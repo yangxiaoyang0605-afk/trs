@@ -3071,7 +3071,7 @@ function App() {
     handler: '张经理',
     applyTime: '2026-07-23 15:05',
     auditTime: '2026-07-23 15:12',
-    template: '其他',
+    template: '回访通知模板',
     content: '您的投诉已经处理完毕，请尽快确认，否则默认无异议。',
     status: '已拦截',
     interceptReason: '短信表述不够规范，存在引导客户默认确认的风险。'
@@ -5505,7 +5505,7 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
         }), /*#__PURE__*/_jsx(Field, {
           label: "短信模板",
           type: "select",
-          options: ['投诉处理联系模板', '回访通知模板', '其他'],
+          options: ['投诉处理联系模板', '回访通知模板'],
           value: smsTemplate,
           setValue: v => { setSmsTemplate(v); setSmsContent(v === '投诉处理联系模板' ? '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。' : v === '回访通知模板' ? '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。' : ''); }
         }), /*#__PURE__*/_jsx(TextArea, {
@@ -9916,8 +9916,8 @@ function ParameterizedConfigManager() {
   ];
   const [activeKey, setActiveKey] = useState('fieldMaintenance');
   const [notificationTemplateRows, setNotificationTemplateRows] = useState([
-    { key: 'smsAcceptTemplate', name: '受理通知模板', desc: '工单受理后发送给客户或经办人员的短信模板' },
-    { key: 'smsReturnVisitTemplate', name: '回访提醒模板', desc: '工单进入回访环节时发送给客户的短信模板' }
+    { key: 'smsAcceptTemplate', name: '投诉处理联系模板', desc: '投诉处理过程中联系客户使用的短信模板' },
+    { key: 'smsReturnVisitTemplate', name: '回访通知模板', desc: '投诉处理后回访客户使用的短信模板' }
   ]);
   const [selectedNotificationKey, setSelectedNotificationKey] = useState('smsAcceptTemplate');
   const toFieldOptions = names => names.map(name => ({ name, status: '启用' }));
@@ -9935,8 +9935,8 @@ function ParameterizedConfigManager() {
     { key: 'gender', name: '性别', module: '客户信息', desc: '投诉人性别下拉项', options: toFieldOptions(['男', '女']) },
     { key: 'complaintDemand', name: '投诉人诉求', module: '投诉信息', desc: '客户期望处理方式下拉项', options: toFieldOptions(['金钱赔偿', '赔礼道歉', '返还财产', '恢复原状', '其他']) },
     { key: 'smsTemplateConfig', name: '短信模板配置', module: '字段维护', desc: '客户受理和回访短信模板', options: [
-      { name: '受理通知模板', content: '您好，您的工单${工单编号}已受理，办理时限为${办理时限}。', status: '启用' },
-      { name: '回访提醒模板', content: '您好，关于工单${工单编号}的处理结果需要与您确认。', status: '启用' }
+      { name: '投诉处理联系模板', content: '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。', status: '启用' },
+      { name: '回访通知模板', content: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' }
     ] },
     { key: 'businessCategory', name: '业务类别', module: '投诉信息', desc: '业务类别大中小类平铺维护，展示名称与父级标签', options: [
       { name: '贷款业务', parent: '-', status: '启用' },
@@ -9979,10 +9979,10 @@ function ParameterizedConfigManager() {
       { code: 'R003', name: '办理进度', desc: '流程效率类原因', status: '启用' }
     ],
     smsAcceptTemplate: [
-      { code: 'SMS001', name: '受理通知模板', desc: '您好，您的工单${工单编号}已受理，办理时限为${办理时限}。', status: '启用' }
+      { code: 'SMS001', name: '投诉处理联系模板', desc: '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。', status: '启用' }
     ],
     smsReturnVisitTemplate: [
-      { code: 'SMS002', name: '回访提醒模板', desc: '您好，关于工单${工单编号}的处理结果需要与您确认。', status: '启用' }
+      { code: 'SMS002', name: '回访通知模板', desc: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' }
     ]
   });
   const [cascadeData, setCascadeData] = useState({
@@ -11927,8 +11927,8 @@ function OrgManager() {
 
 // ─── 短信模板维护 ─────────────────────────────────────────
 const smsTemplatesData = [
-  { id: 1, name: '受理通知模板', content: '您好，您的工单${工单编号}已受理，办理时限为${办理时限}。', status: '启用' },
-  { id: 2, name: '回访提醒模板', content: '您好，关于工单${工单编号}的处理结果需要与您确认。', status: '启用' }
+  { id: 1, name: '投诉处理联系模板', content: '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。', status: '启用' },
+  { id: 2, name: '回访通知模板', content: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' }
 ];
 
 function SMSTemplateManager() {
