@@ -3918,6 +3918,7 @@ function ProcessingWorkspace({
     }
   }, [pendingMessageWorkOrder]);
   const canOperateRow = row => row.owner || row.handler === currentOperator;
+  const canDispatcherRecallRow = row => role === 'org_admin' && (row.status === '待处理' || row.status === '处理中');
   const getWorkOrderSource = row => row.source || (row.no.endsWith('2') || row.no.endsWith('6') ? '客服工单' : '自建工单');
   const submitDelayApply = (row, payload) => {
     onSubmitDelayApproval && onSubmitDelayApproval({
@@ -4085,7 +4086,7 @@ function ProcessingWorkspace({
                     onClick: () => { setDetailMode('process'); setDetailRow(row); },
                     className: "font-bold text-rizhao",
                     children: "审核"
-                  }) : /*#__PURE__*/_jsx("span", {}), canOperate && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsx("button", {
+                  }) : /*#__PURE__*/_jsx("span", {}), canDispatcherRecallRow(row) ? /*#__PURE__*/_jsx("button", {
                     onClick: () => { setRecallMode('recall'); setRecallRow(row); },
                     className: "font-bold text-orange-500",
                     children: "收回"
@@ -4757,7 +4758,7 @@ function ProcessingDetail({
   const [showOrgRecallModal, setShowOrgRecallModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
-  const [showHistoryQuery, setShowHistoryQuery] = useState(false);
+  const [historyQueryRow, setHistoryQueryRow] = useState(null);
   const [showLoanQuery, setShowLoanQuery] = useState(false);
   const [activeLoanIndex, setActiveLoanIndex] = useState(0);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
@@ -4881,54 +4882,25 @@ function ProcessingDetail({
     label: '处理人',
     value: row.handler
   }];
+  const detailQueryActions = /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [/*#__PURE__*/_jsx("button", {
+    type: "button",
+    onClick: () => setHistoryQueryRow(detailHistoryRows[0]),
+    className: "rounded-xl border border-rizhao bg-white px-4 py-2 text-sm font-black text-rizhao",
+    children: "查询历史投诉"
+  }), /*#__PURE__*/_jsx("button", {
+    type: "button",
+    onClick: () => { setActiveLoanIndex(0); setShowLoanQuery(true); },
+    className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
+    children: "查询贷款信息"
+  })] });
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
-    children: [/*#__PURE__*/_jsxs("div", {
-      className: "rounded-2xl border border-slate-200 bg-white px-6 py-5",
-      children: [/*#__PURE__*/_jsxs("div", {
-        className: "flex flex-wrap items-center justify-between gap-3",
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "text-xl font-black text-ink",
-          children: "工单详情"
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "flex flex-wrap items-center gap-3",
-          children: [/*#__PURE__*/_jsx("button", {
-            type: "button",
-            onClick: () => setShowHistoryQuery(value => !value),
-            className: "rounded-xl border border-rizhao bg-white px-4 py-2 text-sm font-black text-rizhao",
-            children: showHistoryQuery ? "收起历史投诉" : "查询历史投诉"
-          }), /*#__PURE__*/_jsx("button", {
-            type: "button",
-            onClick: () => { setActiveLoanIndex(0); setShowLoanQuery(true); },
-            className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
-            children: "查询贷款信息"
-          }), /*#__PURE__*/_jsx("span", {
-            className: "rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700",
-            children: formatWorkOrderStatus(row.status)
-          })]
-        })]
-      }), showHistoryQuery && /*#__PURE__*/_jsx("div", {
-        className: "mt-4 overflow-auto rounded-xl border border-slate-200",
-        children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full text-left text-sm",
-          children: [/*#__PURE__*/_jsx("thead", {
-            className: "bg-mist text-slate-600",
-            children: /*#__PURE__*/_jsx("tr", {
-              children: ['行内工单编号', '标题', '录入时间', '渠道来源', '投诉人', '处理机构', '业务类别', '工单级别', '状态'].map(head => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: head }, head))
-            })
-          }), /*#__PURE__*/_jsx("tbody", {
-            children: detailHistoryRows.map(item => /*#__PURE__*/_jsxs("tr", {
-              className: "border-t border-slate-100",
-              children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-rizhao", children: item.workNo }), /*#__PURE__*/_jsx("td", { className: "min-w-[240px] px-4 py-3", children: item.title }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.time }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.channel }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.caller }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.org }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.business }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.ticketLevel }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-bold text-rizhao", children: item.currentStatus })]
-            }, item.workNo))
-          })]
-        })
-      })]
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+    children: [/*#__PURE__*/_jsx(ReadOnlySection, {
       title: "工单信息",
       fields: detailFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "客户信息",
+      actions: detailQueryActions,
       fields: customerFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "投诉信息",
@@ -5182,7 +5154,7 @@ function ProcessingDetail({
       confirmText: "确认提交",
       onClose: () => setShowSubmitConfirm(false),
       onConfirm: () => { showToast('已提交审核'); setShowSubmitConfirm(false); }
-    }), showLoanQuery && /*#__PURE__*/_jsx(LoanInfoModal, { loans: detailLoanRows, activeIndex: activeLoanIndex, setActiveIndex: setActiveLoanIndex, onClose: () => setShowLoanQuery(false) }), previewFile && /*#__PURE__*/_jsx(AttachmentPreviewModal, { file: previewFile, onClose: () => setPreviewFile(null) }), toast && /*#__PURE__*/_jsx("div", {
+    }), historyQueryRow && /*#__PURE__*/_jsx(HistoryComplaintModal, { row: historyQueryRow, onClose: () => setHistoryQueryRow(null) }), showLoanQuery && /*#__PURE__*/_jsx(LoanInfoModal, { loans: detailLoanRows, activeIndex: activeLoanIndex, setActiveIndex: setActiveLoanIndex, onClose: () => setShowLoanQuery(false) }), previewFile && /*#__PURE__*/_jsx(AttachmentPreviewModal, { file: previewFile, onClose: () => setPreviewFile(null) }), toast && /*#__PURE__*/_jsx("div", {
       className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
       children: toast
     })]
@@ -6157,7 +6129,7 @@ function ReadOnlyComplaintDetail({
 }) {
   const isDraftOrder = row.status === '草稿';
   const [previewFile, setPreviewFile] = useState(null);
-  const [showHistoryQuery, setShowHistoryQuery] = useState(false);
+  const [historyQueryRow, setHistoryQueryRow] = useState(null);
   const [showLoanQuery, setShowLoanQuery] = useState(false);
   const [activeLoanIndex, setActiveLoanIndex] = useState(0);
   const workOrderTimeline = getWorkOrderTimeline(row);
@@ -6239,6 +6211,17 @@ function ReadOnlyComplaintDetail({
     label: '处理人',
     value: '张经理'
   }];
+  const detailQueryActions = /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [/*#__PURE__*/_jsx("button", {
+    type: "button",
+    onClick: () => setHistoryQueryRow(detailHistoryRows[0]),
+    className: "rounded-xl border border-rizhao bg-white px-4 py-2 text-sm font-black text-rizhao",
+    children: "查询历史投诉"
+  }), /*#__PURE__*/_jsx("button", {
+    type: "button",
+    onClick: () => { setActiveLoanIndex(0); setShowLoanQuery(true); },
+    className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
+    children: "查询贷款信息"
+  })] });
   const hasReturnVisit = isCompletedWorkOrder(row.status);
   const returnVisitRecords = [{
     recordNo: 2,
@@ -6253,54 +6236,12 @@ function ReadOnlyComplaintDetail({
   }];
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
-    children: [/*#__PURE__*/_jsxs("div", {
-      className: "rounded-2xl border border-slate-200 bg-white px-6 py-5",
-      children: [/*#__PURE__*/_jsxs("div", {
-        className: "flex flex-wrap items-center justify-between gap-3",
-        children: [/*#__PURE__*/_jsxs("div", {
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "text-xl font-black text-ink",
-            children: "工单详情"
-          })]
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "flex flex-wrap items-center gap-3",
-          children: [/*#__PURE__*/_jsx("button", {
-            type: "button",
-            onClick: () => setShowHistoryQuery(value => !value),
-            className: "rounded-xl border border-rizhao bg-white px-4 py-2 text-sm font-black text-rizhao",
-            children: showHistoryQuery ? "收起历史投诉" : "查询历史投诉"
-          }), /*#__PURE__*/_jsx("button", {
-            type: "button",
-            onClick: () => { setActiveLoanIndex(0); setShowLoanQuery(true); },
-            className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
-            children: "查询贷款信息"
-          }), /*#__PURE__*/_jsx("span", {
-            className: "rounded-full bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700",
-            children: formatWorkOrderStatus(row.status)
-          })]
-        })]
-      }), showHistoryQuery && /*#__PURE__*/_jsx("div", {
-        className: "mt-4 overflow-auto rounded-xl border border-slate-200",
-        children: /*#__PURE__*/_jsxs("table", {
-          className: "w-full text-left text-sm",
-          children: [/*#__PURE__*/_jsx("thead", {
-            className: "bg-mist text-slate-600",
-            children: /*#__PURE__*/_jsx("tr", {
-              children: ['行内工单编号', '标题', '录入时间', '渠道来源', '投诉人', '处理机构', '业务类别', '工单级别', '状态'].map(head => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: head }, head))
-            })
-          }), /*#__PURE__*/_jsx("tbody", {
-            children: detailHistoryRows.map(item => /*#__PURE__*/_jsxs("tr", {
-              className: "border-t border-slate-100",
-              children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-black text-rizhao", children: item.workNo }), /*#__PURE__*/_jsx("td", { className: "min-w-[240px] px-4 py-3", children: item.title }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.time }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.channel }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.caller }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.org }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.business }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3", children: item.ticketLevel }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-4 py-3 font-bold text-rizhao", children: item.currentStatus })]
-            }, item.workNo))
-          })]
-        })
-      })]
-    }), /*#__PURE__*/_jsx(ReadOnlySection, {
+    children: [/*#__PURE__*/_jsx(ReadOnlySection, {
       title: "工单信息",
       fields: detailFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "客户信息",
+      actions: detailQueryActions,
       fields: customerFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "投诉信息",
@@ -6372,6 +6313,9 @@ function ReadOnlyComplaintDetail({
     }), !isDraftOrder && /*#__PURE__*/_jsx(FlowRecordSection, {
       highlight: focusFlow,
       records: buildExampleFlowRecords(row)
+    }), historyQueryRow && /*#__PURE__*/_jsx(HistoryComplaintModal, {
+      row: historyQueryRow,
+      onClose: () => setHistoryQueryRow(null)
     }), showLoanQuery && /*#__PURE__*/_jsx(LoanInfoModal, {
       loans: detailLoanRows,
       activeIndex: activeLoanIndex,
@@ -6543,18 +6487,19 @@ function FlowRecordSection({
 function ReadOnlySection({
   title,
   fields,
+  actions,
   children
 }) {
   return /*#__PURE__*/_jsxs("section", {
     className: "rounded-2xl border border-slate-200 bg-white p-6",
     children: [/*#__PURE__*/_jsxs("div", {
-      className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
+      className: "mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3",
       children: [/*#__PURE__*/_jsx("span", {
         className: "h-7 w-1.5 rounded-full bg-rizhao"
       }), /*#__PURE__*/_jsx("h3", {
-        className: "text-base font-black text-ink",
+        className: "mr-auto text-base font-black text-ink",
         children: title
-      })]
+      }), actions]
     }), /*#__PURE__*/_jsx("div", {
       className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
       children: fields.map(field => /*#__PURE__*/_jsxs("div", {
@@ -7122,22 +7067,20 @@ function StandardComplaintForm({
         })
       }), /*#__PURE__*/_jsx(StandardSection, {
         title: "客户信息",
+        actions: /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [/*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: handleHistorySearch,
+          className: "rounded-xl border border-rizhao bg-white px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
+          children: showHistory ? "收起历史投诉" : "查询历史投诉"
+        }), /*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: handleLoanSearch,
+          className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low hover:bg-orange-600",
+          children: "查询贷款信息"
+        })] }),
         children: /*#__PURE__*/_jsxs("div", {
           className: "space-y-4",
-          children: [/*#__PURE__*/_jsx("div", {
-            className: "flex flex-wrap items-center justify-end gap-3",
-            children: /*#__PURE__*/_jsxs("div", { className: "flex gap-3", children: [/*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: handleHistorySearch,
-              className: "rounded-xl border border-line-divider bg-mist px-4 py-2 text-sm font-black text-rizhao hover:bg-rizhao hover:text-white",
-              children: showHistory ? "收起历史投诉" : "查询历史投诉"
-            }), /*#__PURE__*/_jsx("button", {
-              type: "button",
-              onClick: handleLoanSearch,
-              className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low hover:bg-orange-600",
-              children: "查询贷款"
-            })] })
-          }), /*#__PURE__*/_jsxs("div", {
+          children: [/*#__PURE__*/_jsxs("div", {
             className: "grid grid-cols-1 gap-4 xl:grid-cols-3",
             children: [/*#__PURE__*/_jsx(Field, {
               label: "* 投诉人姓名",
@@ -7710,7 +7653,7 @@ function LoanInfoModal({ loans, activeIndex, setActiveIndex, onClose }) {
             onClick: () => setActiveIndex(index),
             className: `rounded-xl px-4 py-2 text-sm font-black transition ${activeIndex === index ? 'bg-rizhao text-white shadow-low' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`,
             children: String(index + 1)
-          }, loan.no))
+          }, index))
         })
       }), /*#__PURE__*/_jsxs("div", {
         className: "min-h-0 flex-1 overflow-auto p-6",
@@ -7724,18 +7667,19 @@ function LoanInfoModal({ loans, activeIndex, setActiveIndex, onClose }) {
 }
 function StandardSection({
   title,
+  actions,
   children
 }) {
   return /*#__PURE__*/_jsxs("section", {
     className: "rounded-2xl border border-slate-200 bg-white p-6",
     children: [/*#__PURE__*/_jsxs("div", {
-      className: "mb-4 flex items-center gap-3 border-b border-slate-200 pb-3",
+      className: "mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3",
       children: [/*#__PURE__*/_jsx("span", {
         className: "h-7 w-1.5 rounded-full bg-rizhao"
       }), /*#__PURE__*/_jsx("h3", {
-        className: "text-base font-black text-ink",
+        className: "mr-auto text-base font-black text-ink",
         children: title
-      })]
+      }), actions]
     }), children]
   });
 }
@@ -8693,8 +8637,13 @@ function ReturnVisitPage({
   const [visitResult, setVisitResult] = useState('');
   const [toast, setToast] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
+  const [historyQueryRow, setHistoryQueryRow] = useState(null);
+  const [showLoanQuery, setShowLoanQuery] = useState(false);
+  const [activeLoanIndex, setActiveLoanIndex] = useState(0);
   const [returnVisitAttachments, setReturnVisitAttachments] = useState([]);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
+  const detailHistoryRows = buildHistoryComplaintRows(row.customer);
+  const detailLoanRows = buildLoanRecords('371102********2816');
   const currentUser = {
     name: '张经理',
     workNo: 'RZB-2026-018',
@@ -8806,6 +8755,17 @@ function ReturnVisitPage({
     label: '处理人',
     value: row.handler || currentUser.name
   }];
+  const detailQueryActions = /*#__PURE__*/_jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [/*#__PURE__*/_jsx("button", {
+    type: "button",
+    onClick: () => setHistoryQueryRow(detailHistoryRows[0]),
+    className: "rounded-xl border border-rizhao bg-white px-4 py-2 text-sm font-black text-rizhao",
+    children: "查询历史投诉"
+  }), /*#__PURE__*/_jsx("button", {
+    type: "button",
+    onClick: () => { setActiveLoanIndex(0); setShowLoanQuery(true); },
+    className: "rounded-xl bg-rizhao px-4 py-2 text-sm font-black text-white shadow-low",
+    children: "查询贷款信息"
+  })] });
   const showAssignInfo = true;
   return /*#__PURE__*/_jsxs("div", {
     className: "space-y-5",
@@ -8814,6 +8774,7 @@ function ReturnVisitPage({
       fields: visitOrderFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "客户信息",
+      actions: detailQueryActions,
       fields: customerFields
     }), /*#__PURE__*/_jsx(ReadOnlySection, {
       title: "投诉信息",
@@ -8937,6 +8898,14 @@ function ReturnVisitPage({
       })]
     }), /*#__PURE__*/_jsx(FlowRecordSection, {
       records: buildExampleFlowRecords(row, { returnVisitAttachments })
+    }), historyQueryRow && /*#__PURE__*/_jsx(HistoryComplaintModal, {
+      row: historyQueryRow,
+      onClose: () => setHistoryQueryRow(null)
+    }), showLoanQuery && /*#__PURE__*/_jsx(LoanInfoModal, {
+      loans: detailLoanRows,
+      activeIndex: activeLoanIndex,
+      setActiveIndex: setActiveLoanIndex,
+      onClose: () => setShowLoanQuery(false)
     }), previewFile && /*#__PURE__*/_jsx(AttachmentPreviewModal, {
       file: previewFile,
       onClose: () => setPreviewFile(null)
