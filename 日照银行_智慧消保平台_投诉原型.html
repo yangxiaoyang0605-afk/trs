@@ -5876,7 +5876,7 @@ function EntryMethodList({
   setEntryTab,
   onOpenBatchDraft
 }) {
-  const allRows = [{
+  const [allRows, setAllRows] = useState([{
     no: 'TS202607020001', title: '贷款利息争议处理', channel: '省监管局', customer: '王先生', org: '东港支行', level: '普通', status: '草稿', time: '2026-07-02 09:24'
   }, {
     no: 'TS202607020002', title: '信用卡还款协商', channel: '市监管局', customer: '李女士', org: '信用卡中心', level: '重要', status: '待处理', time: '2026-07-02 10:18'
@@ -5896,14 +5896,14 @@ function EntryMethodList({
     no: 'TS202607020009', title: '贷款资料补充说明', channel: '国家局', customer: '孙女士', org: '山海天支行', level: '普通', status: '草稿', time: '2026-07-02 16:03'
   }, {
     no: 'TS202607020010', title: '柜面业务办理时效', channel: '银行协会', customer: '马先生', org: '开发区支行', level: '普通', status: '处理中', time: '2026-07-02 16:48'
-  }];
+  }]);
   const [viewRow, setViewRow] = useState(null);
   const [focusFlow, setFocusFlow] = useState(false);
   const [dispatchRow, setDispatchRow] = useState(null);
   const [listTab, setListTab] = useState('已派发工单');
   const dispatchedRows = allRows.filter(r => r.status !== '草稿');
   const draftRows = allRows.filter(r => r.status === '草稿');
-  const batchDraftRows = [{
+  const [batchDraftRows, setBatchDraftRows] = useState([{
     no: '2026-7-26-1',
     fileName: '投诉批量导入模板.xlsx',
     importCount: 8,
@@ -5958,7 +5958,15 @@ function EntryMethodList({
       { no: 'DR202607250105', title: '账户服务咨询投诉', channel: '政务热线', customer: '张女士', status: '待确认', checked: false, errors: null },
       { no: 'DR202607250106', title: '贷款资料补充说明', channel: '市监管局', customer: '孙女士', status: '待确认', checked: false, errors: null }
     ]
-  }];
+  }]);
+  const deleteSingleDraft = no => {
+    if (!window.confirm(`确认删除草稿工单“${no}”吗？删除后列表中将不再显示。`)) return;
+    setAllRows(rows => rows.filter(row => row.no !== no));
+  };
+  const deleteBatchDraft = no => {
+    if (!window.confirm(`确认删除批量草稿“${no}”吗？删除后该批次将不再显示。`)) return;
+    setBatchDraftRows(rows => rows.filter(row => row.no !== no));
+  };
   const [draftTab, setDraftTab] = useState('单笔录入');
   const currentRows = (listTab === '已派发工单' ? dispatchedRows : draftTab === '单笔录入' ? draftRows : batchDraftRows).map(row => ({
     ...row,
@@ -6064,10 +6072,17 @@ function EntryMethodList({
                 children: row.time
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
-                children: /*#__PURE__*/_jsx("button", {
-                  onClick: () => onOpenBatchDraft && onOpenBatchDraft(row),
-                  className: "font-bold text-rizhao",
-                  children: "查看"
+                children: /*#__PURE__*/_jsxs("div", {
+                  className: "flex gap-3 font-bold",
+                  children: [/*#__PURE__*/_jsx("button", {
+                    onClick: () => onOpenBatchDraft && onOpenBatchDraft(row),
+                    className: "text-rizhao",
+                    children: "查看"
+                  }), /*#__PURE__*/_jsx("button", {
+                    onClick: () => deleteBatchDraft(row.no),
+                    className: "text-red-500",
+                    children: "删除"
+                  })]
                 })
               })]
             }, row.no) : /*#__PURE__*/_jsxs("tr", {
@@ -6111,6 +6126,10 @@ function EntryMethodList({
                     onClick: () => openDetail(row, false),
                     className: "font-bold text-rizhao",
                     children: "查看"
+                  }), row.status === '草稿' && /*#__PURE__*/_jsx("button", {
+                    onClick: () => deleteSingleDraft(row.no),
+                    className: "font-bold text-red-500",
+                    children: "删除"
                   })]
                 })
               })]
@@ -8178,6 +8197,16 @@ function BatchImport({
     setAllChecked(false);
     showToast('当前工单已派发，其余未完成工单已保留在本批次草稿中。');
   }
+  function handleDeleteImportedRow(no, event) {
+    event.stopPropagation();
+    if (!window.confirm(`确认删除工单“${no}”吗？删除后该工单将从当前批次中移除。`)) return;
+    const nextRows = rows.filter(row => row.no !== no);
+    setRows(nextRows);
+    if (selectedNo === no) setSelectedNo(nextRows[0]?.no || null);
+    setAllChecked(false);
+    if ((page - 1) * pageSize >= nextRows.length) setPage(Math.max(1, Math.ceil(nextRows.length / pageSize)));
+    showToast('工单已删除');
+  }
   function handleBatchConfirm() {
     const checked = rows.filter(r => r.checked);
     if (checked.length === 0) { showToast('请先选择需要确认的数据。'); return; }
@@ -8315,7 +8344,7 @@ function BatchImport({
         }), /*#__PURE__*/_jsx("div", {
           className: "space-y-2",
           children: pageRows.map(row => /*#__PURE__*/_jsxs("div", {
-            className: `cursor-pointer rounded-xl border px-3 py-3 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light'}`,
+            className: `relative cursor-pointer rounded-xl border px-3 py-3 pr-14 text-left transition ${selectedNo === row.no ? 'border-line-divider bg-mist shadow-sm' : 'border-slate-200 bg-white hover:border-line-light'}`,
             onClick: () => { setSelectedNo(row.no); setProductTag(''); setReasonTag(''); setPage(Math.floor(rows.indexOf(row) / pageSize) + 1); },
             children: [/*#__PURE__*/_jsxs("div", {
               className: "flex-1 min-w-0",
@@ -8332,6 +8361,11 @@ function BatchImport({
                 className: "mt-1 text-xs text-red-500",
                 children: row.errors.map(e => e.message).join('；')
               })]
+            }), /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: event => handleDeleteImportedRow(row.no, event),
+              className: "absolute right-3 top-3 text-xs font-black text-red-500 hover:text-red-600",
+              children: "删除"
             })]
           }, row.no))
         }), rows.length > pageSize && /*#__PURE__*/_jsxs("div", {
