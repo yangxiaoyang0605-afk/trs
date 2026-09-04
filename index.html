@@ -1750,7 +1750,7 @@ function RzReasonDistribution({ data, selected, onSelect, footer }) {
         /*#__PURE__*/_jsxs("span", { className: "text-right text-slate-600", children: [item.value, "件 · ", item.rate] })
       ] }, item.name);
     }) }),
-    /*#__PURE__*/_jsx("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: footer || "点击对象可作为交叉筛选条件；占比分母为当前筛选范围内工单量。" })
+    footer === null ? null : /*#__PURE__*/_jsx("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: footer || "点击对象可作为交叉筛选条件；占比分母为当前筛选范围内工单量。" })
   ] });
 }
 
@@ -2026,28 +2026,78 @@ const rzInstitutionTrend = [
   { name: '开发区支行', color: '#FCB723', values: [46, 51, 49, 56, 54, 61, 59, 68] }
 ];
 const rzLineTop10 = [
-  { name: '零售金融', value: 2860, rate: '22.9%', mom: '+10.3%', yoy: '+16.8%' },
-  { name: '信用卡条线', value: 2342, rate: '18.8%', mom: '+8.9%', yoy: '+12.5%' },
-  { name: '运营管理', value: 1746, rate: '14.0%', mom: '-1.8%', yoy: '+4.2%' },
-  { name: '网络金融', value: 1428, rate: '11.4%', mom: '+6.5%', yoy: '+9.8%' },
-  { name: '财富管理', value: 1068, rate: '8.6%', mom: '+3.9%', yoy: '+6.1%' },
-  { name: '普惠金融', value: 886, rate: '7.1%', mom: '+12.6%', yoy: '+18.9%' },
-  { name: '公司金融', value: 674, rate: '5.4%', mom: '+2.1%', yoy: '+3.8%' },
-  { name: '风险管理', value: 526, rate: '4.2%', mom: '-2.4%', yoy: '-1.2%' },
-  { name: '渠道管理', value: 438, rate: '3.5%', mom: '+5.7%', yoy: '+7.3%' },
-  { name: '其他条线', value: 318, rate: '2.5%', mom: '+1.8%', yoy: '+2.9%' }
+  { name: '驻行纪检监察组', value: 86, rate: '0.7%', mom: '-0.4%', yoy: '+0.6%' },
+  { name: '党群工作部', value: 74, rate: '0.6%', mom: '+0.3%', yoy: '+0.8%' },
+  { name: '发展规划部(董事会办公室)', value: 96, rate: '0.8%', mom: '+0.7%', yoy: '+1.1%' },
+  { name: '人力资源部', value: 68, rate: '0.5%', mom: '-0.5%', yoy: '+0.4%' },
+  { name: '计划财务部', value: 156, rate: '1.2%', mom: '+1.0%', yoy: '+1.8%' },
+  { name: '营运管理部', value: 1746, rate: '14.0%', mom: '-0.8%', yoy: '+2.6%' },
+  { name: '风险管理部', value: 2342, rate: '18.8%', mom: '+2.4%', yoy: '+4.8%' },
+  { name: '资产保全部', value: 386, rate: '3.1%', mom: '+1.8%', yoy: '+3.0%' },
+  { name: '法律合规部', value: 268, rate: '2.1%', mom: '+1.2%', yoy: '+2.4%' },
+  { name: '审计部', value: 104, rate: '0.8%', mom: '-0.7%', yoy: '+0.9%' },
+  { name: '公司业务部', value: 674, rate: '5.4%', mom: '+0.9%', yoy: '+1.9%' },
+  { name: '小企业金融部（普惠金融部）', value: 886, rate: '7.1%', mom: '+3.6%', yoy: '+6.5%' },
+  { name: '零售金融部', value: 2860, rate: '22.9%', mom: '+2.8%', yoy: '+5.2%' },
+  { name: '乡村振兴金融部', value: 328, rate: '2.6%', mom: '+1.6%', yoy: '+2.9%' },
+  { name: '网络金融部', value: 1428, rate: '11.4%', mom: '+2.1%', yoy: '+4.0%' },
+  { name: '科技部', value: 526, rate: '4.2%', mom: '-1.1%', yoy: '-0.6%' },
+  { name: '数字银行部', value: 1068, rate: '8.6%', mom: '+1.4%', yoy: '+2.7%' },
+  { name: '行政管理部', value: 438, rate: '3.5%', mom: '+1.9%', yoy: '+3.1%' },
+  { name: '安全保卫部', value: 118, rate: '0.9%', mom: '+0.5%', yoy: '+1.2%' },
+  { name: '小企业信贷中心', value: 486, rate: '3.9%', mom: '+2.6%', yoy: '+4.9%' },
+  { name: '供应链金融中心', value: 224, rate: '1.8%', mom: '+1.1%', yoy: '+2.0%' },
+  { name: '票据中心', value: 178, rate: '1.4%', mom: '-0.3%', yoy: '+0.8%' },
+  { name: '场景金融运营中心', value: 318, rate: '2.5%', mom: '+0.8%', yoy: '+1.6%' }
 ];
 const rzLineAssociation = {
   '产品': [{ name: '个人贷款', value: 684, rate: '23.9%' }, { name: '信用卡', value: 526, rate: '18.4%' }, { name: '消费贷款', value: 412, rate: '14.4%' }, { name: '借记卡', value: 286, rate: '10.0%' }, { name: '支付结算', value: 218, rate: '7.6%' }],
   '原因': [{ name: '收费争议', value: 612, rate: '21.4%' }, { name: '规则告知不清', value: 486, rate: '17.0%' }, { name: '办理时效', value: 398, rate: '13.9%' }, { name: '征信异议', value: 312, rate: '10.9%' }, { name: '服务态度', value: 246, rate: '8.6%' }],
-  '机构': [{ name: '东港支行', value: 536, rate: '18.7%' }, { name: '青岛分行', value: 428, rate: '15.0%' }, { name: '开发区支行', value: 364, rate: '12.7%' }, { name: '岚山支行', value: 286, rate: '10.0%' }, { name: '五莲支行', value: 218, rate: '7.6%' }]
+  '机构': [{ name: '东港支行', value: 536, rate: '18.7%' }, { name: '青岛分行', value: 428, rate: '15.0%' }, { name: '开发区支行', value: 364, rate: '12.7%' }, { name: '岚山支行', value: 286, rate: '10.0%' }, { name: '五莲支行', value: 218, rate: '7.6%' }],
+  '渠道': [{ name: '省监管局', value: 642, rate: '22.4%' }, { name: '客服热线', value: 526, rate: '18.4%' }, { name: '政务热线', value: 416, rate: '14.5%' }, { name: '国家局', value: 298, rate: '10.4%' }, { name: '银行协会', value: 246, rate: '8.6%' }]
 };
 const rzLineDetails = [
-  { id: 'TS202607150096', date: '2026-07-15', line: '零售金融', reason: '收费争议', product: '个人贷款', institution: '东港支行', status: '处理中' },
-  { id: 'TS202607150064', date: '2026-07-15', line: '零售金融', reason: '征信异议', product: '消费贷款', institution: '青岛分行', status: '待回访' },
-  { id: 'TS202607140082', date: '2026-07-14', line: '信用卡条线', reason: '规则告知不清', product: '信用卡', institution: '信用卡中心', status: '处理中' },
-  { id: 'TS202607140047', date: '2026-07-14', line: '运营管理', reason: '服务态度', product: '借记卡', institution: '岚山支行', status: '已办结' },
-  { id: 'TS202607130031', date: '2026-07-13', line: '网络金融', reason: '功能与系统异常', product: '手机银行', institution: '开发区支行', status: '处理中' }
+  { id: 'TS202607150096', date: '2026-07-15', line: '零售金融部', reason: '收费争议', product: '个人贷款', institution: '东港支行', channel: '省监管局', status: '处理中', overdue: '否' },
+  { id: 'TS202607150064', date: '2026-07-15', line: '零售金融部', reason: '征信异议', product: '消费贷款', institution: '青岛分行', channel: '客服热线', status: '待回访', overdue: '否' },
+  { id: 'TS202607140082', date: '2026-07-14', line: '风险管理部', reason: '规则告知不清', product: '信用卡', institution: '信用卡中心', channel: '银行协会', status: '处理中', overdue: '否' },
+  { id: 'TS202607140047', date: '2026-07-14', line: '营运管理部', reason: '服务态度', product: '借记卡', institution: '岚山支行', channel: '政务热线', status: '已办结', overdue: '否' },
+  { id: 'TS202607130031', date: '2026-07-13', line: '网络金融部', reason: '功能与系统异常', product: '手机银行', institution: '开发区支行', channel: '客服热线', status: '处理中', overdue: '是' }
+];
+const rzLineTrendSets = {
+  '日': { labels: ['07-01', '07-03', '07-05', '07-07', '07-09', '07-11', '07-13', '07-15'], values: [62, 68, 74, 82, 76, 91, 88, 104], second: [14, 16, 18, 21, 19, 24, 22, 28] },
+  '周': { labels: ['6月第2周', '6月第3周', '6月第4周', '7月第1周', '7月第2周', '7月第3周'], values: [286, 318, 342, 396, 428, 486], second: [54, 61, 68, 76, 83, 92] },
+  '月': { labels: ['2月', '3月', '4月', '5月', '6月', '7月'], values: [826, 918, 986, 1056, 1168, 1286], second: [126, 142, 158, 171, 188, 214] }
+};
+const rzLineEfficiencyRows = [
+  { name: '驻行纪检监察组', total: 86, closed: 78, unfinished: 8, overdue: 0, due24h: 1, duration: 1.2 },
+  { name: '党群工作部', total: 74, closed: 66, unfinished: 8, overdue: 0, due24h: 0, duration: 1.1 },
+  { name: '发展规划部(董事会办公室)', total: 96, closed: 84, unfinished: 12, overdue: 1, due24h: 1, duration: 1.5 },
+  { name: '人力资源部', total: 68, closed: 61, unfinished: 7, overdue: 0, due24h: 0, duration: 1.0 },
+  { name: '计划财务部', total: 156, closed: 138, unfinished: 18, overdue: 2, due24h: 1, duration: 1.6 },
+  { name: '零售金融部', total: 2860, closed: 2386, unfinished: 474, overdue: 38, due24h: 16, duration: 2.1 },
+  { name: '风险管理部', total: 2342, closed: 2036, unfinished: 306, overdue: 26, due24h: 12, duration: 1.8 },
+  { name: '营运管理部', total: 1746, closed: 1532, unfinished: 214, overdue: 18, due24h: 9, duration: 1.6 },
+  { name: '资产保全部', total: 386, closed: 326, unfinished: 60, overdue: 6, due24h: 3, duration: 2.0 },
+  { name: '法律合规部', total: 268, closed: 238, unfinished: 30, overdue: 3, due24h: 2, duration: 1.7 },
+  { name: '审计部', total: 104, closed: 96, unfinished: 8, overdue: 1, due24h: 0, duration: 1.3 },
+  { name: '公司业务部', total: 674, closed: 586, unfinished: 88, overdue: 8, due24h: 4, duration: 1.9 },
+  { name: '小企业金融部（普惠金融部）', total: 886, closed: 742, unfinished: 144, overdue: 14, due24h: 6, duration: 2.2 },
+  { name: '乡村振兴金融部', total: 328, closed: 284, unfinished: 44, overdue: 4, due24h: 2, duration: 1.8 },
+  { name: '网络金融部', total: 1428, closed: 1198, unfinished: 230, overdue: 22, due24h: 11, duration: 2.3 },
+  { name: '科技部', total: 526, closed: 462, unfinished: 64, overdue: 5, due24h: 3, duration: 1.7 },
+  { name: '数字银行部', total: 1068, closed: 886, unfinished: 182, overdue: 20, due24h: 7, duration: 2.4 },
+  { name: '行政管理部', total: 438, closed: 382, unfinished: 56, overdue: 5, due24h: 2, duration: 1.8 },
+  { name: '安全保卫部', total: 118, closed: 106, unfinished: 12, overdue: 1, due24h: 1, duration: 1.4 },
+  { name: '小企业信贷中心', total: 486, closed: 414, unfinished: 72, overdue: 7, due24h: 4, duration: 2.1 },
+  { name: '供应链金融中心', total: 224, closed: 198, unfinished: 26, overdue: 2, due24h: 1, duration: 1.6 },
+  { name: '票据中心', total: 178, closed: 159, unfinished: 19, overdue: 2, due24h: 1, duration: 1.5 },
+  { name: '场景金融运营中心', total: 318, closed: 272, unfinished: 46, overdue: 4, due24h: 2, duration: 1.9 }
+];
+const rzLineCollaborationRows = [
+  { pair: '零售金融部 + 网络金融部', value: 286, rate: '10.0%', product: '手机银行贷款', reason: '线上办理流程', owner: '零售金融部牵头，网络金融部协同' },
+  { pair: '风险管理部 + 营运管理部', value: 214, rate: '9.1%', product: '信用卡还款', reason: '入账与扣款时效', owner: '风险管理部牵头，营运管理部协同' },
+  { pair: '数字银行部 + 场景金融运营中心', value: 168, rate: '15.7%', product: '线上支付', reason: '系统功能异常', owner: '数字银行部牵头，场景金融运营中心协同' },
+  { pair: '公司业务部 + 小企业金融部（普惠金融部）', value: 126, rate: '14.2%', product: '经营贷', reason: '审批进度争议', owner: '公司业务部牵头，小企业金融部协同' }
 ];
 const rzProductLevel2 = {
   '信用卡': [{ name: '标准信用卡', value: 826, rate: '33.2%', repeat: '2.8%' }, { name: '白金信用卡', value: 584, rate: '23.5%', repeat: '3.1%' }, { name: '汽车分期卡', value: 426, rate: '17.1%', repeat: '2.4%' }, { name: '公务卡', value: 318, rate: '12.8%', repeat: '1.9%' }, { name: '乡村振兴卡', value: 196, rate: '7.9%', repeat: '1.6%' }],
@@ -2248,26 +2298,146 @@ function RzSelectableLineChart({ data, selected, onSelect, applied, compareMode 
   const chartHeight = data.length * rowHeight + 34;
   return /*#__PURE__*/_jsx(RzReasonPanel, { title: '各业务条线有效投诉量对比', note: `${applied.org}｜展示全部业务条线，不设 Top 排名；点击柱形选择条线并查看关联分布`, info: [{ label: '展示范围', text: '展示当前查询范围内全部业务条线，不截取TopN。' }, { label: '指标口径', text: '按最终生效业务条线统计有效投诉量，事件单编号去重。' }, { label: '交互说明', text: '点击任一柱形后，关联分布与投诉明细同步刷新。' }], children: /*#__PURE__*/_jsxs("div", { children: [
     /*#__PURE__*/_jsxs("div", { className: "mb-3 flex items-center justify-between text-xs", children: [/*#__PURE__*/_jsx("span", { className: "font-bold text-slate-500", children: "全部业务条线" }), /*#__PURE__*/_jsxs("span", { className: "rounded-md bg-orange-50 px-3 py-1.5 font-black text-rizhao", children: ["当前选择：", selected] })] }),
-    /*#__PURE__*/_jsx("svg", { viewBox: `0 0 1000 ${chartHeight}`, className: "w-full", style: { height: `${chartHeight}px` }, role: "img", "aria-label": "全部业务条线有效投诉量柱状图", children: data.map((item,index) => { const y = 10 + index * rowHeight; const active = selected === item.name; const barWidth = item.value / max * 650; const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("g", { onClick: () => onSelect(item.name), style: { cursor: 'pointer' }, children: [/*#__PURE__*/_jsx("text", { x: "4", y: y + 21, fontSize: "12", fontWeight: active ? "700" : "500", fill: active ? "#EE7800" : "#334155", children: item.name }), /*#__PURE__*/_jsx("rect", { x: "125", y: y + 3, width: "650", height: "26", rx: "5", fill: active ? "#FFF3D6" : "#F1F5F9" }), /*#__PURE__*/_jsx("rect", { x: "125", y: y + 3, width: barWidth, height: "26", rx: "5", fill: active ? "#EE7800" : "#F59E0B", opacity: active ? "1" : ".72" }), /*#__PURE__*/_jsxs("text", { x: "792", y: y + 21, fontSize: "12", fontWeight: "700", fill: active ? "#EE7800" : "#475569", children: [item.value.toLocaleString(), "件 · ", item.rate] }), /*#__PURE__*/_jsxs("text", { x: "930", y: y + 21, textAnchor: "end", fontSize: "11", fill: change.startsWith('+') ? "#F5555E" : "#10B981", children: [rzCompareModeLabel(compareMode), " ", change] })] }, item.name); }) }),
+    /*#__PURE__*/_jsx("svg", { viewBox: `0 0 1000 ${chartHeight}`, className: "w-full", style: { height: `${chartHeight}px` }, role: "img", "aria-label": "全部业务条线有效投诉量柱状图", children: data.map((item,index) => { const y = 10 + index * rowHeight; const active = selected === item.name; const barWidth = item.value / max * 520; const change = rzCompareValue(item, compareMode, index); return /*#__PURE__*/_jsxs("g", { onClick: () => onSelect(item.name), style: { cursor: 'pointer' }, children: [/*#__PURE__*/_jsx("text", { x: "4", y: y + 21, fontSize: "11", fontWeight: active ? "700" : "500", fill: active ? "#EE7800" : "#334155", children: item.name }), /*#__PURE__*/_jsx("rect", { x: "250", y: y + 3, width: "520", height: "26", rx: "5", fill: active ? "#FFF3D6" : "#F1F5F9" }), /*#__PURE__*/_jsx("rect", { x: "250", y: y + 3, width: barWidth, height: "26", rx: "5", fill: active ? "#EE7800" : "#F59E0B", opacity: active ? "1" : ".72" }), /*#__PURE__*/_jsxs("text", { x: "788", y: y + 21, fontSize: "12", fontWeight: "700", fill: active ? "#EE7800" : "#475569", children: [item.value.toLocaleString(), "件 · ", item.rate] }), /*#__PURE__*/_jsxs("text", { x: "952", y: y + 21, textAnchor: "end", fontSize: "11", fill: change.startsWith('+') ? "#F5555E" : "#10B981", children: [rzCompareModeLabel(compareMode), " ", change] })] }, item.name); }) }),
     /*#__PURE__*/_jsxs("div", { className: "mt-3 border-t border-slate-100 pt-3 text-[11px] text-slate-400", children: ["柱长表示有效投诉量；右侧同步展示投诉量、占比和", rzCompareModeLabel(compareMode), "。橙色高亮柱为当前选中条线。"] })
   ] }) });
 }
 
+function RzLineScaleQualityPanel({ data, selected, onSelect, applied, compareMode = 'mom' }) {
+  const displayRows = [...data].sort((a,b) => b.value - a.value);
+  const selectedStat = rzLineEfficiencyRows.find(item => item.name === selected) || rzLineEfficiencyRows[0];
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  const closed = rzLineEfficiencyRows.reduce((sum, item) => sum + item.closed, 0);
+  const unfinished = rzLineEfficiencyRows.reduce((sum, item) => sum + item.unfinished, 0);
+  const overdue = rzLineEfficiencyRows.reduce((sum, item) => sum + item.overdue, 0);
+  const maxValue = Math.max(...data.map(item => item.value), 1);
+  const rowMap = Object.fromEntries(rzLineEfficiencyRows.map(item => [item.name, item]));
+  const metrics = [
+    { label: '条线涉及投诉量', value: total, unit: '件', sub: '多条线按命中计次', tone: 'orange' },
+    { label: '当前选中条线', value: selectedStat.total, unit: '件', sub: selected, tone: 'blue' },
+    { label: '条线已办结', value: closed, unit: '件', sub: `办结率 ${(closed / total * 100).toFixed(1)}%`, tone: 'green' },
+    { label: '条线未办结', value: unfinished, unit: '件', sub: `超期 ${overdue}件`, tone: overdue ? 'red' : 'slate' }
+  ];
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: '投诉规模｜各业务归属条线投诉量与办理质效', note: `${applied.org}｜按业务归属条线汇总，最多两个条线分别计入命中条线`, info: [{ label: '规模口径', text: '按最终生效业务归属条线统计；一笔工单选择两个条线时，两个条线各计1件。' }, { label: '质效指标', text: '同一行展示已办结、未办结、超期和平均处理时长。' }, { label: `${rzCompareModeLabel(compareMode)}口径`, text: compareMode === 'yoy' ? '当前查询周期与去年同期比较。' : '当前查询周期与等长上一周期比较。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+    /*#__PURE__*/_jsx("section", { className: "mb-5 grid grid-cols-4 gap-4", children: metrics.map(item => /*#__PURE__*/_jsx(RzAnalyticsMetricCard, { item: item }, item.label)) }),
+    /*#__PURE__*/_jsxs("div", { className: "mb-2 grid grid-cols-[30px_220px_1fr_150px_150px_96px] gap-3 px-2 text-[11px] font-bold text-slate-400", children: [/*#__PURE__*/_jsx("span", { children: "序号" }), /*#__PURE__*/_jsx("span", { children: "业务归属条线" }), /*#__PURE__*/_jsx("span", { children: "投诉量分布" }), /*#__PURE__*/_jsxs("span", { className: "text-right", children: ["投诉量 / 占比 / ", rzCompareModeLabel(compareMode)] }), /*#__PURE__*/_jsx("span", { className: "text-right", children: "办结情况" }), /*#__PURE__*/_jsx("span", { className: "text-right", children: "风险" })] }),
+    /*#__PURE__*/_jsx("div", { className: "max-h-[360px] space-y-2 overflow-y-auto pr-2", children: displayRows.map((item,index) => { const active = selected === item.name; const quality = rowMap[item.name] || { closed: 0, unfinished: 0, overdue: 0, duration: 0, total: item.value }; const change = rzCompareValue(item, compareMode, index); const closeRate = quality.total ? (quality.closed / quality.total * 100).toFixed(1) : '0.0'; return /*#__PURE__*/_jsxs("button", { type: "button", onClick: () => onSelect(item.name), className: `grid w-full grid-cols-[30px_220px_1fr_150px_150px_96px] items-center gap-3 rounded-lg px-2 py-2 text-left text-xs transition ${active ? 'bg-orange-50 ring-1 ring-rizhao/20' : 'hover:bg-slate-50'}`, children: [
+      /*#__PURE__*/_jsx("span", { className: `grid h-6 w-6 place-items-center rounded font-black ${index < 3 ? 'bg-rizhao text-white' : 'bg-slate-100 text-slate-500'}`, children: index + 1 }),
+      /*#__PURE__*/_jsx("span", { className: `truncate font-black ${active ? 'text-rizhao' : 'text-slate-700'}`, title: item.name, children: item.name }),
+      /*#__PURE__*/_jsx("span", { className: "h-7 overflow-hidden rounded bg-slate-100", children: /*#__PURE__*/_jsx("span", { className: "block h-full rounded", style: { width: `${item.value / maxValue * 100}%`, background: active ? 'linear-gradient(90deg, #EE7800 0%, #F5A623 100%)' : '#F59E0B' } }) }),
+      /*#__PURE__*/_jsxs("span", { className: "text-right", children: [/*#__PURE__*/_jsxs("b", { className: "text-slate-700", children: [item.value.toLocaleString(), "件 · ", item.rate] }), /*#__PURE__*/_jsxs("small", { className: `ml-2 font-bold ${rzCompareToneClass(change)}`, children: [change] })] }),
+      /*#__PURE__*/_jsxs("span", { className: "text-right font-bold text-success", children: ["办结 ", quality.closed, " · ", closeRate, "%"] }),
+      /*#__PURE__*/_jsxs("span", { className: `text-right font-bold ${quality.overdue ? 'text-danger' : 'text-slate-500'}`, children: [quality.overdue ? "超期 " : "超期 ", quality.overdue] })
+    ] }, item.name); }) }),
+  ] }) });
+}
+
+function RzLineTrendPanel({ selectedLine, applied, compareMode = 'mom' }) {
+  const [granularity, setGranularity] = useState('日');
+  const selected = rzLineTop10.find(item => item.name === selectedLine) || rzLineTop10[0];
+  const trend = rzLineTrendSets[granularity];
+  const scale = Math.max(selected.value / Math.max(...rzLineTop10.map(item => item.value), 1), 0.28);
+  const values = trend.values.map(value => Math.max(1, Math.round(value * scale)));
+  const second = trend.second.map(value => Math.max(1, Math.round(value * scale)));
+  const max = Math.ceil(Math.max(...values) * 1.18 / 10) * 10;
+  const x = index => 70 + index * 860 / Math.max(values.length - 1, 1);
+  const y = value => 220 - value / max * 178;
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `投诉趋势｜${selectedLine}日/周/月变化`, note: `${applied.org}｜${applied.start} 至 ${applied.end}`, info: [{ label: '时间口径', text: '按客户投诉时间聚合，支持日、周、月切换。' }, { label: '条线投诉量', text: '橙色柱表示命中当前业务归属条线的工单量。' }, { label: '关联其他条线', text: '蓝色折线表示当前条线与其他条线共同命中的双条线工单量。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+    /*#__PURE__*/_jsx("div", { className: "mb-4 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['日','周','月'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setGranularity(item), className: `rounded px-4 py-1.5 text-xs font-black ${granularity === item ? 'bg-rizhao text-white shadow-low' : 'text-slate-500'}`, children: `按${item}` }, item)) }) }),
+    /*#__PURE__*/_jsxs("svg", { viewBox: "0 0 1000 260", className: "h-[280px] w-full", role: "img", "aria-label": `${selectedLine}业务条线投诉趋势`, children: [
+      [0,1,2,3,4].map(i => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("line", { x1: "54", x2: "952", y1: 42 + i * 44, y2: 42 + i * 44, stroke: "#E4E4E4", strokeDasharray: "4 5" }), /*#__PURE__*/_jsx("text", { x: "44", y: 46 + i * 44, textAnchor: "end", fontSize: "10", fill: "#64748B", children: Math.round(max * (4 - i) / 4) })] }, i)),
+      values.map((value,index) => /*#__PURE__*/_jsxs("g", { children: [/*#__PURE__*/_jsx("rect", { x: x(index) - 17, y: y(value), width: "34", height: 220 - y(value), rx: "5", fill: "#EE7800", opacity: ".82" }), /*#__PURE__*/_jsx("text", { x: x(index), y: "244", textAnchor: "middle", fontSize: "11", fill: "#707070", children: trend.labels[index] })] }, trend.labels[index])),
+      /*#__PURE__*/_jsx("polyline", { fill: "none", stroke: "#3C71FF", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round", points: second.map((value,index) => `${x(index)},${y(value)}`).join(' ') }),
+      second.map((value,index) => /*#__PURE__*/_jsx("circle", { cx: x(index), cy: y(value), r: "4", fill: "white", stroke: "#3C71FF", strokeWidth: "2.5" }, `${trend.labels[index]}-second`)),
+      /*#__PURE__*/_jsx("text", { x: "58", y: "24", fontSize: "11", fill: "#EE7800", children: "条线涉及投诉量（件）" }),
+      /*#__PURE__*/_jsx("text", { x: "800", y: "24", fontSize: "11", fill: "#3C71FF", children: "关联其他条线工单量" })
+    ] }),
+    /*#__PURE__*/_jsxs("div", { className: "mt-3 grid grid-cols-3 gap-3 border-t border-slate-100 pt-3 text-xs font-bold", children: [/*#__PURE__*/_jsxs("div", { className: "rounded-md bg-orange-50 px-3 py-2 text-rizhao", children: ["本期条线投诉量：", selected.value.toLocaleString(), "件"] }), /*#__PURE__*/_jsxs("div", { className: "rounded-md bg-blue-50 px-3 py-2 text-blue-600", children: ["关联其他条线：", second.reduce((sum, value) => sum + value, 0).toLocaleString(), "件"] }), /*#__PURE__*/_jsxs("div", { className: `rounded-md bg-slate-50 px-3 py-2 ${rzCompareToneClass(rzCompareValue(selected, compareMode))}`, children: [rzCompareModeLabel(compareMode), " ", rzCompareValue(selected, compareMode)] })] })
+  ] }) });
+}
+
+function RzLineEfficiencyPanel({ selectedLine, onSelect }) {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const current = rzLineEfficiencyRows.find(item => item.name === selectedLine) || rzLineEfficiencyRows[0];
+  const pageRows = rzLineEfficiencyRows.slice((page - 1) * pageSize, page * pageSize);
+  const closeRate = (current.closed / current.total * 100).toFixed(1);
+  const overdueRate = (current.overdue / current.total * 100).toFixed(1);
+  const metrics = [
+    { label: '涉及投诉量', value: current.total, unit: '件', sub: '条线维度计次', tone: 'orange' },
+    { label: '已办结工单', value: current.closed, unit: '件', sub: `办结率 ${closeRate}%`, tone: 'green' },
+    { label: '未办结工单', value: current.unfinished, unit: '件', sub: `24小时临期 ${current.due24h}件`, tone: 'blue' },
+    { label: '超期工单', value: current.overdue, unit: '件', sub: `超期率 ${overdueRate}%`, tone: current.overdue ? 'red' : 'slate' }
+  ];
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `处理质效｜${selectedLine}办理压力`, note: "展示办结率、未办结、超期和平均处理时长", info: [{ label: '办结率', text: '当前条线已办结工单量除以当前条线涉及投诉量。' }, { label: '超期口径', text: '未办结已超过办理时限，或办结时间晚于应办结时间。' }, { label: '多条线规则', text: '双条线工单在命中的两个条线下分别展示质效压力。' }], children: /*#__PURE__*/_jsxs("div", { children: [
+    /*#__PURE__*/_jsx("section", { className: "mb-5 grid grid-cols-2 gap-4 xl:grid-cols-4", children: metrics.map(item => /*#__PURE__*/_jsx(RzAnalyticsMetricCard, { item: item }, item.label)) }),
+    /*#__PURE__*/_jsx("div", { className: "overflow-x-auto rounded-lg border border-slate-200", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[760px] text-left text-xs", children: [
+      /*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['业务归属条线','涉及投诉量','已办结','办结率','未办结','超期','24小时临期','平均处理时长'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }),
+      /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: pageRows.map(item => { const active = item.name === selectedLine; return /*#__PURE__*/_jsxs("tr", { onClick: () => onSelect(item.name), className: `cursor-pointer ${active ? 'bg-orange-50' : 'hover:bg-slate-50'}`, children: [
+        /*#__PURE__*/_jsx("td", { className: `px-4 py-3 font-black ${active ? 'text-rizhao' : 'text-slate-700'}`, children: item.name }),
+        /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-600", children: item.total }),
+        /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-600", children: item.closed }),
+        /*#__PURE__*/_jsxs("td", { className: "px-4 py-3 font-bold text-success", children: [(item.closed / item.total * 100).toFixed(1), "%"] }),
+        /*#__PURE__*/_jsx("td", { className: "px-4 py-3 text-slate-600", children: item.unfinished }),
+        /*#__PURE__*/_jsx("td", { className: `px-4 py-3 font-bold ${item.overdue ? 'text-danger' : 'text-slate-500'}`, children: item.overdue }),
+        /*#__PURE__*/_jsx("td", { className: `px-4 py-3 font-bold ${item.due24h ? 'text-rizhao' : 'text-slate-500'}`, children: item.due24h }),
+        /*#__PURE__*/_jsxs("td", { className: item.duration >= 2.3 ? "px-4 py-3 font-bold text-danger" : "px-4 py-3 text-slate-600", children: [item.duration, "天"] })
+      ] }, item.name); }) })
+    ] }) }),
+    /*#__PURE__*/_jsx(ListPagination, { total: rzLineEfficiencyRows.length, page: page, pageSize: pageSize, onPageChange: setPage, onPageSizeChange: size => { setPageSize(size); setPage(1); } })
+  ] }) });
+}
+
+function RzLineCollaborationPanel({ selectedLine }) {
+  const selectedStat = rzLineTop10.find(item => item.name === selectedLine) || rzLineTop10[0];
+  const products = ['手机银行贷款', '信用卡还款', '经营贷', '转账汇款', '线上支付'];
+  const reasons = ['线上办理流程', '入账与扣款时效', '审批进度争议', '规则告知不清', '系统功能异常'];
+  const rows = rzLineTop10
+    .filter(item => item.name !== selectedLine)
+    .sort((a,b) => b.value - a.value)
+    .slice(0, 5)
+    .map((item,index) => {
+      const value = Math.max(12, Math.round(Math.min(selectedStat.value, item.value) * [0.12, 0.1, 0.085, 0.07, 0.055][index]));
+      return {
+        line: item.name,
+        value,
+        rate: `${(value / selectedStat.value * 100).toFixed(1)}%`,
+        product: products[index],
+        reason: reasons[index],
+        owner: `${selectedLine}牵头，${item.name}协同`
+      };
+    });
+  return /*#__PURE__*/_jsx(RzReasonPanel, { title: `${selectedLine}｜双条线协同分析`, note: '仅查看当前选中条线与其他业务归属条线共同命中的工单', info: [{ label: '统计对象', text: '业务归属条线最多选择两个，当前模块固定以选中条线为主线。' }, { label: '组合投诉量', text: '同时命中当前条线和协同条线的工单，按行内工单编号去重。' }, { label: '业务用途', text: '识别当前条线与其他部门之间的责任边界和协同处置重点。' }], children: /*#__PURE__*/_jsx("div", { className: "overflow-x-auto rounded-lg border border-slate-200", children: /*#__PURE__*/_jsxs("table", { className: "w-full min-w-[820px] text-left text-xs", children: [
+    /*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['当前条线','协同条线','双条线投诉量','占当前条线比重','高频产品','高频原因'].map(label => /*#__PURE__*/_jsx("th", { className: "whitespace-nowrap px-4 py-3 font-black", children: label }, label)) }) }),
+    /*#__PURE__*/_jsx("tbody", { className: "divide-y divide-slate-100", children: rows.map((row,index) => /*#__PURE__*/_jsxs("tr", { className: "hover:bg-orange-50/40", children: [
+      /*#__PURE__*/_jsx("td", { className: "px-4 py-4 font-black text-rizhao", children: selectedLine }),
+      /*#__PURE__*/_jsx("td", { className: "px-4 py-4 font-black text-ink", children: row.line }),
+      /*#__PURE__*/_jsxs("td", { className: "px-4 py-4 font-black text-ink", children: [row.value, "件"] }),
+      /*#__PURE__*/_jsx("td", { className: "px-4 py-4 text-slate-600", children: row.rate }),
+      /*#__PURE__*/_jsx("td", { className: "px-4 py-4 text-slate-600", children: row.product }),
+      /*#__PURE__*/_jsx("td", { className: "px-4 py-4 text-slate-600", children: row.reason })
+    ] }, `${selectedLine}-${row.line}-${index}`)) })
+  ] }) }) });
+}
+
+function RzLineRelationGrid({ selectedLine, selectedAssociation, onSelectAssociation }) {
+  const panels = [
+    { key: '机构', title: `机构关联｜${selectedLine}高频机构 Top5`, note: '按被投诉机构统计', tone: 'blue', info: [{ label: '关联口径', text: '筛选当前业务归属条线后，按被投诉机构汇总。' }, { label: '投诉量', text: '同一机构下按行内工单编号去重。' }, { label: '用途', text: '识别当前条线下投诉压力集中的机构。' }] },
+    { key: '产品', title: `产品关联｜${selectedLine}高频产品 Top5`, note: '按最终生效产品标签统计', tone: 'orange', info: [{ label: '关联口径', text: '筛选当前业务归属条线后，按投诉产品标签汇总。' }, { label: '投诉量', text: '同一产品下按行内工单编号去重。' }, { label: '用途', text: '定位当前条线集中暴露的产品问题。' }] },
+    { key: '原因', title: `原因关联｜${selectedLine}高频原因 Top5`, note: '按最终生效投诉原因标签统计', tone: 'amber', info: [{ label: '关联口径', text: '筛选当前业务归属条线后，按投诉原因标签汇总。' }, { label: '投诉量', text: '同一原因下按行内工单编号去重。' }, { label: '用途', text: '识别当前条线需要重点治理的投诉原因。' }] },
+    { key: '渠道', title: `渠道关联｜${selectedLine}投诉来源 Top5`, note: '按投诉反映渠道统计', tone: 'blue', info: [{ label: '关联口径', text: '筛选当前业务归属条线后，按投诉反映渠道汇总。' }, { label: '投诉量', text: '同一渠道下按行内工单编号去重。' }, { label: '用途', text: '判断当前条线投诉主要来自监管、客服或政务等渠道。' }] }
+  ];
+  return /*#__PURE__*/_jsx("section", { className: "grid grid-cols-1 gap-5 xl:grid-cols-2", children: panels.map(panel => /*#__PURE__*/_jsx(RzReasonPanel, { title: panel.title, note: panel.note, info: panel.info, children: /*#__PURE__*/_jsx(RzReasonDistribution, { data: rzLineAssociation[panel.key], selected: selectedAssociation, onSelect: onSelectAssociation, footer: null }) }, panel.key)) });
+}
+
 function RzLineAnalysisPage({ applied, compareMode = 'mom' }) {
-  const [selectedLine, setSelectedLine] = useState('零售金融');
-  const [view, setView] = useState('产品');
+  const [selectedLine, setSelectedLine] = useState('零售金融部');
   const [selectedAssociation, setSelectedAssociation] = useState('全部');
-  const data = rzLineAssociation[view];
-  const filtered = rzLineDetails.filter(row => row.line === selectedLine && (selectedAssociation === '全部' || row.product === selectedAssociation || row.reason === selectedAssociation || row.institution === selectedAssociation));
-  const [linePage, setLinePage] = useState(1);
-  const [linePageSize, setLinePageSize] = useState(5);
-  const lineTotalPages = Math.max(1, Math.ceil(filtered.length / linePageSize));
-  const lineSafePage = Math.min(linePage, lineTotalPages);
-  const linePageRows = filtered.slice((lineSafePage - 1) * linePageSize, lineSafePage * linePageSize);
   return /*#__PURE__*/_jsxs("div", { className: "space-y-5", children: [
-    /*#__PURE__*/_jsx(RzSelectableLineChart, { data: rzLineTop10, selected: selectedLine, onSelect: value => { setSelectedLine(value); setSelectedAssociation('全部'); }, applied: applied, compareMode: compareMode }),
-    /*#__PURE__*/_jsx(RzReasonPanel, { title: `${selectedLine}｜关联分布 Top5`, note: '支持产品、原因、机构视角，点击对象叠加筛选下方投诉明细', info: [{ label: '指标口径', text: '展示选中条线关联产品、原因或责任机构前5名。' }, { label: '计算公式', text: '占比为组合投诉量除以当前条线投诉量。' }, { label: '交叉筛选', text: '选择对象后同步刷新明细。' }], children: /*#__PURE__*/_jsxs("div", { children: [/*#__PURE__*/_jsx("div", { className: "mb-4 flex justify-end", children: /*#__PURE__*/_jsx("div", { className: "flex rounded-md bg-slate-100 p-1", children: ['产品','原因','机构'].map(item => /*#__PURE__*/_jsx("button", { type: "button", onClick: () => { setView(item); setSelectedAssociation('全部'); }, className: `rounded px-5 py-1.5 text-xs font-black ${view === item ? 'bg-white text-rizhao shadow-low' : 'text-slate-500'}`, children: `${item}视角` }, item)) }) }), /*#__PURE__*/_jsx(RzReasonDistribution, { data: data, selected: selectedAssociation, onSelect: setSelectedAssociation })] }) }),
-    /*#__PURE__*/_jsx(RzReasonPanel, { title: '条线关联投诉明细', note: `当前条线：${selectedLine}｜匹配 ${filtered.length} 笔示例数据`, info: [{ label: '明细口径', text: '继承机构、日期、条线及关联对象筛选。' }, { label: '原因标签', text: '优先采用人工修正后的最终原因标签。' }, { label: '事件状态', text: '取当前流程实例状态。' }], children: [/*#__PURE__*/_jsx("div", { className: "overflow-x-auto", children: /*#__PURE__*/_jsxs("table", { className: "w-full text-left text-xs", children: [/*#__PURE__*/_jsx("thead", { className: "bg-slate-50 text-slate-500", children: /*#__PURE__*/_jsx("tr", { children: ['事件单编号','客户投诉时间','所属业务条线','修正投诉原因','产品一级分类','投诉责任机构','事件单状态','操作'].map(label => /*#__PURE__*/_jsx("th", { className: "px-4 py-3", children: label }, label)) }) }), /*#__PURE__*/_jsxs("tbody", { className: "divide-y divide-slate-100", children: [linePageRows.map(row => /*#__PURE__*/_jsxs("tr", { children: [/*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-black text-rizhao", children: row.id }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.date }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.line }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.reason }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.product }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.institution }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3", children: row.status }), /*#__PURE__*/_jsx("td", { className: "px-4 py-3 font-black text-rizhao", children: "查看详情" })] }, row.id)), filtered.length === 0 && /*#__PURE__*/_jsx("tr", { children: /*#__PURE__*/_jsx("td", { colSpan: "8", className: "px-5 py-10 text-center text-slate-400", children: "当前条件下暂无匹配投诉" }) })] })] }) }), /*#__PURE__*/_jsx(ListPagination, { total: filtered.length, page: linePage, pageSize: linePageSize, onPageChange: setLinePage, onPageSizeChange: size => { setLinePageSize(size); setLinePage(1); } })] })
+    /*#__PURE__*/_jsx(RzLineScaleQualityPanel, { data: rzLineTop10, selected: selectedLine, onSelect: value => { setSelectedLine(value); setSelectedAssociation('全部'); }, applied: applied, compareMode: compareMode }),
+    /*#__PURE__*/_jsx(RzLineTrendPanel, { selectedLine: selectedLine, applied: applied, compareMode: compareMode }),
+    /*#__PURE__*/_jsx(RzLineRelationGrid, { selectedLine: selectedLine, selectedAssociation: selectedAssociation, onSelectAssociation: setSelectedAssociation }),
+    /*#__PURE__*/_jsx(RzLineCollaborationPanel, { selectedLine: selectedLine })
   ] });
 }
 
@@ -3840,8 +4010,9 @@ function ProcessingWorkspace({
   }));
   const markRows = (rows, marker) => rows.map((row, index) => ({ ...row, ...marker(row, index) }));
   const currentOperator = role === 'org_admin' ? '王主管' : '张经理';
+  const orgAdminTodoRows = adminMyRows.concat(extraAdminTodoRows.filter(row => row.status !== '已派发'));
   const myTodoRows = role === 'org_admin'
-    ? markRows(myPendingAssignRows.concat(adminMyRows, extraAdminTodoRows), row => ({ owner: true, handler: row.handler || currentOperator }))
+    ? markRows(orgAdminTodoRows, row => ({ owner: true, handler: row.handler || currentOperator }))
     : markRows(myRows.concat(extraHandlerTodoRows), () => ({ owner: true, handler: currentOperator }));
   const allWorkRows = role === 'org_admin'
     ? markRows(
@@ -8057,7 +8228,6 @@ function BatchImport({
   const [page, setPage] = useState(1);
   const [allChecked, setAllChecked] = useState(false);
   const [errorTriggered, setErrorTriggered] = useState(false);
-  const [showReUploadConfirm, setShowReUploadConfirm] = useState(false);
   const [toast, setToast] = useState(null);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
   const pageRows = rows.slice((page - 1) * pageSize, page * pageSize);
@@ -8109,19 +8279,6 @@ function BatchImport({
         setPhase('confirm');
       }, 900);
     }, 300);
-  }
-  function handleReUpload() {
-    clearDraftBatch && clearDraftBatch();
-    setPhase('upload');
-    setUploadState('idle');
-    setParseError(null);
-    setRows([]);
-    setSelectedNo(null);
-    setProductTag('');
-    setReasonTag('');
-    setPage(1);
-    setAllChecked(false);
-    setErrorTriggered(false);
   }
   function handleSaveDraft() { showToast('当前工单已保存，未派发数据继续保留在本批次草稿中。'); }
   function handleSaveConfirm() {
@@ -8181,9 +8338,6 @@ function BatchImport({
             className: "mt-1 text-sm text-slate-500",
             children: "请使用系统标准模板填写并上传。仅支持 .xlsx 文件。"
           })]
-        }), /*#__PURE__*/_jsx("span", {
-          className: "rounded-full bg-mist px-4 py-2 text-sm font-bold text-rizhao",
-          children: uploadState === 'parsed' ? "解析完成" : uploadState === 'parsing' ? "解析中" : uploadState === 'uploaded' ? "上传成功" : "下载模板"
         })]
       }), /*#__PURE__*/_jsx("div", {
         className: "mt-4 flex gap-3",
@@ -8325,13 +8479,6 @@ function BatchImport({
             className: "rounded-lg border px-3 py-1.5 text-xs font-bold " + (page === totalPages ? 'border-slate-200 text-slate-400' : 'border-line-divider text-slate-600 hover:text-rizhao'),
             children: "›"
           })]
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "mt-4 flex gap-2 border-t border-slate-200 pt-4",
-          children: [/*#__PURE__*/_jsx("button", {
-            onClick: () => setShowReUploadConfirm(true),
-            className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-xs font-bold text-slate-600",
-            children: "重新上传"
-          })]
         })]
       }), selectedRow ? /*#__PURE__*/_jsx("section", {
         className: "min-w-0 space-y-4",
@@ -8363,31 +8510,6 @@ function BatchImport({
     }), toast && /*#__PURE__*/_jsx("div", {
       className: "fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white shadow-lg",
       children: toast
-    }), showReUploadConfirm && /*#__PURE__*/_jsxs("div", {
-      className: "fixed inset-0 z-50 flex items-center justify-center bg-black/30",
-      onClick: e => { if (e.target === e.currentTarget) setShowReUploadConfirm(false); },
-      children: [/*#__PURE__*/_jsxs("div", {
-        className: "w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-high",
-        onClick: e => e.stopPropagation(),
-        children: [/*#__PURE__*/_jsx("div", {
-          className: "text-base font-black text-ink",
-          children: "重新上传"
-        }), /*#__PURE__*/_jsx("p", {
-          className: "mt-2 text-sm text-slate-600",
-          children: "重新上传后，将重新解析本批次数据，是否继续？"
-        }), /*#__PURE__*/_jsxs("div", {
-          className: "mt-6 flex justify-end gap-3",
-          children: [/*#__PURE__*/_jsx("button", {
-            className: "rounded-lg border border-line-divider bg-white px-4 py-2 text-sm font-bold text-slate-600",
-            onClick: () => setShowReUploadConfirm(false),
-            children: "取消"
-          }), /*#__PURE__*/_jsx("button", {
-            className: "rounded-lg bg-rizhao px-4 py-2 text-sm font-bold text-white",
-            onClick: () => { setShowReUploadConfirm(false); handleReUpload(); },
-            children: "继续上传"
-          })]
-        })]
-      })]
     })]
   });
 }
@@ -10859,7 +10981,7 @@ function RolePermissionConfig({ role, onBack, onSaveScope }) {
     { key: 'ledgerExport', name: '台账导出权限', desc: '允许导出台账并记录导出日志' },
     { key: 'reportView', name: '报表查看权限', desc: '允许查询和查看报表结果' },
     { key: 'reportExport', name: '报表导出权限', desc: '允许导出报表结果' },
-    { key: 'statsView', name: '统计分析查看权限', desc: '允许查看投诉总览、机构、产品、原因和渠道统计分析' },
+    { key: 'statsView', name: '统计分析查看权限', desc: '允许查看投诉总览、机构、产品、原因、渠道统计分析' },
     { key: 'userManage', name: '用户管理权限', desc: '允许维护系统用户、用户状态和角色关联' },
     { key: 'roleManage', name: '角色权限管理权限', desc: '允许维护角色列表并配置功能权限' },
     { key: 'orgManage', name: '机构管理权限', desc: '允许维护机构列表、机构层级和机构负责人' },
@@ -11276,7 +11398,7 @@ function UserManager() {
     ]}),
     $("div", { className: "overflow-x-auto rounded-2xl border border-slate-200 bg-white", children: [
       $("table", { className: "w-full text-left text-sm", children: [
-        $("thead", { children: $("tr", { className: "border-b border-slate-200 bg-mist/60", children: ['员工号','姓名','性别','手机号','证件类型','证件号','人员类型','人员状态','职务','机构编号','机构名称','系统角色','操作'].map(function(h) { return $("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }); }) })}),
+        $("thead", { children: $("tr", { className: "border-b border-slate-200 bg-mist/60", children: ['员工号','姓名','性别','手机号','证件类型','证件号','人员类型','状态','职务','机构编号','机构名称','系统角色','操作'].map(function(h) { return $("th", { className: "px-4 py-3 font-bold text-slate-600 whitespace-nowrap", children: h }); }) })}),
         $("tbody", { children: visibleUsers.map(function(u, i) {
           return $("tr", { key: i, className: "border-b border-slate-100 hover:bg-mist/40", children: [
             $("td", { className: "px-4 py-3 whitespace-nowrap", children: u.empId }),
