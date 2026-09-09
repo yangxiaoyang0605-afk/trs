@@ -1195,13 +1195,12 @@ const {
 function UploadFormatHint() {
   const [open, setOpen] = useState(false);
   const formats = [
-    ['文档', 'PDF、DOC、DOCX、TXT、WPS'],
+    ['文档', 'PDF、DOC、DOCX、TXT'],
     ['表格', 'XLS、XLSX、CSV'],
-    ['图片', 'JPG、JPEG、PNG、BMP、GIF、WEBP'],
+    ['图片', 'JPG、JPEG、PNG'],
     ['音频', 'MP3、WAV、M4A、AMR'],
     ['视频', 'MP4、MOV、AVI、MKV'],
-    ['压缩包', 'ZIP、RAR、7Z'],
-    ['邮件', 'EML、MSG']
+    ['压缩包', 'ZIP、RAR、7Z']
   ];
   return /*#__PURE__*/_jsxs("span", {
     className: `rz-upload-format-hint ${open ? 'open' : ''}`,
