@@ -1086,6 +1086,80 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       padding-bottom: 0 !important;
       border-bottom: 0 !important;
     }
+    .rz-upload-format-hint {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      z-index: 20;
+    }
+    .rz-upload-format-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 0;
+      background: transparent;
+      color: #EE7800;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .rz-upload-format-trigger::before {
+      content: "?";
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      border: 1px solid #EE7800;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .rz-upload-format-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: min(360px, calc(100vw - 48px));
+      padding: 14px 16px;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, .16);
+      color: #202020;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-4px);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .rz-upload-format-hint:hover .rz-upload-format-popover,
+    .rz-upload-format-hint:focus-within .rz-upload-format-popover,
+    .rz-upload-format-hint.open .rz-upload-format-popover {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .rz-upload-format-popover ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .rz-upload-format-popover li {
+      margin: 6px 0;
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: normal;
+    }
+    .rz-upload-format-popover strong {
+      font-weight: 800;
+    }
+    .rz-upload-format-limit {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #E5E7EB;
+      color: #EE7800;
+      font-size: 13px;
+      font-weight: 800;
+    }
     @media (min-width: 1800px) {
       :root {
         --rz-layout-sidebar: 264px;
@@ -1117,6 +1191,40 @@ const _jsxs = _jsx;
 const {
   useState
 } = React;
+
+function UploadFormatHint() {
+  const [open, setOpen] = useState(false);
+  const formats = [
+    ['文档', 'PDF、DOC、DOCX、TXT、WPS'],
+    ['表格', 'XLS、XLSX、CSV'],
+    ['图片', 'JPG、JPEG、PNG、BMP、GIF、WEBP'],
+    ['音频', 'MP3、WAV、M4A、AMR'],
+    ['视频', 'MP4、MOV、AVI、MKV'],
+    ['压缩包', 'ZIP、RAR、7Z'],
+    ['邮件', 'EML、MSG']
+  ];
+  return /*#__PURE__*/_jsxs("span", {
+    className: `rz-upload-format-hint ${open ? 'open' : ''}`,
+    children: [/*#__PURE__*/_jsx("button", {
+      type: "button",
+      className: "rz-upload-format-trigger",
+      onClick: () => setOpen(!open),
+      children: "查看支持上传格式"
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "rz-upload-format-popover",
+      children: [/*#__PURE__*/_jsx("ul", {
+        children: formats.map(([name, items]) => /*#__PURE__*/_jsxs("li", {
+          children: [/*#__PURE__*/_jsx("strong", {
+            children: `${name}：`
+          }), items]
+        }, name))
+      }), /*#__PURE__*/_jsx("div", {
+        className: "rz-upload-format-limit",
+        children: "单个文件不超过 300MB"
+      })]
+    })]
+  });
+}
 
 // 左侧一级菜单。
 const menus = [{
@@ -4010,7 +4118,7 @@ function ProcessingWorkspace({
   }));
   const markRows = (rows, marker) => rows.map((row, index) => ({ ...row, ...marker(row, index) }));
   const currentOperator = role === 'org_admin' ? '王主管' : '张经理';
-  const orgAdminTodoRows = adminMyRows.concat(extraAdminTodoRows.filter(row => row.status !== '已派发'));
+  const orgAdminTodoRows = myPendingAssignRows.concat(adminMyRows, extraAdminTodoRows.filter(row => row.status !== '已派发'));
   const myTodoRows = role === 'org_admin'
     ? markRows(orgAdminTodoRows, row => ({ owner: true, handler: row.handler || currentOperator }))
     : markRows(myRows.concat(extraHandlerTodoRows), () => ({ owner: true, handler: currentOperator }));
@@ -4185,11 +4293,11 @@ function ProcessingWorkspace({
       }), /*#__PURE__*/_jsx("div", {
         className: "overflow-x-auto",
         children: /*#__PURE__*/_jsxs("table", {
-          className: "rz-processing-table w-full min-w-[1180px] text-left text-sm whitespace-nowrap",
+          className: "rz-processing-table w-full min-w-[1080px] text-left text-sm whitespace-nowrap",
           children: [/*#__PURE__*/_jsx("thead", {
             className: "bg-slate-100 text-slate-600",
             children: /*#__PURE__*/_jsx("tr", {
-              children: ['行内工单编号', '工单来源', '标题', '投诉反映渠道', '投诉人姓名', '处理机构', '工单级别', '工单状态', '剩余处理时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
+              children: ['行内工单编号', '标题', '投诉反映渠道', '投诉人姓名', '处理机构', '工单级别', '工单状态', '剩余处理时间', '操作'].map(head => /*#__PURE__*/_jsx("th", {
                 className: "whitespace-nowrap px-5 py-4 font-black",
                 children: head
               }, head))
@@ -4203,9 +4311,6 @@ function ProcessingWorkspace({
               children: [/*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4 font-bold text-rizhao",
                 children: row.no
-              }), /*#__PURE__*/_jsx("td", {
-                className: "px-5 py-4",
-                children: getWorkOrderSource(row)
               }), /*#__PURE__*/_jsx("td", {
                 className: "px-5 py-4",
                 children: row.title
@@ -4932,6 +5037,8 @@ function ProcessingDetail({
   const [historyQueryRow, setHistoryQueryRow] = useState(null);
   const [showLoanQuery, setShowLoanQuery] = useState(false);
   const [activeLoanIndex, setActiveLoanIndex] = useState(0);
+  const [sentSmsIds, setSentSmsIds] = useState([]);
+  const [deletedSmsIds, setDeletedSmsIds] = useState([]);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
   const detailHistoryRows = buildHistoryComplaintRows(row.customer);
   const detailLoanRows = buildLoanRecords('371102********2816');
@@ -4947,14 +5054,15 @@ function ProcessingDetail({
     onContactRecordsChange && onContactRecordsChange(next);
     return next;
   });
-  const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status !== '待审核').map(item => ({
+  const approvedSmsRows = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status === '已同意' && !sentSmsIds.includes(item.id) && !deletedSmsIds.includes(item.id));
+  const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && (sentSmsIds.includes(item.id) || item.status === '已拦截')).map(item => ({
     type: 'sms',
     time: item.auditTime || item.applyTime,
     method: '短信',
     handler: item.handler,
     replyPersonName: item.handler,
     replyPhone: customerPhone,
-    contactResult: item.status === '已同意' ? '已联系' : '未联系上',
+    contactResult: sentSmsIds.includes(item.id) ? '已联系' : '未联系上',
     contactContent: item.content,
     recordingFile: '-',
     interceptReason: item.interceptReason || ''
@@ -5132,7 +5240,7 @@ function ProcessingDetail({
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowSendSms(true),
           className: "h-12 rounded-xl border border-rizhao bg-white px-6 text-sm font-black text-rizhao",
-          children: "发送短信"
+          children: "添加短信联系"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowNewComm(true),
           className: "h-12 rounded-xl border border-slate-300 bg-white px-6 text-sm font-black text-slate-700",
@@ -5181,10 +5289,7 @@ function ProcessingDetail({
         children: [/*#__PURE__*/_jsx("button", {
           className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
           children: "上传处理附件"
-        }), /*#__PURE__*/_jsx("span", {
-          className: "text-sm text-slate-500",
-          children: "可上传沟通记录、证明材料等"
-        })]
+        }), /*#__PURE__*/_jsx(UploadFormatHint, {})]
       })]
     })]
       })]
@@ -5268,6 +5373,15 @@ function ProcessingDetail({
       workOrderNo: row.no,
       handler: row.handler || '当前处理人',
       onClose: () => setShowSendSms(false),
+      approvedSmsRows: approvedSmsRows,
+      onSendApprovedSms: item => {
+        setSentSmsIds(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
+        showToast('短信已发送并生成联系记录');
+      },
+      onDeleteApprovedSms: item => {
+        setDeletedSmsIds(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
+        showToast('短信记录已删除');
+      },
       onSubmitAudit: rec => {
         onSubmitSmsAudit && onSubmitSmsAudit({ ...rec, returnTo: 'detail' });
         setShowSendSms(false);
@@ -5601,10 +5715,15 @@ function OutboundCallModal({ customerPhone, onClose, onSave }) {
     })]
   });
 }
-function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAudit, submitText = "发送审核" }) {
+function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAudit, approvedSmsRows = [], onSendApprovedSms, onDeleteApprovedSms, submitText = "提交短信审核" }) {
   const [smsTemplate, setSmsTemplate] = useState('');
   const [smsContent, setSmsContent] = useState('');
   const canSubmit = smsTemplate && smsContent.trim();
+  const canSendApproved = approvedSmsRows.length > 0;
+  const handleApprovedSend = () => {
+    if (!canSendApproved) return;
+    onSendApprovedSms && onSendApprovedSms(approvedSmsRows[0]);
+  };
   const handleSubmit = () => {
     if (!canSubmit) return;
     onSubmitAudit({
@@ -5624,7 +5743,7 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
         className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
         children: [/*#__PURE__*/_jsx("div", {
           className: "text-xl font-black text-ink",
-          children: "发送短信"
+          children: "添加短信联系"
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
@@ -5633,7 +5752,42 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
         })]
       }), /*#__PURE__*/_jsxs("div", {
         className: "space-y-4 px-6 py-5",
-        children: [/*#__PURE__*/_jsxs("div", {
+        children: [approvedSmsRows.length ? /*#__PURE__*/_jsxs("section", {
+          className: "rounded-2xl border border-slate-200 bg-slate-50 p-4",
+          children: [/*#__PURE__*/_jsxs("div", {
+            className: "mb-3 flex items-center justify-between",
+            children: [/*#__PURE__*/_jsx("div", {
+              className: "text-sm font-black text-ink",
+              children: "审核通过未发送"
+            }), /*#__PURE__*/_jsxs("span", {
+              className: "text-xs font-bold text-slate-500",
+              children: [approvedSmsRows.length, " 条"]
+            })]
+          }), approvedSmsRows.length ? /*#__PURE__*/_jsx("div", {
+            className: "space-y-3",
+            children: approvedSmsRows.map(item => /*#__PURE__*/_jsxs("div", {
+              className: "relative rounded-xl border border-slate-200 bg-white p-3 pr-12",
+              children: [/*#__PURE__*/_jsx("button", {
+                type: "button",
+                onClick: () => onDeleteApprovedSms && onDeleteApprovedSms(item),
+                className: "absolute right-3 top-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-xs font-black text-slate-400 hover:border-red-200 hover:text-red-600",
+                children: "删除"
+              }), /*#__PURE__*/_jsx("div", {
+                className: "line-clamp-2 text-sm font-bold leading-6 text-slate-700",
+                children: item.content
+              }), /*#__PURE__*/_jsxs("div", {
+                className: "mt-3 flex items-center justify-between gap-3",
+                children: [/*#__PURE__*/_jsxs("span", {
+                  className: "text-xs font-bold text-slate-400",
+                  children: ["审核时间：", item.auditTime || "-"]
+                }), /*#__PURE__*/_jsx("span", {
+                  className: "rounded-full bg-green-50 px-3 py-1 text-xs font-black text-green-700",
+                  children: "可发送"
+                })]
+              })]
+            }, item.id))
+          }) : null]
+        }) : null, /*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("div", {
             className: "field-label mb-1",
             children: "接收号码"
@@ -5663,6 +5817,10 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
           onClick: onClose,
           className: "rounded-xl border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700",
           children: "取消"
+        }), /*#__PURE__*/_jsx("button", {
+          onClick: canSendApproved ? handleApprovedSend : undefined,
+          className: `rounded-xl px-5 py-2 text-sm font-black shadow-mid ${canSendApproved ? 'border border-rizhao bg-white text-rizhao' : 'cursor-not-allowed border border-slate-200 bg-white text-slate-300'}`,
+          children: "发送"
         }), /*#__PURE__*/_jsx("button", {
           onClick: canSubmit ? handleSubmit : undefined,
           className: `rounded-xl px-5 py-2 text-sm font-black text-white shadow-mid ${canSubmit ? 'bg-rizhao' : 'cursor-not-allowed bg-slate-300'}`,
@@ -5812,9 +5970,9 @@ function TransferModal({ currentHandler, onClose, onSave, row }) {
 }
 function DispatchModal({ row, onClose, onSave }) {
   const orgs = ['东港支行', '岚山支行', '莒县支行', '五莲支行', '开发区支行', '信用卡中心'];
-  const handlers = ['张经理', '李经理', '王主管', '赵专员', '陈专员', '刘专员'];
-  const [targetOrg, setTargetOrg] = useState('');
-  const [targetHandler, setTargetHandler] = useState('');
+  const handlers = ['王主管（我）', '张经理', '李经理', '赵专员', '陈专员', '刘专员'];
+  const [targetOrg, setTargetOrg] = useState(row.org || '东港支行');
+  const [targetHandler, setTargetHandler] = useState('王主管（我）');
   const canSave = targetOrg && targetHandler;
   return /*#__PURE__*/_jsxs("div", {
     className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-6 py-8",
@@ -5857,6 +6015,9 @@ function DispatchModal({ row, onClose, onSave }) {
           options: handlers,
           value: targetHandler,
           setValue: setTargetHandler
+        }), /*#__PURE__*/_jsx("div", {
+          className: "rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-xs font-bold leading-5 text-orange-700",
+          children: "工单派发员可将本人作为负责人，派发给自己后进入本人待处理工单。"
         })]
       }), /*#__PURE__*/_jsx("div", {
         className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-4",
@@ -6880,15 +7041,15 @@ function StandardComplaintForm({
   const [attachments, setAttachments] = useState([]);
   const [previewAttachment, setPreviewAttachment] = useState(null);
   const handleUpload = () => {
-    if (attachments.length === 0) {
-      setAttachments([
-        { name: '客户身份证复印件.jpg', size: '2.3 MB', date: '2026-07-09', uploader: '张经理' },
-        { name: '投诉录音转写.docx', size: '156 KB', date: '2026-07-09', uploader: '张经理' },
-      ]);
-    } else {
-      setAttachments([]);
-    }
+    setAttachments(prev => prev.length ? [
+      ...prev,
+      { name: `补充证明材料${prev.length + 1}.pdf`, size: '520 KB', date: '2026-07-09', uploader: '张经理' }
+    ] : [
+      { name: '客户身份证复印件.jpg', size: '2.3 MB', date: '2026-07-09', uploader: '张经理' },
+      { name: '投诉录音转写.docx', size: '156 KB', date: '2026-07-09', uploader: '张经理' },
+    ]);
   };
+  const removeAttachment = index => setAttachments(prev => prev.filter((_, i) => i !== index));
   const cascaderSelect = (l1, l2, l3) => { setBizL1(l1); setBizL2(l2 || ''); setBizL3(l3 || ''); setShowCascader(false); setCascaderHoverL1(null); setCascaderHoverL2(null); };
   const [compL1, setCompL1] = useState('');
   const [compL2, setCompL2] = useState('');
@@ -7570,13 +7731,10 @@ function StandardComplaintForm({
         children: [/*#__PURE__*/_jsxs("div", {
           className: "mb-4 flex items-center gap-3",
           children: [/*#__PURE__*/_jsx("button", {
-            className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
-            onClick: handleUpload,
-            children: attachments.length === 0 ? "上传" : "清空"
-          }), /*#__PURE__*/_jsx("span", {
-            className: "text-sm text-slate-500",
-            children: "支持多种格式"
-          })]
+          className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
+          onClick: handleUpload,
+          children: "上传"
+          }), /*#__PURE__*/_jsx(UploadFormatHint, {})]
         }), /*#__PURE__*/_jsx("div", {
           className: "overflow-hidden rounded-xl border border-slate-200",
           children: /*#__PURE__*/_jsxs("table", {
@@ -7612,11 +7770,19 @@ function StandardComplaintForm({
                   children: att.uploader
                 }), /*#__PURE__*/_jsx("td", {
                   className: "px-4 py-3",
-                  children: /*#__PURE__*/_jsx("button", {
-                    type: "button",
-                    onClick: () => previewAttachmentFile(att, setPreviewAttachment),
-                    className: "font-bold text-rizhao hover:underline",
-                    children: "在线预览"
+                  children: /*#__PURE__*/_jsxs("div", {
+                    className: "flex items-center gap-3",
+                    children: [/*#__PURE__*/_jsx("button", {
+                      type: "button",
+                      onClick: () => previewAttachmentFile(att, setPreviewAttachment),
+                      className: "font-bold text-rizhao hover:underline",
+                      children: "在线预览"
+                    }), /*#__PURE__*/_jsx("button", {
+                      type: "button",
+                      onClick: () => removeAttachment(i),
+                      className: "font-bold text-red-600 hover:underline",
+                      children: "删除"
+                    })]
                   })
                 })]
               }, i))
@@ -8763,6 +8929,8 @@ function ReturnVisitPage({
   const [showLoanQuery, setShowLoanQuery] = useState(false);
   const [activeLoanIndex, setActiveLoanIndex] = useState(0);
   const [returnVisitAttachments, setReturnVisitAttachments] = useState([]);
+  const [sentSmsIds, setSentSmsIds] = useState([]);
+  const [deletedSmsIds, setDeletedSmsIds] = useState([]);
   const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2000); };
   const detailHistoryRows = buildHistoryComplaintRows(row.customer);
   const detailLoanRows = buildLoanRecords('371102********2816');
@@ -8772,10 +8940,10 @@ function ReturnVisitPage({
     org: '总行消保中心'
   };
   const uploadReturnVisitAttachment = () => {
-    const nextFile = { name: `回访附件_${row.no || '工单'}.pdf`, size: '680 KB', date: '2026-07-04', uploader: currentUser.name };
-    setReturnVisitAttachments(prev => prev.length ? prev : [nextFile]);
+    setReturnVisitAttachments(prev => [...prev, { name: `回访附件_${row.no || '工单'}_${prev.length + 1}.pdf`, size: '680 KB', date: '2026-07-04', uploader: currentUser.name }]);
     showToast('回访附件已上传');
   };
+  const removeReturnVisitAttachment = fileName => setReturnVisitAttachments(prev => prev.filter(file => file.name !== fileName));
   const addCommRecord = record => setCommRecords(prev => {
     const next = [...prev, {
       recordNo: prev.length + 1,
@@ -8787,14 +8955,15 @@ function ReturnVisitPage({
     onReturnVisitRecordsChange && onReturnVisitRecordsChange(next);
     return next;
   });
-  const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status !== '待审核').map(item => ({
+  const approvedSmsRows = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status === '已同意' && !sentSmsIds.includes(item.id) && !deletedSmsIds.includes(item.id));
+  const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && (sentSmsIds.includes(item.id) || item.status === '已拦截')).map(item => ({
     type: 'sms',
     time: item.auditTime || item.applyTime,
     method: '短信',
     handler: item.handler,
     replyPersonName: item.handler,
     replyPhone: customerPhone,
-    contactResult: item.status === '已同意' ? '已联系' : '未联系上',
+    contactResult: sentSmsIds.includes(item.id) ? '已联系' : '未联系上',
     contactContent: item.content,
     recordingFile: '-',
     interceptReason: item.interceptReason || ''
@@ -8961,7 +9130,7 @@ function ReturnVisitPage({
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowSendSms(true),
           className: "h-12 rounded-xl border border-rizhao bg-white px-6 text-sm font-black text-rizhao",
-          children: "发送短信"
+          children: "添加短信联系"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowNewComm(true),
           className: "h-12 rounded-xl border border-slate-300 bg-white px-6 text-sm font-black text-slate-700",
@@ -8994,15 +9163,20 @@ function ReturnVisitPage({
           onClick: uploadReturnVisitAttachment,
           className: "rounded-lg bg-rizhao px-5 py-2.5 text-sm font-black text-white",
           children: "上传回访附件"
-        }), /*#__PURE__*/_jsx("span", {
-          className: "text-sm text-slate-500",
-          children: "可上传沟通记录、证明材料等"
-        }), returnVisitAttachments.map(file => /*#__PURE__*/_jsx("button", {
-          type: "button",
-          onClick: () => previewAttachmentFile(file, setPreviewFile),
-          className: "max-w-[220px] truncate text-left text-sm font-bold text-rizhao hover:underline",
-          title: file.name,
-          children: file.name
+        }), /*#__PURE__*/_jsx(UploadFormatHint, {}), returnVisitAttachments.map(file => /*#__PURE__*/_jsxs("div", {
+          className: "flex max-w-[300px] items-center gap-3 rounded-lg border border-slate-200 px-3 py-2",
+          children: [/*#__PURE__*/_jsx("button", {
+            type: "button",
+            onClick: () => previewAttachmentFile(file, setPreviewFile),
+            className: "max-w-[200px] truncate text-left text-sm font-bold text-rizhao hover:underline",
+            title: file.name,
+            children: file.name
+          }), /*#__PURE__*/_jsx("button", {
+            type: "button",
+            onClick: () => removeReturnVisitAttachment(file.name),
+            className: "text-sm font-bold text-red-600 hover:underline",
+            children: "删除"
+          })]
         }, file.name))]
       }), /*#__PURE__*/_jsxs("div", {
         className: "mt-5 flex justify-end",
@@ -9036,20 +9210,21 @@ function ReturnVisitPage({
       workOrderNo: row.no,
       handler: currentUser.name,
       onClose: () => setShowSendSms(false),
-      onSubmitAudit: rec => {
-        addCommRecord({
-          type: 'sms',
-          time: getCurrentContactTime(),
-          method: '短信',
-          replyPhone: customerPhone,
-          contactResult: '已联系',
-          contactContent: rec.content,
-          recordingFile: '-'
-        });
-        setShowSendSms(false);
+      approvedSmsRows: approvedSmsRows,
+      onSendApprovedSms: item => {
+        setSentSmsIds(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
         showToast('短信已发送并生成联系记录');
       },
-      submitText: "发送"
+      onDeleteApprovedSms: item => {
+        setDeletedSmsIds(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
+        showToast('短信记录已删除');
+      },
+      onSubmitAudit: rec => {
+        onSubmitSmsAudit && onSubmitSmsAudit({ ...rec, returnTo: 'returnVisit' });
+        setShowSendSms(false);
+        showToast('短信已提交审核');
+      },
+      submitText: "提交短信审核"
     }), showBbkRecording && /*#__PURE__*/_jsx(RecordingFileModal, {
       customerPhone: customerPhone,
       onClose: () => setShowBbkRecording(false),
