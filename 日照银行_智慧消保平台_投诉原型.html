@@ -5079,11 +5079,12 @@ const CONTACT_RESULT_OPTIONS = ['已联系', '未联系上', '无需联系'];
 function ContactRecordsTable({
   records = [],
   resultHeader = '联系结果',
-  showInterceptReason = true
+  showInterceptReason = true,
+  onSendSmsRecord
 }) {
   const [fullText, setFullText] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
-  const headers = ['序号', '联系时间', '触达方式', '答复人姓名', '答复群众电话', resultHeader, '短信状态', '附件', '联系内容'].concat(showInterceptReason ? ['拦截原因'] : []);
+  const headers = ['序号', '联系时间', '触达方式', '答复人姓名', '答复群众电话', resultHeader, '短信状态', '附件', '联系内容'].concat(showInterceptReason ? ['拦截原因'] : []).concat(onSendSmsRecord ? ['操作'] : []);
   const renderSmsStatus = status => {
     if (!status) return /*#__PURE__*/_jsx("span", { className: "text-slate-400", children: "-" });
     const colorClass = status === '已审核' || status === '已发送' ? 'bg-green-50 text-green-700' : status === '已拦截' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600';
@@ -5112,9 +5113,9 @@ function ContactRecordsTable({
     });
   };
   return /*#__PURE__*/_jsxs("div", {
-    className: "overflow-hidden rounded-xl border border-slate-200",
+    className: "no-scrollbar overflow-x-auto rounded-xl border border-slate-200",
     children: [/*#__PURE__*/_jsxs("table", {
-      className: "w-full text-left text-sm",
+      className: "min-w-[1480px] w-full text-left text-sm",
       children: [/*#__PURE__*/_jsx("thead", {
         className: "bg-slate-50 text-slate-600",
         children: /*#__PURE__*/_jsx("tr", {
@@ -5163,6 +5164,14 @@ function ContactRecordsTable({
           }), showInterceptReason && /*#__PURE__*/_jsx("td", {
             className: "px-4 py-3",
             children: renderLongText(record.interceptReason, '')
+          }), onSendSmsRecord && /*#__PURE__*/_jsx("td", {
+            className: "px-4 py-3",
+            children: record.canSendSms ? /*#__PURE__*/_jsx("button", {
+              type: "button",
+              onClick: () => onSendSmsRecord(record),
+              className: "whitespace-nowrap rounded-full border border-rizhao bg-white px-3 py-1 text-xs font-black text-rizhao hover:bg-rizhao hover:text-white",
+              children: "发送"
+            }) : /*#__PURE__*/_jsx("span", { className: "text-slate-400", children: "-" })
           })]
         }, `${record.time || 'record'}-${index}`))
       })]
@@ -5329,6 +5338,8 @@ function ProcessingDetail({
     const smsStatus = item.status === '待审核' ? '未联系' : item.status === '已同意' ? '已审核' : item.status === '已拦截' ? '已拦截' : item.status;
     return {
       type: 'sms',
+      auditId: item.id,
+      canSendSms: item.status === '已同意' && !isSent,
       time: item.auditTime || item.applyTime,
       method: '短信',
       handler: item.handler,
@@ -5526,7 +5537,12 @@ function ProcessingDetail({
       title: "联系记录",
       children: /*#__PURE__*/_jsx(ContactRecordsTable, {
         records: displayCommRecords,
-        showInterceptReason: false
+        showInterceptReason: false,
+        onSendSmsRecord: record => {
+          if (!record.auditId) return;
+          setSentSmsIds(prev => prev.includes(record.auditId) ? prev : [...prev, record.auditId]);
+          showToast('短信已发送并生成联系记录');
+        }
       })
     }), /*#__PURE__*/_jsxs(ProcessingInfoSubSection, {
       integrated: true,
@@ -9340,6 +9356,8 @@ function ReturnVisitPage({
     const smsStatus = item.status === '待审核' ? '未联系' : item.status === '已同意' ? '已审核' : item.status === '已拦截' ? '已拦截' : item.status;
     return {
       type: 'sms',
+      auditId: item.id,
+      canSendSms: item.status === '已同意' && !isSent,
       time: item.auditTime || item.applyTime,
       method: '短信',
       handler: item.handler,
@@ -9520,10 +9538,15 @@ function ReturnVisitPage({
           className: "h-12 rounded-xl border border-slate-300 bg-white px-6 text-sm font-black text-slate-700",
           children: "新增回访记录"
         })]
-      }), /*#__PURE__*/_jsx(ContactRecordsTable, {
-        records: displayCommRecords,
-        showInterceptReason: false
-      }), /*#__PURE__*/_jsxs("div", {
+    }), /*#__PURE__*/_jsx(ContactRecordsTable, {
+      records: displayCommRecords,
+      showInterceptReason: false,
+      onSendSmsRecord: record => {
+        if (!record.auditId) return;
+        setSentSmsIds(prev => prev.includes(record.auditId) ? prev : [...prev, record.auditId]);
+        showToast('短信已发送并生成联系记录');
+      }
+    }), /*#__PURE__*/_jsxs("div", {
         className: "grid grid-cols-1 gap-4 xl:grid-cols-2",
         children: [/*#__PURE__*/_jsx(Field, {
           label: "* 回访结论",
