@@ -5095,7 +5095,7 @@ function ContactRecordsTable({
   const headers = ['序号', '联系时间', '触达方式', '答复人姓名', '答复群众电话', resultHeader, '短信状态', '附件', '联系内容'].concat(showInterceptReason ? ['拦截原因'] : []).concat(onSendSmsRecord ? ['操作'] : []);
   const renderSmsStatus = status => {
     if (!status) return /*#__PURE__*/_jsx("span", { className: "text-slate-400", children: "-" });
-    const colorClass = status === '已审核' || status === '已发送' ? 'bg-green-50 text-green-700' : status === '已拦截' ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600';
+    const colorClass = status === '审核通过' ? 'bg-green-50 text-green-700' : status === '审核未通过' ? 'bg-red-50 text-red-600' : status === '待审核' ? 'bg-orange-50 text-rizhao' : 'bg-slate-100 text-slate-600';
     return /*#__PURE__*/_jsx("span", { className: `inline-flex whitespace-nowrap rounded-full px-3 py-1 text-xs font-black ${colorClass}`, children: status });
   };
   const renderLongText = (text, emptyText = '-') => {
@@ -5345,7 +5345,7 @@ function ProcessingDetail({
   const approvedSmsRows = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status === '已同意' && !sentSmsIds.includes(item.id) && !deletedSmsIds.includes(item.id));
   const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && !deletedSmsIds.includes(item.id)).map(item => {
     const isSent = sentSmsIds.includes(item.id);
-    const smsStatus = item.status === '待审核' ? '未联系' : item.status === '已同意' ? '已审核' : item.status === '已拦截' ? '已拦截' : item.status;
+    const smsStatus = item.status === '待审核' ? '待审核' : item.status === '已同意' ? '审核通过' : item.status === '已拦截' ? '审核未通过' : item.status;
     return {
       type: 'sms',
       auditId: item.id,
@@ -5707,7 +5707,7 @@ function ProcessingDetail({
           replyPersonName: rec.handler,
           replyPhone: customerPhone,
           contactResult: '已联系',
-          smsStatus: '已发送',
+          smsStatus: '审核通过',
           contactContent: rec.content,
           recordingFile: '-'
         });
@@ -9373,7 +9373,7 @@ function ReturnVisitPage({
   const approvedSmsRows = smsAuditRows.filter(item => item.workOrderNo === row.no && item.status === '已同意' && !sentSmsIds.includes(item.id) && !deletedSmsIds.includes(item.id));
   const auditedSmsRecords = smsAuditRows.filter(item => item.workOrderNo === row.no && !deletedSmsIds.includes(item.id)).map(item => {
     const isSent = sentSmsIds.includes(item.id);
-    const smsStatus = item.status === '待审核' ? '未联系' : item.status === '已同意' ? '已审核' : item.status === '已拦截' ? '已拦截' : item.status;
+    const smsStatus = item.status === '待审核' ? '待审核' : item.status === '已同意' ? '审核通过' : item.status === '已拦截' ? '审核未通过' : item.status;
     return {
       type: 'sms',
       auditId: item.id,
@@ -9605,27 +9605,27 @@ function ReturnVisitPage({
             children: "删除"
           })]
         }, file.name))]
-      }), /*#__PURE__*/_jsxs("div", {
-        className: "mt-5 flex justify-end gap-3",
-        children: [/*#__PURE__*/_jsx("button", {
-          type: "button",
-          onClick: () => showToast('回访信息已保存'),
-          className: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-700",
-          children: "保存"
-        }), /*#__PURE__*/_jsx("button", {
-          onClick: () => {
-            if (!visitConclusion || !visitResult.trim()) {
-              showToast('请填写回访结论和回访结果');
-              return;
-            }
-            showToast('回访已提交');
-          },
-          className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
-          children: "提交"
-        })]
       })]
     }), /*#__PURE__*/_jsx(FlowRecordSection, {
       records: buildExampleFlowRecords(row, { returnVisitAttachments })
+    }), /*#__PURE__*/_jsxs("div", {
+      className: "flex justify-end gap-3",
+      children: [/*#__PURE__*/_jsx("button", {
+        type: "button",
+        onClick: () => showToast('回访信息已保存'),
+        className: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-700",
+        children: "保存"
+      }), /*#__PURE__*/_jsx("button", {
+        onClick: () => {
+          if (!visitConclusion || !visitResult.trim()) {
+            showToast('请填写回访结论和回访结果');
+            return;
+          }
+          showToast('回访已提交');
+        },
+        className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
+        children: "提交"
+      })]
     }), historyQueryRow && /*#__PURE__*/_jsx(HistoryComplaintModal, {
       row: historyQueryRow,
       onClose: () => setHistoryQueryRow(null)
@@ -9660,7 +9660,7 @@ function ReturnVisitPage({
           replyPersonName: rec.handler,
           replyPhone: customerPhone,
           contactResult: '已联系',
-          smsStatus: '已发送',
+          smsStatus: '审核通过',
           contactContent: rec.content,
           recordingFile: '-'
         });
