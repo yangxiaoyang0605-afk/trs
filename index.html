@@ -5659,6 +5659,11 @@ function ProcessingDetail({
         onClick: () => setShowOrgRecallModal(true),
         className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
         children: "收回"
+      }) : null, showProcessingInputs ? /*#__PURE__*/_jsx("button", {
+        type: "button",
+        onClick: () => showToast('工单处理信息已保存'),
+        className: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-700",
+        children: "保存"
       }) : null]
     }) : !isViewMode && isComplaintHandler && (row.status === '待处理' || row.status === '处理中') ? /*#__PURE__*/_jsxs("div", {
       className: "flex flex-wrap items-center justify-end gap-3",
@@ -5668,6 +5673,11 @@ function ProcessingDetail({
           onClick: () => setShowDelayApply(true),
           className: "rounded-xl border border-orange-300 bg-white px-5 py-3 text-sm font-bold text-orange-600",
           children: "延期申请"
+        }), /*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: () => showToast('工单处理信息已保存'),
+          className: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-700",
+          children: "保存"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => setShowSubmitConfirm(true),
           className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid",
@@ -9596,8 +9606,13 @@ function ReturnVisitPage({
           })]
         }, file.name))]
       }), /*#__PURE__*/_jsxs("div", {
-        className: "mt-5 flex justify-end",
+        className: "mt-5 flex justify-end gap-3",
         children: [/*#__PURE__*/_jsx("button", {
+          type: "button",
+          onClick: () => showToast('回访信息已保存'),
+          className: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-700",
+          children: "保存"
+        }), /*#__PURE__*/_jsx("button", {
           onClick: () => {
             if (!visitConclusion || !visitResult.trim()) {
               showToast('请填写回访结论和回访结果');
