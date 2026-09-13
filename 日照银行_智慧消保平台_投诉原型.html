@@ -4642,10 +4642,10 @@ function RecallApplicationWorkspace() {
   const totalPages = Math.max(1, Math.ceil(visibleRows.length / pageSize));
   const safePage = Math.min(page, totalPages);
   const pageRows = visibleRows.slice((safePage - 1) * pageSize, safePage * pageSize);
-  const heads = tab === '待处理' ? ['工单编号', '工单状态', '处理人', '申请时间', '申请理由', '操作'] : ['工单编号', '工单状态', '处理人', '申请时间', '处理时间', '申请理由', '处理结果'];
+  const heads = tab === '待处理' ? ['工单编号', '工单状态', '处理人', '申请时间', '申请理由', '操作'] : ['工单编号', '工单状态', '处理人', '申请时间', '处理时间', '申请理由', '处理结果', '拒绝理由'];
   const statusClass = status => status === '已收回' ? 'bg-green-50 text-green-700' : status === '不收回' ? 'bg-red-50 text-red-600' : 'bg-orange-50 text-rizhao';
-  const updateRecall = (row, status) => {
-    setRows(list => list.map(item => item.id === row.id ? { ...item, status, auditTime: getCurrentContactTime() } : item));
+  const updateRecall = (row, status, rejectReason = '') => {
+    setRows(list => list.map(item => item.id === row.id ? { ...item, status, auditTime: getCurrentContactTime(), rejectReason } : item));
     setHandleRow(null);
     window.alert(status === '已收回' ? '已收回该工单。' : '已不收回该工单。');
   };
@@ -4680,7 +4680,7 @@ function RecallApplicationWorkspace() {
             className: "divide-y divide-slate-100",
             children: pageRows.length === 0 ? /*#__PURE__*/_jsx("tr", { children: /*#__PURE__*/_jsx("td", { colSpan: heads.length, className: "px-5 py-10 text-center text-slate-400", children: tab === '待处理' ? "暂无待处理收回申请" : "暂无历史记录" }) }) : pageRows.map(row => /*#__PURE__*/_jsxs("tr", {
               className: "align-top hover:bg-slate-50/70",
-              children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4 font-black text-rizhao", children: row.workOrderNo }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: /*#__PURE__*/_jsx("span", { className: `rounded-full px-3 py-1 text-xs font-black ${row.workOrderStatus === '处理中' ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-rizhao'}`, children: row.workOrderStatus || "待处理" }) }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: row.handler }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4 text-slate-500", children: row.applyTime }), tab === '历史记录' ? /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4 text-slate-500", children: row.auditTime || "-" }) : null, /*#__PURE__*/_jsx("td", { className: "max-w-[420px] px-5 py-4 leading-6 text-slate-700", children: row.content }), tab === '历史记录' ? /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: /*#__PURE__*/_jsx("span", { className: `rounded-full px-3 py-1 text-xs font-black ${statusClass(row.status)}`, children: row.status }) }) : /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setHandleRow(row), className: "font-black text-rizhao", children: "处理" }) })]
+              children: [/*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4 font-black text-rizhao", children: row.workOrderNo }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: /*#__PURE__*/_jsx("span", { className: `rounded-full px-3 py-1 text-xs font-black ${row.workOrderStatus === '处理中' ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-rizhao'}`, children: row.workOrderStatus || "待处理" }) }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: row.handler }), /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4 text-slate-500", children: row.applyTime }), tab === '历史记录' ? /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4 text-slate-500", children: row.auditTime || "-" }) : null, /*#__PURE__*/_jsx("td", { className: "max-w-[420px] px-5 py-4 leading-6 text-slate-700", children: row.content }), tab === '历史记录' ? /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: /*#__PURE__*/_jsx("span", { className: `rounded-full px-3 py-1 text-xs font-black ${statusClass(row.status)}`, children: row.status }) }) : /*#__PURE__*/_jsx("td", { className: "whitespace-nowrap px-5 py-4", children: /*#__PURE__*/_jsx("button", { type: "button", onClick: () => setHandleRow(row), className: "font-black text-rizhao", children: "处理" }) }), tab === '历史记录' ? /*#__PURE__*/_jsx("td", { className: "max-w-[240px] px-5 py-4 leading-6 text-slate-600", children: row.status === '不收回' ? row.rejectReason || '-' : '-' }) : null]
             }, row.id))
           })]
         })
@@ -4688,12 +4688,11 @@ function RecallApplicationWorkspace() {
     }), handleRow && /*#__PURE__*/_jsx(RecallApplicationModal, {
       row: handleRow,
       onClose: () => setHandleRow(null),
-      onSave: status => updateRecall(handleRow, status)
+      onSave: (status, reason = '') => updateRecall(handleRow, status, reason)
     })]
   });
 }
 function DelayProcessModal({ row, onClose, onSave }) {
-  const [interceptMode, setInterceptMode] = useState(false);
   const [interceptReason, setInterceptReason] = useState('');
   const fields = [
     ['工单编号', row.workOrderNo],
@@ -4717,7 +4716,7 @@ function DelayProcessModal({ row, onClose, onSave }) {
           className: label === '申请理由' ? "col-span-2 rounded-xl bg-slate-50 p-4" : "rounded-xl bg-slate-50 p-4",
           children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-black text-slate-400", children: label }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-bold leading-6 text-ink", children: value || "-" })]
         }, label))
-      }), interceptMode && /*#__PURE__*/_jsx("div", {
+      }), /*#__PURE__*/_jsx("div", {
         className: "border-t border-slate-100 px-6 py-5",
         children: /*#__PURE__*/_jsx(TextArea, {
           label: "* 拦截原因",
@@ -4729,9 +4728,9 @@ function DelayProcessModal({ row, onClose, onSave }) {
       }), /*#__PURE__*/_jsxs("div", {
         className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-5",
         children: [/*#__PURE__*/_jsx("button", {
-          onClick: interceptMode ? interceptReason.trim() ? () => onSave('已拦截', interceptReason.trim()) : undefined : () => setInterceptMode(true),
-          className: `rounded-xl border px-6 py-3 text-sm font-black ${interceptMode && !interceptReason.trim() ? 'cursor-not-allowed border-slate-200 bg-white text-slate-300' : 'border-slate-300 bg-white text-slate-700'}`,
-          children: interceptMode ? "确认拦截" : "拦截"
+          onClick: interceptReason.trim() ? () => onSave('已拦截', interceptReason.trim()) : undefined,
+          className: `rounded-xl border px-6 py-3 text-sm font-black ${!interceptReason.trim() ? 'cursor-not-allowed border-slate-200 bg-white text-slate-300' : 'border-slate-300 bg-white text-slate-700'}`,
+          children: "拦截"
         }), /*#__PURE__*/_jsx("button", { onClick: () => onSave('已同意'), className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid", children: "同意" })]
       })]
     })
@@ -4780,6 +4779,7 @@ function DelayRejectReasonModal({ row, onClose, onSave }) {
   });
 }
 function RecallApplicationModal({ row, onClose, onSave }) {
+  const [rejectReason, setRejectReason] = useState('');
   const fields = [
     ['工单编号', row.workOrderNo],
     ['工单状态', row.workOrderStatus || '待处理'],
@@ -4808,11 +4808,20 @@ function RecallApplicationModal({ row, onClose, onSave }) {
           className: label === '申请理由' ? "col-span-2 rounded-xl bg-slate-50 p-4" : "rounded-xl bg-slate-50 p-4",
           children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-black text-slate-400", children: label }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-bold leading-6 text-ink", children: value || "-" })]
         }, label))
+      }), /*#__PURE__*/_jsx("div", {
+        className: "border-t border-slate-100 px-6 py-5",
+        children: /*#__PURE__*/_jsx(TextArea, {
+          label: "* 拒绝理由",
+          placeholder: "请输入不收回该工单的理由，200字以内",
+          value: rejectReason,
+          setValue: value => setRejectReason(value.slice(0, 200)),
+          maxLength: 200
+        })
       }), /*#__PURE__*/_jsxs("div", {
         className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-5",
         children: [/*#__PURE__*/_jsx("button", {
-          onClick: () => onSave('不收回'),
-          className: "rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-700",
+          onClick: rejectReason.trim() ? () => onSave('不收回', rejectReason.trim()) : undefined,
+          className: `rounded-xl border px-6 py-3 text-sm font-black ${rejectReason.trim() ? 'border-slate-300 bg-white text-slate-700' : 'cursor-not-allowed border-slate-200 bg-white text-slate-300'}`,
           children: "不收回"
         }), /*#__PURE__*/_jsx("button", {
           onClick: () => onSave('已收回'),
@@ -4986,7 +4995,6 @@ function SmsAuditWorkspace({
   });
 }
 function SmsProcessModal({ row, onClose, onAgree, onIntercept }) {
-  const [interceptMode, setInterceptMode] = useState(false);
   const [interceptReason, setInterceptReason] = useState('');
   const fields = [
     ['工单编号', row.workOrderNo],
@@ -5009,7 +5017,7 @@ function SmsProcessModal({ row, onClose, onAgree, onIntercept }) {
           className: label === '短信内容' ? "col-span-2 rounded-xl bg-slate-50 p-4" : "rounded-xl bg-slate-50 p-4",
           children: [/*#__PURE__*/_jsx("div", { className: "text-xs font-black text-slate-400", children: label }), /*#__PURE__*/_jsx("div", { className: "mt-2 text-sm font-bold leading-6 text-ink", children: value || "-" })]
         }, label))
-      }), interceptMode && /*#__PURE__*/_jsx("div", {
+      }), /*#__PURE__*/_jsx("div", {
         className: "border-t border-slate-100 px-6 py-5",
         children: /*#__PURE__*/_jsx(TextArea, {
           label: "* 拦截原因",
@@ -5021,9 +5029,9 @@ function SmsProcessModal({ row, onClose, onAgree, onIntercept }) {
       }), /*#__PURE__*/_jsxs("div", {
         className: "flex justify-end gap-3 border-t border-slate-100 px-6 py-5",
         children: [/*#__PURE__*/_jsx("button", {
-          onClick: interceptMode ? interceptReason.trim() ? () => onIntercept(interceptReason.trim()) : undefined : () => setInterceptMode(true),
-          className: `rounded-xl border px-6 py-3 text-sm font-black ${interceptMode && !interceptReason.trim() ? 'cursor-not-allowed border-slate-200 bg-white text-slate-300' : 'border-slate-300 bg-white text-slate-700'}`,
-          children: interceptMode ? "确认拦截" : "拦截"
+          onClick: interceptReason.trim() ? () => onIntercept(interceptReason.trim()) : undefined,
+          className: `rounded-xl border px-6 py-3 text-sm font-black ${!interceptReason.trim() ? 'cursor-not-allowed border-slate-200 bg-white text-slate-300' : 'border-slate-300 bg-white text-slate-700'}`,
+          children: "拦截"
         }), /*#__PURE__*/_jsx("button", { onClick: onAgree, className: "rounded-xl bg-rizhao px-6 py-3 text-sm font-black text-white shadow-mid", children: "同意" })]
       })]
     })
@@ -5108,19 +5116,19 @@ function ContactRecordsTable({
       type: "button",
       title: normalizedFile.name,
       onClick: () => previewAttachmentFile(normalizedFile, setPreviewFile),
-      className: "block max-w-[150px] truncate text-left font-bold text-rizhao hover:underline",
+      className: "block w-full truncate text-left font-bold text-rizhao hover:underline",
       children: normalizedFile.name
     });
   };
   return /*#__PURE__*/_jsxs("div", {
-    className: "no-scrollbar overflow-x-auto rounded-xl border border-slate-200",
+    className: "overflow-hidden rounded-xl border border-slate-200",
     children: [/*#__PURE__*/_jsxs("table", {
-      className: "min-w-[1480px] w-full text-left text-sm",
+      className: "w-full table-fixed text-left text-xs",
       children: [/*#__PURE__*/_jsx("thead", {
         className: "bg-slate-50 text-slate-600",
         children: /*#__PURE__*/_jsx("tr", {
-          children: headers.map((head, index) => /*#__PURE__*/_jsx("th", {
-            className: `px-4 py-3 font-bold whitespace-nowrap ${index === 0 ? 'w-[64px]' : index === 1 ? 'w-[150px]' : index === 2 ? 'w-[96px]' : index === 3 ? 'w-[118px]' : index === 4 ? 'w-[138px]' : index === 5 ? 'w-[118px]' : index === 6 ? 'w-[110px]' : index === 7 ? 'w-[150px]' : index === 9 ? 'w-[160px]' : ''}`,
+          children: headers.map(head => /*#__PURE__*/_jsx("th", {
+            className: `px-2 py-3 font-bold ${head === '序号' ? 'w-[4%]' : head === '联系时间' ? 'w-[10%]' : head === '触达方式' ? 'w-[6%]' : head === '答复人姓名' ? 'w-[8%]' : head === '答复群众电话' ? 'w-[9%]' : head === resultHeader ? 'w-[7%]' : head === '短信状态' ? 'w-[7%]' : head === '附件' ? 'w-[10%]' : head === '联系内容' ? 'w-[18%]' : head === '拦截原因' ? 'w-[14%]' : 'w-[7%]'}`,
             children: head
           }, head))
         })
@@ -5135,37 +5143,39 @@ function ContactRecordsTable({
         }) : records.map((record, index) => /*#__PURE__*/_jsxs("tr", {
           className: "align-top hover:bg-slate-50/60",
           children: [/*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 text-slate-500",
+            className: "px-2 py-3 text-slate-500",
             children: record.recordNo || index + 1
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 whitespace-nowrap text-slate-500",
-            children: record.time
+            className: "px-2 py-3 text-slate-500",
+            children: renderLongText(record.time)
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 whitespace-nowrap",
+            className: "px-2 py-3",
             children: record.method || (record.type === 'outbound' ? '外呼' : record.type === 'sms' ? '短信' : '其他')
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 whitespace-nowrap font-bold text-ink",
+            className: "truncate px-2 py-3 font-bold text-ink",
+            title: record.replyPersonName || record.handler || '当前处理人',
             children: record.replyPersonName || record.handler || '当前处理人'
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 whitespace-nowrap",
+            className: "truncate px-2 py-3",
+            title: record.replyPhone || '156****2816',
             children: record.replyPhone || '156****2816'
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 leading-6 text-slate-700",
-            children: record.contactResult || '-'
+            className: "px-2 py-3 leading-5 text-slate-700",
+            children: renderLongText(record.contactResult)
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3",
+            className: "px-2 py-3",
             children: renderSmsStatus(record.smsStatus)
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3 text-slate-600",
+            className: "px-2 py-3 text-slate-600",
             children: renderRecordingFile(record.recordingFile)
           }), /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3",
+            className: "px-2 py-3",
             children: renderLongText(record.contactContent || record.content, '-')
           }), showInterceptReason && /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3",
+            className: "px-2 py-3",
             children: renderLongText(record.interceptReason, '')
           }), onSendSmsRecord && /*#__PURE__*/_jsx("td", {
-            className: "px-4 py-3",
+            className: "px-2 py-3",
             children: record.canSendSms ? /*#__PURE__*/_jsx("button", {
               type: "button",
               onClick: () => onSendSmsRecord(record),
@@ -6144,9 +6154,9 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
         }), /*#__PURE__*/_jsx(Field, {
           label: "短信模板",
           type: "select",
-          options: ['投诉处理联系模板', '回访通知模板', '事项告知模板', '其他'],
+          options: ['投诉处理联系模板', '回访通知模板', '其他'],
           value: smsTemplate,
-          setValue: v => { setSmsTemplate(v); setSmsContent(v === '投诉处理联系模板' ? '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。' : v === '回访通知模板' ? '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。' : v === '事项告知模板' ? '您好，关于您反馈事项的办理情况，我行现向您告知相关进展，请您知悉。' : ''); }
+          setValue: v => { setSmsTemplate(v); setSmsContent(v === '投诉处理联系模板' ? '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。' : v === '回访通知模板' ? '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。' : ''); }
         }), /*#__PURE__*/_jsx(TextArea, {
           label: "短信内容",
           placeholder: "请输入短信内容",
@@ -10638,8 +10648,7 @@ function ParameterizedConfigManager() {
   const [activeKey, setActiveKey] = useState('fieldMaintenance');
   const [notificationTemplateRows, setNotificationTemplateRows] = useState([
     { key: 'smsAcceptTemplate', name: '投诉处理联系模板', desc: '投诉处理过程中联系客户使用的短信模板' },
-    { key: 'smsReturnVisitTemplate', name: '回访通知模板', desc: '投诉处理后回访客户使用的短信模板' },
-    { key: 'smsMatterNoticeTemplate', name: '事项告知模板', desc: '单笔事项办理进展或结果告知客户使用的短信模板' }
+    { key: 'smsReturnVisitTemplate', name: '回访通知模板', desc: '投诉处理后回访客户使用的短信模板' }
   ]);
   const [selectedNotificationKey, setSelectedNotificationKey] = useState('smsAcceptTemplate');
   const toFieldOptions = names => names.map(name => ({ name, status: '启用' }));
@@ -10657,10 +10666,9 @@ function ParameterizedConfigManager() {
     { key: 'gender', name: '性别', module: '客户信息', desc: '投诉人性别下拉项', options: toFieldOptions(['男', '女']) },
     { key: 'complaintDemand', name: '投诉人诉求', module: '投诉信息', desc: '客户期望处理方式下拉项', options: toFieldOptions(['金钱赔偿', '赔礼道歉', '返还财产', '恢复原状', '其他']) },
     { key: 'contactResult', name: '联系结果', module: '处理工单 / 回访记录', desc: '联系与沟通记录中的联系结果下拉项', options: toFieldOptions(['已联系', '未联系上', '无需联系']) },
-    { key: 'smsTemplateConfig', name: '短信模板配置', module: '字典维护', desc: '客户受理、回访和事项告知短信模板', options: [
+    { key: 'smsTemplateConfig', name: '短信模板配置', module: '字典维护', desc: '投诉处理联系和回访通知短信模板', options: [
       { name: '投诉处理联系模板', content: '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。', status: '启用' },
-      { name: '回访通知模板', content: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' },
-      { name: '事项告知模板', content: '您好，关于您反馈事项的办理情况，我行现向您告知相关进展，请您知悉。', status: '启用' }
+      { name: '回访通知模板', content: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' }
     ] },
     { key: 'handleConclusionTemplate', name: '处理结论', module: '处理工单', desc: '工单处理页处理结论下拉项', options: toFieldOptions(['已和客户达成一致', '未达成一致但客户表示理解', '未达成一致']) },
     { key: 'returnVisitConclusionTemplate', name: '回访结论', module: '回访工单', desc: '回访页回访结论下拉项', options: toFieldOptions(['客户认可处理结果', '客户不认可处理结果', '未联系上', '无需回访']) },
@@ -10709,9 +10717,6 @@ function ParameterizedConfigManager() {
     ],
     smsReturnVisitTemplate: [
       { code: 'SMS002', name: '回访通知模板', desc: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' }
-    ],
-    smsMatterNoticeTemplate: [
-      { code: 'SMS003', name: '事项告知模板', desc: '您好，关于您反馈事项的办理情况，我行现向您告知相关进展，请您知悉。', status: '启用' }
     ]
   });
   const [cascadeData, setCascadeData] = useState({
@@ -12669,8 +12674,7 @@ function OrgManager() {
 // ─── 短信模板维护 ─────────────────────────────────────────
 const smsTemplatesData = [
   { id: 1, name: '投诉处理联系模板', content: '您好，关于您反馈的投诉事项，我行正在处理中，感谢您的理解与配合。', status: '启用' },
-  { id: 2, name: '回访通知模板', content: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' },
-  { id: 3, name: '事项告知模板', content: '您好，关于您反馈事项的办理情况，我行现向您告知相关进展，请您知悉。', status: '启用' }
+  { id: 2, name: '回访通知模板', content: '您好，我行近期将就您反馈的问题进行回访，请保持电话畅通。', status: '启用' }
 ];
 
 function SMSTemplateManager() {
