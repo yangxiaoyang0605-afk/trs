@@ -5845,18 +5845,19 @@ function DelayApplyModal({ row, onClose, onSave }) {
 }
 function RecordingFileModal({ customerPhone, defaultReplyPerson = '', onClose, onSave, resultLabel = "* 联系结果", resultOptions = CONTACT_RESULT_OPTIONS, contentLabel = "* 联系内容", contentPlaceholder = "请输入本次电话联系内容、客户反馈或未联系原因", saveText = "保存并生成联系记录" }) {
   const [recordingFile, setRecordingFile] = useState('');
-  const [replyPersonName, setReplyPersonName] = useState(defaultReplyPerson);
-  const [replyTime, setReplyTime] = useState(getCurrentContactTime());
+  const [replyPhone, setReplyPhone] = useState('');
+  const [replyPersonName, setReplyPersonName] = useState('');
+  const [replyTime, setReplyTime] = useState('');
   const [contactResult, setContactResult] = useState('');
   const [contactContent, setContactContent] = useState('');
   const [duration, setDuration] = useState('');
-  const canSave = recordingFile && replyPersonName.trim() && replyTime.trim() && contactResult && contactContent.trim();
+  const canSave = recordingFile && replyPhone.trim() && replyPersonName.trim() && replyTime.trim() && contactResult && contactContent.trim();
   const handleSave = () => {
     if (!canSave) return;
     onSave({
       time: replyTime.trim(),
       method: '电话联系',
-      replyPhone: customerPhone,
+      replyPhone: replyPhone.trim() || '-',
       replyPersonName: replyPersonName.trim(),
       contactResult,
       contactContent: contactContent.trim(),
@@ -5885,23 +5886,24 @@ function RecordingFileModal({ customerPhone, defaultReplyPerson = '', onClose, o
         children: [/*#__PURE__*/_jsxs("div", {
           children: [/*#__PURE__*/_jsx("div", {
             className: "field-label mb-1",
-            children: "答复群众电话"
+            children: "* 答复群众电话"
           }), /*#__PURE__*/_jsx("div", {
             className: "field-box",
             children: /*#__PURE__*/_jsx("input", {
-              value: customerPhone,
-              disabled: true,
-              className: "text-slate-600"
+              value: replyPhone,
+              onChange: event => setReplyPhone(event.target.value),
+              placeholder: "",
+              className: "text-ink"
             })
           })]
         }), /*#__PURE__*/_jsx(Field, {
           label: "* 答复人姓名",
-          placeholder: "请输入答复人姓名",
+          placeholder: "",
           value: replyPersonName,
           setValue: setReplyPersonName
         }), /*#__PURE__*/_jsx(Field, {
           label: "* 联系时间",
-          placeholder: "例如 2026-09-10 14:30",
+          placeholder: "",
           value: replyTime,
           setValue: setReplyTime
         }), /*#__PURE__*/_jsxs("div", {
@@ -6194,9 +6196,9 @@ function SendSmsModal({ customerPhone, workOrderNo, handler, onClose, onSubmitAu
   });
 }
 function NewCommunicationModal({ customerPhone, defaultReplyPerson = '', onClose, onSave, title = "其他沟通方式", resultLabel = "* 联系结果", resultOptions = CONTACT_RESULT_OPTIONS, contentLabel = "* 联系内容", contentPlaceholder = "请输入本次联系的主要内容" }) {
-  const [replyPhone, setReplyPhone] = useState(customerPhone || '');
-  const [replyPersonName, setReplyPersonName] = useState(defaultReplyPerson);
-  const [replyTime, setReplyTime] = useState(getCurrentContactTime());
+  const [replyPhone, setReplyPhone] = useState('');
+  const [replyPersonName, setReplyPersonName] = useState('');
+  const [replyTime, setReplyTime] = useState('');
   const [contactMethod, setContactMethod] = useState('');
   const [contactResult, setContactResult] = useState('');
   const [commContent, setCommContent] = useState('');
@@ -6243,19 +6245,19 @@ function NewCommunicationModal({ customerPhone, defaultReplyPerson = '', onClose
           }), /*#__PURE__*/_jsx("div", {
             className: "field-box",
             children: /*#__PURE__*/_jsx("input", {
-              placeholder: "选填，其他方式可不填电话",
+              placeholder: "",
               value: replyPhone,
               onChange: e => setReplyPhone(e.target.value)
             })
           })]
         }), /*#__PURE__*/_jsx(Field, {
           label: "* 答复人姓名",
-          placeholder: "请输入答复人姓名",
+          placeholder: "",
           value: replyPersonName,
           setValue: setReplyPersonName
         }), /*#__PURE__*/_jsx(Field, {
           label: "* 联系时间",
-          placeholder: "例如 2026-09-10 14:30",
+          placeholder: "",
           value: replyTime,
           setValue: setReplyTime
         }), /*#__PURE__*/_jsx(Field, {
@@ -10598,7 +10600,7 @@ function Field({
         }, option))]
       }) : /*#__PURE__*/_jsx("input", {
         type: type === 'date' ? 'date' : 'text',
-        placeholder: placeholder || '请输入',
+        placeholder: placeholder === undefined ? '请输入' : placeholder,
         value: value !== undefined ? value : undefined,
         onChange: event => setValue && setValue(event.target.value)
       })
