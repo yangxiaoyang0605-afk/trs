@@ -3479,7 +3479,7 @@ function App() {
               }) : mainTab === '延期审批' ? /*#__PURE__*/_jsx(DelayApprovalWorkspace, {
                 rows: delayApprovalRows,
                 setRows: setDelayApprovalRows
-              }) : mainTab === '收回申请' ? /*#__PURE__*/_jsx(RecallApplicationWorkspace, {
+              }) : mainTab === '收回审批' ? /*#__PURE__*/_jsx(RecallApplicationWorkspace, {
               }) : mainTab === '短信审核' ? /*#__PURE__*/_jsx(SmsAuditWorkspace, {
                 rows: smsAuditRows,
                 setRows: setSmsAuditRows,
@@ -3565,7 +3565,7 @@ function Sidebar({
     setExpandedComplaintMenu(current => ({ ...current, [name]: !current[name] }));
   };
   const isPrimaryActive = name => name === '投诉管理'
-    ? ['录入工单', '处理工单', '延期审批', '收回申请', '短信审核', '台账导出', '报表管理', '统计分析'].includes(mainTab)
+    ? ['录入工单', '处理工单', '延期审批', '收回审批', '短信审核', '台账导出', '报表管理', '统计分析'].includes(mainTab)
     : name === '后台管理' ? mainTab === '后台管理' : name === '消保审查' ? mainTab === '消保审查' : mainTab === name;
   return /*#__PURE__*/_jsx("aside", {
     className: "rz-sidebar shrink-0",
@@ -3635,13 +3635,13 @@ function Sidebar({
                 toggleComplaintMenu('申请处理');
                 setMainTab('延期审批');
               },
-              className: `rz-nav-secondary ${['延期审批', '收回申请', '短信审核'].includes(mainTab) ? 'active' : ''}`,
+              className: `rz-nav-secondary ${['延期审批', '收回审批', '短信审核'].includes(mainTab) ? 'active' : ''}`,
               children: "申请处理"
             }), /*#__PURE__*/_jsx("div", {
-              className: `rz-nav-accordion ${expandedComplaintMenu['申请处理'] || ['延期审批', '收回申请', '短信审核'].includes(mainTab) ? 'open' : ''}`,
+              className: `rz-nav-accordion ${expandedComplaintMenu['申请处理'] || ['延期审批', '收回审批', '短信审核'].includes(mainTab) ? 'open' : ''}`,
               children: /*#__PURE__*/_jsx("div", {
                 className: "rz-nav-accordion-inner rz-nav-nested space-y-1",
-                children: ['延期审批', '收回申请', '短信审核'].map(name => /*#__PURE__*/_jsx("button", {
+                children: ['延期审批', '收回审批', '短信审核'].map(name => /*#__PURE__*/_jsx("button", {
                   type: "button",
                   onClick: () => openSubMenu(name),
                   className: `rz-nav-tertiary ${mainTab === name ? 'active' : ''}`,
@@ -4652,12 +4652,12 @@ function RecallApplicationWorkspace() {
   return /*#__PURE__*/_jsxs("div", {
     className: "flex min-h-full flex-col space-y-5",
     children: [/*#__PURE__*/_jsxs("div", {
-      children: [/*#__PURE__*/_jsx("h2", { className: "text-2xl font-black text-ink", children: "收回申请" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm font-bold text-slate-500", children: "处理工单收回申请，可查看申请工单信息并决定收回或不收回。" })]
+      children: [/*#__PURE__*/_jsx("h2", { className: "text-2xl font-black text-ink", children: "收回审批" }), /*#__PURE__*/_jsx("p", { className: "mt-1 text-sm font-bold text-slate-500", children: "审批工单收回申请，可查看申请工单信息并决定收回或不收回。" })]
     }), /*#__PURE__*/_jsxs("section", {
       className: "flex-none overflow-hidden rounded-2xl border border-slate-200 bg-white",
       children: [/*#__PURE__*/_jsxs("div", {
         className: "flex items-center justify-between border-b border-slate-100 px-5 py-4",
-        children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "收回申请列表" }), /*#__PURE__*/_jsxs("div", {
+        children: [/*#__PURE__*/_jsx("div", { className: "text-lg font-black text-ink", children: "收回审批列表" }), /*#__PURE__*/_jsxs("div", {
           className: "flex items-center gap-3",
           children: [/*#__PURE__*/_jsx("div", {
             className: "rounded-2xl bg-slate-100 p-1",
@@ -4795,7 +4795,7 @@ function RecallApplicationModal({ row, onClose, onSave }) {
         className: "flex items-start justify-between gap-4 border-b border-slate-200 bg-gradient-to-r from-mist to-white px-6 py-5",
         children: [/*#__PURE__*/_jsx("div", {
           className: "text-xl font-black text-ink",
-          children: "处理收回申请"
+          children: "处理收回审批"
         }), /*#__PURE__*/_jsx("button", {
           type: "button",
           onClick: onClose,
@@ -7100,7 +7100,7 @@ function buildExampleFlowRecords(row = {}, options = {}) {
     node: '处理',
     operator: '总行消保中心-张派发',
     org: '总行消保中心',
-    action: '收回',
+    action: '收回审批',
     opinion: '同意收回，请核对承办机构后重新派发。',
     attachments: []
   }, {
@@ -7110,6 +7110,22 @@ function buildExampleFlowRecords(row = {}, options = {}) {
     org: '总行消保中心',
     action: '派发',
     opinion: '已核对承办机构，请重新核实处理。',
+    attachments: []
+  }, {
+    time: '2026-07-02 15:20:16',
+    node: '处理',
+    operator: `${handlingOrg}-${handlerName}`,
+    org: handlingOrg,
+    action: '申请延期',
+    opinion: '客户补充材料尚未提供完整，申请延长办理时限。',
+    attachments: []
+  }, {
+    time: '2026-07-02 15:36:42',
+    node: '申请处理',
+    operator: '总行消保中心-张派发',
+    org: '总行消保中心',
+    action: '延期审批',
+    opinion: '同意延期，最新处理时限已更新。',
     attachments: []
   }, {
     time: '2026-07-03 15:48:25',
